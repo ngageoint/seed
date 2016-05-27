@@ -1,0 +1,141 @@
+= Containerized Job Definition Standard Details
+Jonathan Meyer <jon@gisjedi.com>
+v0.0.1, 2016-05-26
+:toc:
+
+== Introduction
+
+The Containerized Job Definition Standard (CJDS) is a general standard to aid in the discovery and consumption of
+discrete units of work contained within a Docker image. While initially developed to support the Scale data processing
+system with job discovery, it is designed to be readily applied to other systems as well.
+
+CJDS compliant images must also be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-cjds` must be used when naming images to enable discovery, prior to Hub or Registry
+push. This requirement may be lifted in future versions of the standard if support is provided for label search by
+Docker Hub and Registry APIs.
+
+=== Examples
+
+Dockerfile snippet containing required labels for CJDS compliance:
+
+----
+FROM centos
+
+LABEL com.cjds.version="0.0.1" \
+      com.cjds.name="watermark-image" \
+      com.cjds.description="Job to add a watermark to an existing image" \
+      com.cjds.system="Scale" \
+      com.cjds.manifest="{...}"
+----
+
+The com.cjds.manifest label should contain the system specific job manifest. The following is a JSON example of the Scale
+job-type manifest and must be serialized as a string-escaped value of the label:
+
+----
+{
+    "version": "1.0",
+    "recipe_types": [],
+    "errors": [],
+    "job_types": [
+        {
+            "name": "my-algorithm",
+            "version": "1.0.0",
+            "title": "My first algorithm",
+            "description": "Reads an HDF5 file and outputs two TIFF images and a CSV",
+            "category": "image-processing",
+            "author_name": "John_Doe",
+            "author_url": "http://www.example.com",
+            "is_operational": true,
+            "icon_code": "f27d",
+            "docker_privileged": true,
+            "docker_image": "10.4.4.10:5000/my_algorithm_1.0.0:dev",
+            "priority": 230,
+            "timeout": 3600,
+            "max_scheduled": null,
+            "max_tries": 3,
+            "cpus_required": 10.0,
+            "mem_required": 10240.0,
+            "disk_out_const_required": 0.0,
+            "disk_out_mult_required": 0.0,
+            "interface": {
+                "output_data": [
+                    {
+                        "media_type": "image/tiff",
+                        "required": true,
+                        "type": "file",
+                        "name": "output_file_tif"
+                    },
+                    {
+                        "media_type": "image/tiff",
+                        "required": true,
+                        "type": "file",
+                        "name": "output_file_tif2"
+                    },
+                    {
+                        "media_type": "text/csv",
+                        "required": true,
+                        "type": "file",
+                        "name": "output_file_csv"
+                    }
+                ],
+                "shared_resources": [],
+                "command_arguments": "${input_file} ${job_output_dir}",
+                "input_data": [
+                    {
+                        "media_types": [
+                            "image/x-hdf5-image"
+                        ],
+                        "required": true,
+                        "type": "file",
+                        "name": "input_file"
+                    }
+                ],
+                "version": "1.0",
+                "command": "/app/my_wrapper.sh"
+            },
+            "error_mapping": {
+                "version": "1.0",
+                "exit_codes": {}
+            },
+            "trigger_rule": null
+        }
+    ]
+}
+----
+
+=== Definitions
+* JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
+http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
+* The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
+
+== Discovery
+A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
+Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
+offerings and the following sections describe the steps that may be taken to access the labels defined by CJSD.
+
+=== Docker Hub
+
+https://hub.docker.com/v2/search/repositories/?query=-cjds
+
+Use https://github.com/CenturyLinkLabs/imagelayers[ImageLayers] /registry/analyze endpoint to extrapolate the Dockerfile
+contents and retrieve label metadata.
+
+=== Docker Trusted Registry
+
+TBD Waiting on forum post response
+
+=== Docker Registry
+
+* Use catalog to find names: http://myreg.org/v2/_catalog
+* Follow with tags query per image matched: http://myreg.org/v2/{image-id}/tags/list
+* Finally use manifests API to retrieve labels per tag (extract labels from history):
+http://myreg.org/v2/{image-id}/manifests/{tag}
+
+== Labels
+
+TODO: Give details on contents and formatting of all CJDS labels
+
+== Manifest
+
+TODO: Give details on manifest usage and explanation of Scale specific use.
