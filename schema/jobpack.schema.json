@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "author_name": {
+        "type": "string"
+      },
+      "author_url": {
+        "type": "string"
+      },
+      "timeout": {
+        "type": "integer"
+      },
+      "cpus_required": {
+        "type": "number"
+      },
+      "mem_required": {
+        "type": "number"
+      },
+      "disk_out_const_required": {
+        "type": "number"
+      },
+      "disk_out_mult_required": {
+        "type": "number"
+      },
+      "interface": {
+        "type": "object",
+        "properties": {
+          "output_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "media_type": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "glob": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_type",
+                "type",
+                "name",
+                "glob"
+              ]
+            }
+          },
+          "command_arguments": {
+            "type": "string"
+          },
+          "input_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "media_types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_types",
+                "required",
+                "type",
+                "name"
+              ]
+            }
+          },
+          "command": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "output_data",
+          "command_arguments",
+          "input_data",
+          "command"
+        ]
+      },
+      "error_mapping": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "ALGORITHM",
+                "DATA",
+                "SYSTEM"
+              ]
+            }
+          },
+          "required": [
+            "code",
+            "name",
+            "title",
+            "description",
+            "category"
+          ]
+        }
+      }
+    },
+    "required": [
+      "name",
+      "version",
+      "title",
+      "description",
+      "author_name",
+      "author_url",
+      "timeout",
+      "cpus_required",
+      "mem_required",
+      "disk_out_const_required",
+      "disk_out_mult_required",
+      "interface",
+      "error_mapping"
+    ]
+  }
+}

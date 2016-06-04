@@ -1,23 +1,20 @@
-= Containerized Job Definition Standard
+= JobPack
 Jonathan Meyer <jon@gisjedi.com>
 v0.0.1, 2016-05-26
 :toc:
 
-The Containerized Job Definition Standard (CJDS) is a general standard to aid in the discovery and consumption of
+JobPack is a general standard to aid in the discovery and consumption of
 discrete units of work contained within a Docker image.
 
-To comply with the CJDS a Docker image must have at a minimum 5 labels:
+To comply with the JobPack standard a Docker image must have at a minimum 2 labels:
 
 ----
-LABEL com.cjds.version="0.0.1"
-LABEL com.cjds.name="watermark-image"
-LABEL com.cjds.description="Job to add a watermark to an existing image"
-LABEL com.cjds.system="Scale"
-LABEL com.cjds.manifest="{...}"
+LABEL com.jobpack.version="0.0.1"
+LABEL com.jobpack.manifest="{...}"
 ----
 
-CJDS compliant images must also be named in a specific fashion due to the lack of label search capability on Docker Hub
-and Registry services. The suffix `-cjds` must be used when naming images to enable discovery, prior to Hub or Registry
+JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
 push.
 
 See the http://detail[full specification] for more detail.

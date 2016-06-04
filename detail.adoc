@@ -1,35 +1,31 @@
-= Containerized Job Definition Standard Details
+= JobPack Details
 Jonathan Meyer <jon@gisjedi.com>
 v0.0.1, 2016-05-26
 :toc:
 
 == Introduction
 
-The Containerized Job Definition Standard (CJDS) is a general standard to aid in the discovery and consumption of
+JobPack is a general standard to aid in the discovery and consumption of
 discrete units of work contained within a Docker image. While initially developed to support the Scale data processing
 system with job discovery, it is designed to be readily applied to other systems as well.
 
-CJDS compliant images must also be named in a specific fashion due to the lack of label search capability on Docker Hub
-and Registry services. The suffix `-cjds` must be used when naming images to enable discovery, prior to Hub or Registry
+JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
 push. This requirement may be lifted in future versions of the standard if support is provided for label search by
 Docker Hub and Registry APIs.
 
 === Examples
 
-Dockerfile snippet containing required labels for CJDS compliance:
+Dockerfile snippet containing required labels for JobPack compliance:
 
 ----
 FROM centos
 
-LABEL com.cjds.version="0.0.1" \
-      com.cjds.name="watermark-image" \
-      com.cjds.description="Job to add a watermark to an existing image" \
-      com.cjds.system="Scale" \
-      com.cjds.manifest="{...}"
+LABEL com.jobpack.version="0.0.1"
+LABEL com.jobpack.manifest="{...}"
 ----
 
-The com.cjds.manifest label should contain the system specific job manifest. The following is a JSON example of the Scale
-job-type manifest and must be serialized as a string-escaped value of the label:
+The com.jobpack.manifest label contents must be serialized as a string-escaped value:
 
 ----
 {
@@ -116,7 +112,7 @@ offerings and the following sections describe the steps that may be taken to acc
 
 === Docker Hub
 
-https://hub.docker.com/v2/search/repositories/?query=-cjds
+https://hub.docker.com/v2/search/repositories/?query=-jobpack
 
 Use https://github.com/CenturyLinkLabs/imagelayers[ImageLayers] /registry/analyze endpoint to extrapolate the Dockerfile
 contents and retrieve label metadata.
@@ -134,7 +130,7 @@ http://myreg.org/v2/{image-id}/manifests/{tag}
 
 == Labels
 
-TODO: Give details on contents and formatting of all CJDS labels
+TODO: Give details on contents and formatting of all JobPack labels
 
 == Manifest
 

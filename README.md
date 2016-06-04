@@ -1,2 +1,2 @@
-# cjds
-Containerized Job Definition Standard
+# JobPack
+JobPack - containerized job package standard
