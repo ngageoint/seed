@@ -17,7 +17,7 @@ JobPack compliant images must be named in a specific fashion due to the lack of 
 and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
 push.
 
-See the http://detail[full specification] for more detail.
+See the link:detail.html[full specification] for more detail.
 
 
 

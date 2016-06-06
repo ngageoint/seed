@@ -19,84 +19,13 @@ Docker Hub and Registry APIs.
 Dockerfile snippet containing required labels for JobPack compliance:
 
 ----
-FROM centos
-
-LABEL com.jobpack.version="0.0.1"
-LABEL com.jobpack.manifest="{...}"
+include::examples/Dockerfile-snippet[]
 ----
 
 The com.jobpack.manifest label contents must be serialized as a string-escaped value:
 
 ----
-{
-    "version": "1.0",
-    "recipe_types": [],
-    "errors": [],
-    "job_types": [
-        {
-            "name": "my-algorithm",
-            "version": "1.0.0",
-            "title": "My first algorithm",
-            "description": "Reads an HDF5 file and outputs two TIFF images and a CSV",
-            "category": "image-processing",
-            "author_name": "John_Doe",
-            "author_url": "http://www.example.com",
-            "is_operational": true,
-            "icon_code": "f27d",
-            "docker_privileged": true,
-            "docker_image": "10.4.4.10:5000/my_algorithm_1.0.0:dev",
-            "priority": 230,
-            "timeout": 3600,
-            "max_scheduled": null,
-            "max_tries": 3,
-            "cpus_required": 10.0,
-            "mem_required": 10240.0,
-            "disk_out_const_required": 0.0,
-            "disk_out_mult_required": 0.0,
-            "interface": {
-                "output_data": [
-                    {
-                        "media_type": "image/tiff",
-                        "required": true,
-                        "type": "file",
-                        "name": "output_file_tif"
-                    },
-                    {
-                        "media_type": "image/tiff",
-                        "required": true,
-                        "type": "file",
-                        "name": "output_file_tif2"
-                    },
-                    {
-                        "media_type": "text/csv",
-                        "required": true,
-                        "type": "file",
-                        "name": "output_file_csv"
-                    }
-                ],
-                "shared_resources": [],
-                "command_arguments": "${input_file} ${job_output_dir}",
-                "input_data": [
-                    {
-                        "media_types": [
-                            "image/x-hdf5-image"
-                        ],
-                        "required": true,
-                        "type": "file",
-                        "name": "input_file"
-                    }
-                ],
-                "version": "1.0",
-                "command": "/app/my_wrapper.sh"
-            },
-            "error_mapping": {
-                "version": "1.0",
-                "exit_codes": {}
-            },
-            "trigger_rule": null
-        }
-    ]
-}
+include::examples/jobpack-full.json[]
 ----
 
 === Definitions

@@ -1,0 +1,4 @@
+FROM centos
+
+LABEL com.jobpack.version="0.0.1"
+LABEL com.jobpack.manifest="{...}"
