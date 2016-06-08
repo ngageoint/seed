@@ -75,19 +75,19 @@ The following annotated snippet provides quick reference to the use of Job objec
   "errorMapping": [ ... ] <12>
 }
 ----
-<1> Required job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique
+<1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique
 system-wide.
-<2> Required job version identifier in SemVer format. `name` and `version` members combined should be unique system-wide.
-<3> Required short job title.
-<4> Required job abstract. Inline markup should be avoided, but not prohibited.
-<5> Required job author name or organization.
-<6> Optional URL to job website.
-<7> Required job timeout value in seconds.
-<8> Required CPU needs of job. Whole or fractional values allowed.
-<9> Required memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<2> Required string containing job version identifier in SemVer format. `name` and `version` members combined should be unique system-wide.
+<3> Required string containing short job title.
+<4> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
+<5> Required string containing job author name or organization.
+<6> Optional string containing URL to job website.
+<7> Required integer containing job timeout value in seconds.
+<8> Required number containing CPU needs of job. Whole or fractional values allowed.
+<9> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
 <10> Optional storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
 <11> Required [[interface-section]].
-<12> Optional [[errormapping-section]].
+<12> Optional array of [[errormapping-section]].
 
 [[interface-section, Interface Object]]
 ===== Interface Object
@@ -117,9 +117,54 @@ array size.
 
 [[inputdata-section, InputData Objects]]
 ====== InputData Objects
+The InputData object is the member responsible for indicating all mutable content available to the JobPack image at
+runtime.
+
+* The InputData object MUST have a member `name`. The member's value MUST be a string indicating the environment
+variable name that will be injected by the processing platform for job consumption.
+* The InputData object MUST have a member `type`. The member's value MUST be a string containing either `file` or `json`
+as the value. This value SHALL determine whether the value is directly injected or a reference to a file is given.
+* The InputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
+value MAY always be expected. If omitted, the default value MUST be treated as true.
+* The InputData object MUST have a member `content`. The member's value MUST be an object containing at minimum a member
+`mediaType` with a value of string elements for `type` of `file` or a member of `type` when `type` is `json`. These
+elements MUST be used by the processing system to validate file input.
+
+The following annotated snippet provides quick reference to the use of InputData Objects:
+
+----
+[
+  {
+    "name": "INPUT_FILE", <1>
+    "type": "file", <2>
+    "required": true, <3>
+    "content": {
+      "mediaType": [ "image/x-hdf5-image" ] <4>
+    }
+  },
+  {
+    "name": "INPUT_STRING",
+    "type": "json", <5>
+    "required": false,
+    "content": {
+      "type": "string" <6>
+    }
+  }
+]
+----
+<1> Required string containing name used to inject data via environment variables.
+<2> Required string containing type differentiation between `file` and `json`. For member `type` set to `file` content
+member object must contain a `mediaType` member identifying the accepted MIME types.
+<3> Optional boolean indicating whether this job can be successfully executed without this particular value or file.
+Default is `true`.
+<4> Required array containing a list of accepted MIME types for `file` input.
+<5> Required string containing type differentiation between `file` and `json`. For member `type` set to `json` content
+member object must contain a `type` member identifying a valid JSON schema type.
+<6> Required string containing a valid JSON schema type for `json` input.
 
 [[outputdata-section, OutputData Objects]]
 ====== OutputData Objects
+
 
 [[errormapping-section, ErrorMapping Objects]]
 ===== ErrorMapping Objects
