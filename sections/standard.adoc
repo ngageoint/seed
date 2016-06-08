@@ -99,6 +99,12 @@ absolute path to the job executable within the Docker image.
 * The Interface object MUST have a member with the name `args`. The member's value MUST be a string specifying the
 complete parameter string passed to the executable defined in `cmd` member. Based on the Linux shell, shell escaping
 of special characters MAY be required.
+* The Interface object MUST have a member with the name `inputData`. The member's value is an array of `InputData`
+objects (see [[inputdata-section]]) and MUST contain at least 1 element. There is no other standard restriction on the
+array size.
+* The Interface object MUST have a member with the name `outputData`. The member's value is an array of `OutputData`
+objects (see [[inputdata-section]]) and MUST contain at least 1 element. There is no other standard restriction on the
+array size.
 
 ----
 {
