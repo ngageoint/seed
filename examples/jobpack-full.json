@@ -1,75 +1,86 @@
-[
-  {
-    "name": "my-algorithm",
-    "version": "1.0.0",
-    "title": "My first algorithm",
-    "description": "Reads an HDF5 file and outputs two TIFF images and a CSV",
-    "author_name": "John_Doe",
-    "author_url": "http://www.example.com",
-    "timeout": 3600,
-    "cpus_required": 10.0,
-    "mem_required": 10240.0,
-    "disk_out_const_required": 0.0,
-    "disk_out_mult_required": 0.0,
-    "interface": {
-      "output_data": [
+{
+  "manifestVersion": "0.0.1",
+  "jobs":
+  [
+    {
+      "name": "my-algorithm",
+      "version": "1.0.0",
+      "title": "My first algorithm",
+      "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
+      "authorName": "John Doe",
+      "authorUrl": "http://www.example.com",
+      "timeout": 3600,
+      "cpus": 10.0,
+      "mem": 10240.0,
+      "storage": 0.0,
+      "interface": {
+        "cmd": "/app/job.sh",
+        "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+        "inputData": [
+          {
+            "name": "INPUT_FILE",
+            "type": "file",
+            "required": true,
+            "content": {
+              "mediaType": [ "image/x-hdf5-image" ]
+            }
+          }
+        ],
+        "outputData": [
+          {
+            "runtimeStorage": 0.0,
+            "name": "output_file_tiffs",
+            "type": "file",
+            "required": true,
+            "content": {
+              "mediaType": "image/tiff",
+              "multiple": true,
+              "spatialMetadata": true,
+              "temporalMetadata": true,
+              "pattern": "outfile*.tif"
+            }
+          },
+          {
+            "name": "output_file_csv",
+            "type": "file",
+            "required": true,
+            "content": {
+              "mediaType": "text/csv",
+              "multiple": false,
+              "pattern": "outfile*.csv"
+            }
+          },
+          {
+            "name": "cell_count",
+            "type": "json",
+            "required": true,
+            "content": {
+              "key": "cell_count",
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "errorMapping": [
         {
-          "media_type": "image/tiff",
-          "required": true,
-          "type": "file",
-          "name": "output_file_tif",
-          "glob": "outfile1*.tif"
+          "code": 1,
+          "title": "Error Name",
+          "description": "Error Description",
+          "category": "SYSTEM"
         },
         {
-          "media_type": "image/tiff",
-          "required": true,
-          "type": "file",
-          "name": "output_file_tif2",
-          "glob": "outfile2*.tif"
+          "code": 2,
+          "title": "Error Name",
+          "description": "Error Description",
+          "category": "DATA"
         },
         {
-          "media_type": "text/csv",
-          "required": true,
-          "type": "file",
-          "name": "output_file_csv",
-          "glob": "outfile*.csv"
+          "code": 3,
+          "title": "Error Name",
+          "description": "Error Description",
+          "category": "ALGORITHM"
         }
-      ],
-      "command_arguments": "${input_file} ${job_output_dir}",
-      "input_data": [
-        {
-          "media_types": [
-            "image/x-hdf5-image"
-          ],
-          "required": true,
-          "type": "file",
-          "name": "input_file"
-        }
-      ],
-      "command": "/app/my_wrapper.sh"
-    },
-    "error_mapping": [
-      {
-        "code": 1,
-        "name": "ErrorName",
-        "title": "Error Title",
-        "description": "Error Description",
-        "category": "SYSTEM"
-      },
-      {
-        "code": 2,
-        "name": "ErrorName",
-        "title": "Error Title",
-        "description": "Error Description",
-        "category": "DATA"
-      },
-      {
-        "code": 3,
-        "name": "ErrorName",
-        "title": "Error Title",
-        "description": "Error Description",
-        "category": "ALGORITHM"
-      }
-    ]
-  }
-]
+      ]
+    }
+  ]
+}

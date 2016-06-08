@@ -1,7 +1,7 @@
-= JobPack Details
+= JobPack Standard Definition
 Jonathan Meyer <jon@gisjedi.com>
 v0.0.1, 2016-05-26
-:toc:
+:toc: left
 
 == Introduction
 
@@ -10,19 +10,20 @@ discrete units of work contained within a Docker image. While initially develope
 system with job discovery, it is designed to be readily applied to other systems as well.
 
 JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
-and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
-push. This requirement may be lifted in future versions of the standard if support is provided for label search by
-Docker Hub and Registry APIs.
+and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or
+Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
+services.
 
 === Examples
 
-Dockerfile snippet containing required labels for JobPack compliance:
+Dockerfile snippet containing required label for JobPack compliance:
 
 ----
 include::examples/Dockerfile-snippet[]
 ----
 
-The com.jobpack.manifest label contents must be serialized as a string-escaped value:
+The com.jobpack.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
+example including required and optional keys:
 
 ----
 include::examples/jobpack-full.json[]
@@ -31,8 +32,37 @@ include::examples/jobpack-full.json[]
 === Definitions
 * JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
 http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
+* Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
+http://semver.org/spec/v2.0.0.html
 * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
+
+== Standard
+The JobPack standard is intended to provide a complete definition of the runtime processing, memory and storage
+requirements of one or more discrete units of work, in addition to the inputs, outputs and potential errors produced.
+Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
+REQUIRED properties. The following sections detail every possible REQUIRED and OPTIONAL manifest property in both root
+and child objects.
+
+=== JobPack Objects
+The JobPack object is the root JSON object that is placed within a com.jobpack.manifest Docker image label. At a minimum
+this object MUST define the `manifestVersion` and `jobs` names.
+
+* The JobPack object must have a member with the name `manifestVersion`. The member's value MUST be a string that
+conforms to the SemVer standard.
+* The JobPack object must have a member with the name `jobs`. The member's value is an array of `Job` objects and MUST
+contain at least 1 element. There is no other standard restriction on the array size.
+* The JobPack object may have any number of additional members.
+
+==== Job Objects
+
+===== Interface Objects
+
+====== InputData Objects
+
+====== OutputData Objects
+
+===== ErrorMapping Objects
 
 == Discovery
 A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,

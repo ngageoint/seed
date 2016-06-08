@@ -6,18 +6,19 @@ v0.0.1, 2016-05-26
 JobPack is a general standard to aid in the discovery and consumption of
 discrete units of work contained within a Docker image.
 
-To comply with the JobPack standard a Docker image must have at a minimum 2 labels:
+To comply with the JobPack standard a Docker image must have a single label used for discovery. This can be applied
+with the following Dockerfile snippet:
 
 ----
-LABEL com.jobpack.version="0.0.1"
-LABEL com.jobpack.manifest="{...}"
+include::examples/Dockerfile-snippet[]
 ----
+
 
 JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
-push.
+push. This requirement will be deprecated as label search support is standardized across Docker registry services.
 
-See the link:detail.html[full specification] for more detail.
+See the link:detail.html[full specification] for complete detail on manifest format.
 
 
 
