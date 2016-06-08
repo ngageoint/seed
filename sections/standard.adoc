@@ -22,7 +22,7 @@ contain at least 1 element. There is no other standard restriction on the array 
 
 ----
 {
-  "manifestVersion": "0.0.1",
+  "manifestVersion": "0.0",
   "jobs": [...]
 }
 ----
@@ -56,6 +56,7 @@ ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the de
 `Interface`.
 * The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
 elements defined in [[errormapping-section]]
+* The Job object MAY have any number of additional members.
 
 The following annotated snippet provides quick reference to the use of Job object:
 

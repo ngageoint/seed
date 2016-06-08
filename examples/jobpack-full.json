@@ -28,15 +28,12 @@
         ],
         "outputData": [
           {
-            "runtimeStorage": 0.0,
             "name": "output_file_tiffs",
             "type": "file",
             "required": true,
             "content": {
               "mediaType": "image/tiff",
-              "multiple": true,
-              "spatialMetadata": true,
-              "temporalMetadata": true,
+              "count": "1",
               "pattern": "outfile*.tif"
             }
           },
