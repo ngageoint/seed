@@ -86,8 +86,8 @@ system-wide.
 <8> Required number containing CPU needs of job. Whole or fractional values allowed.
 <9> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
 <10> Optional storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<11> Required [[interface-section]].
-<12> Optional array of [[errormapping-section]].
+<11> Required <<interface-section>>.
+<12> Optional array of <<errormapping-section>>.
 
 [[interface-section, Interface Object]]
 ===== Interface Object
@@ -100,10 +100,10 @@ absolute path to the job executable within the Docker image.
 complete parameter string passed to the executable defined in `cmd` member. Based on the Linux shell, shell escaping
 of special characters MAY be required.
 * The Interface object MUST have a member with the name `inputData`. The member's value is an array of `InputData`
-objects (see [[inputdata-section]]) and MUST contain at least 1 element. There is no other standard restriction on the
+objects (see <<inputdata-section>>) and MUST contain at least 1 element. There is no other standard restriction on the
 array size.
 * The Interface object MUST have a member with the name `outputData`. The member's value is an array of `OutputData`
-objects (see [[inputdata-section]]) and MUST contain at least 1 element. There is no other standard restriction on the
+objects (see <<inputdata-section>>) and MUST contain at least 1 element. There is no other standard restriction on the
 array size.
 
 ----
@@ -164,6 +164,9 @@ member object must contain a `type` member identifying a valid JSON schema type.
 
 [[outputdata-section, OutputData Objects]]
 ====== OutputData Objects
+The OutputData object is the member responsible for indicating all output data and the means to capture that data
+following the execution of a JobPack image. Data can be gathered in two different forms: directly from a file or
+extracted as JSON from a manifest.
 
 
 [[errormapping-section, ErrorMapping Objects]]
