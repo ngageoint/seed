@@ -2,6 +2,9 @@
 Jonathan Meyer <jon@gisjedi.com>
 v0.0.1, 2016-05-26
 :toc: left
+:toclevels: 4
+:sectlinks:
+:sectnums:
 
 == Introduction
 
@@ -38,102 +41,20 @@ http://semver.org/spec/v2.0.0.html
 "OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
 
 == Standard
-The JobPack standard is intended to provide a complete definition of the runtime processing, memory and storage
-requirements of one or more discrete units of work, in addition to the inputs, outputs and potential errors produced.
-Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
-REQUIRED properties. The following sections detail every possible REQUIRED and OPTIONAL manifest property in both root
-and child objects.
+include::sections/standard.adoc[]
 
-A complete JobPack object contained within a com.jobpack.manifest label is always a serialized object (in JSON terms).
-In JobPack, an object consists of a collection of name/value pairs -- also called members. For each member, the name is
-always a string. Member values are either a string, number, object, array or one of the literals: true, false, and null.
-An array consists of elements where each element is a value as described above.
+== Usage
+A few requirements must be satisfied when constructing a system capable of executing JobPack standardized images. These
+are outlined below:
 
-=== JobPack Object
-The JobPack object is the root JSON object that MUST be placed within a com.jobpack.manifest Docker image label. At a
-minimum this object MUST define the `manifestVersion` and `jobs` names.
-
-* The JobPack object MUST have a member with the name `manifestVersion`. The member's value MUST be a string that
-conforms to the SemVer standard.
-* The JobPack object MUST have a member with the name `jobs`. The member's value is an array of `Job` objects and MUST
-contain at least 1 element. There is no other standard restriction on the array size.
-* The JobPack object MAY have any number of additional members.
-
-----
-{
-  "manifestVersion": "0.0.1",
-  "jobs": [...]
-}
-----
-
-==== Job Objects
-The Job object is the core component that describes a single unit of work and the resources it requires.
-
-* The Job object MUST have a member with the name `name`. The member's value MUST be a string of only lowercase
-alpha-numeric, dash or underscore characters (defined by the regex `[a-z0-9_-]+`).
-* The Job object MUST have a member with the name `version`. The member's value MUST be a string that conforms to the
-SemVer standard.
-* The Job object MUST have a member with the name `title`. The member's value MUST be a string and SHOULD contain a
-short descriptive title of the job.
-* The Job object MUST have a member with the name `description`. The member's value MUST be a string and SHOULD contain
-a full job abstract.
-* The Job object MUST have a member with the name `authorName`. The member's value MUST be a string and SHOULD contain
-the authoring individual or organization.
-* The Job object MAY have a member with the name `authorUrl`. The member's value MUST be a string and SHOULD contain a
-publicly accessible URL with further job detail.
-* The Job object MUST have a member with the name `timeout`. This member's values MUST be a integer indicating a timeout
-period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
-* The Job object MUST have a member with the name `cpus`. This member's value MUST be a number indicating the whole or
-fractional CPUs allocated for the job.
-* The Job object MUST have a member with the name `mem`. This member's value MUST be a number indicating the memory
-requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate allocations below 1 MiB.
-* The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
-ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the default of 0.0 may be assumed.
-* The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
-[[Interface Object]]
-`Interface`.
-* The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an object as defined by
-`ErrorMapping`
-
-The following annotated snippet provides quick reference to the use of Job object:
-
-----
-{
-  "name": "my-algorithm", <1>
-  "version": "1.0.0", <2>
-  "title": "My first algorithm", <3>
-  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", <4>
-  "authorName": "John Doe", <5>
-  "authorUrl": "http://www.example.com", <6>
-  "timeout": 3600, <7>
-  "cpus": 10.0, <8>
-  "mem": 10240.0, <9>
-  "storage": 0.0, <10>
-  "interface": { ...  }, <11>
-  "errorMapping": [ ... ] <12>
-}
-----
-<1> Required job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique system-wide.
-<2> Required job version identifier in SemVer format. `name` and `version` members combined should be unique system-wide.
-<3> Required short job title.
-<4> Required job abstract. Inline markup should be avoided, but not prohibited.
-<5> Required job author name or organization.
-<6> Optional URL to job website.
-<7> Required job timeout value in seconds.
-<8> Required CPU needs of job. Whole or fractional values allowed.
-<9> Required memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<10> Optional storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<11> Required [[Interface Object]].
-<12> Optional [[ErrorMapping Object]].
-
-
-===== Interface Object
-
-====== InputData Objects
-
-====== OutputData Objects
-
-===== ErrorMapping Object
+* Environment variable injection must be performed. May be consumed by job directly as environment variables or shell
+variable expansion may be leveraged in the `interface.args` member. The following minimum variables MUST be provided:
+** JOB_OUTPUT_DIR: Root path job must place all products that should be captured as output.
+** ALLOCATED_CPUS: Value of `cpus` member.
+** ALLOCATED_MEM: Value of `mem` member.
+** ALLOCATED_STORAGE: Value of `storage` member.
+** All `name` member values of `interface.inputData` elements: Indicate the absolute path of input files. Environment
+variable name case MUST map exactly from `name` value.
 
 == Discovery
 A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
