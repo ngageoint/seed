@@ -40,6 +40,8 @@ SemVer standard.
 short descriptive title of the job.
 * The Job object MUST have a member with the name `description`. The member's value MUST be a string and SHOULD contain
 a full job abstract.
+* The Job object MAY have a member with the name `tag`. The member's value MUST be an array of strings and MAY contain
+any number of elements.
 * The Job object MUST have a member with the name `authorName`. The member's value MUST be a string and SHOULD contain
 the authoring individual or organization.
 * The Job object MAY have a member with the name `authorUrl`. The member's value MUST be a string and SHOULD contain a
@@ -99,25 +101,31 @@ outputs defined for a job.
 
 * The Interface object MUST have a member with the name `cmd`. The member's value MUST be a string specifying the
 absolute path to the job executable within the Docker image.
-* The Interface object MUST have a member with the name `args`. The member's value MUST be a string specifying the
+* The Interface object MAY have a member with the name `args`. The member's value MUST be a string specifying the
 complete parameter string passed to the executable defined in `cmd` member. Based on the Linux shell, shell escaping
 of special characters MAY be required.
-* The Interface object MUST have a member with the name `inputData`. The member's value is an array of `InputData`
-objects (see <<inputdata-section>>) and MUST contain at least 1 element. There is no other standard restriction on the
-array size.
-* The Interface object MUST have a member with the name `outputData`. The member's value is an array of `OutputData`
-objects (see <<inputdata-section>>) and MUST contain at least 1 element. There is no other standard restriction on the
-array size.
+* The Interface object MAY have a member with the name `inputData`. The member's value is an array of `InputData`
+objects (see <<inputdata-section>>) and MAY contain any number of elements.
+* The Interface object MAY have a member with the name `outputData`. The member's value is an array of `OutputData`
+objects (see <<inputdata-section>>) and MAY contain any number of elements. There is no other standard restriction on
+the array size.
+
+The following annotated snippet provides quick reference to the use of Interface object:
 
 [source,javascript]
 ----
 {
-  "cmd": "/app/job.sh",
-  "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
-  "inputData": [ { "name": "INPUT_FILE", ... }, ... ],
-  "outputData": [ ... ]
+  "cmd": "/app/job.sh", // <1>
+  "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
+  "inputData": [ { "name": "INPUT_FILE", ... }, ... ], // <3>
+  "outputData": [ ... ] <4>
 }
 ----
+<1> Required string indicating the job executable. It should be an absolute path for clarity.
+<2> Optional string indicating the job arguments. Shell expansion may be used to inject existing environment variables
+and executable arguments. Linux shell escaping may be needed in the case of special characters.
+<3> Optional array of InputData objects. This is the means to inject external data into the job container.
+<4> Optional array of OutputData objects. This is the means to capture results from the job container.
 
 [[inputdata-section, InputData Objects]]
 ====== InputData Objects
@@ -134,7 +142,7 @@ value SHOULD always be expected. If omitted, the default value MUST be treated a
 `mediaType` with a value of string elements for `type` of `FILE` or a member of `type` when `type` is `JSON`. These
 elements MUST be used by the processing system to validate file input.
 
-The following annotated snippet provides quick reference to the use of InputData Object:
+The following annotated snippet provides quick reference to the use of InputData object:
 
 [source,javascript]
 ----
@@ -191,13 +199,13 @@ the file being captured by OutputData.
 *** The Content object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the 
 capture of files.
 *** The Content object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
-positive numeric values or a `\*`. Numeric values indicate an explicit match expected for `pattern` while `\*` indicates
+positive numeric values or a `\*`. Numeric values indicate an explicit match expected for `pattern` while `*` indicates
 1 or more matched.
 ** The Content object for OutputData objects with member `type` of value `JSON` MUST follow the following format:
 *** The Content object MUST have a member `type`. The member's value MUST indicate the JSON schema type of the member
 being captured by OutputData from the result manifest.
 
-The following annotated snippet provides quick reference to the use of OutputData Object:
+The following annotated snippet provides quick reference to the use of OutputData object:
 
 [source,javascript]
 ----
@@ -228,7 +236,7 @@ The following annotated snippet provides quick reference to the use of OutputDat
 is true.
 <4> Required string (only for `file` type) containing IANA MIME type on `file` type output.
 <5> Optional string (only for `file` type) containing either a numeric count or `\*` for unbounded output. Default value
-is `"1"`.
+is `1`.
 <6> Required string (only for `file` type) containing glob expression for file capture. Processing system is expected to
 capture output relative to JOB_OUTPUT_DIR.
 <7> Required string containing output identifier. MUST be used by processing framework to match member for capture from
@@ -238,3 +246,33 @@ result manifest.
 
 [[errormapping-section, ErrorMapping Objects]]
 ===== ErrorMapping Objects
+The ErrorMapping objects allow for job developers to map arbitrary exit codes to meaningful textual descriptions. This
+is useful in passing information to the processing system to differentiate between data and algorithm errors.
+
+* The ErrorMapping object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
+the executing job process.
+* The ErrorMapping object MUST have a member `title`. The member's value MUST be a string indicating the short
+descriptive title of the error.
+* The ErrorMapping object MAY have a member `description`. The member's value MUST be a string indicating the complete
+error description and possible causes.
+* The ErrorMapping object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
+MUST be a string containing one of the following values: `algorithm`, `data` or `system`.
+
+The following annotated snippet provides quick reference to the use of ErrorMapping objects:
+
+[source,javascript]
+----
+[
+  {
+    "code": 1, // <1>
+    "title": "Error Name", // <2>
+    "description": "Error Description", // <3>
+    "category": "system" // <4>
+  }
+]
+----
+<1> Required integer indicating job process exit code.
+<2> Required string containing human-friendly short name of error.
+<3> Optional string containing complete error code description.
+<4> Optional string containing the error type. This value MUST be either: `algorithm`, `data` or `system`. The default
+value is `algorithm`.
