@@ -19,7 +19,7 @@ and Registry services. The suffix `-jobpack` must be used when naming images to 
 Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
 services.
 
-=== Examples
+=== Format
 
 Dockerfile snippet containing required label for JobPack compliance:
 
@@ -46,7 +46,9 @@ http://semver.org/spec/v2.0.0.html
 include::sections/standard.adoc[]
 
 == Usage
-A few requirements must be satisfied when constructing a system capable of executing JobPack standardized images. These
+
+=== Implementing
+A few requirements must be satisfied when implementing a system capable of executing JobPack standardized images. These
 are outlined below:
 
 * Environment variable injection must be performed. May be consumed by job directly as environment variables or shell
@@ -57,6 +59,43 @@ variable expansion may be leveraged in the `interface.args` member. The followin
 ** ALLOCATED_STORAGE: Value of `storage` member.
 ** All `name` member values of `interface.inputData` elements: Indicate the absolute path of input files. Environment
 variable name case MUST map exactly from `name` value.
+
+=== Examples
+The JobPack standard is intended to support both simple and complex job packaging. To that end the standard allows for
+sensible defaults to take the place of a fully specified manifest. The following examples identify both a minimal
+JobPack use and a more realistic, fully exercised standard.
+
+==== Random Number Generator Job
+Minimal manifest demonstrating the simplest possible JobPack definition.
+
+----
+{
+  "manifestVersion": "0.0.1",
+  "jobs":
+  [
+    {
+      "name": "random-number-gen",
+      "version": "0.1.0",
+      "title": "Random Number Generator",
+      "description": "Generates a random number and outputs on stdout",
+      "authorName": "John Doe",
+      "timeout": 10,
+      "cpus": 0.1,
+      "mem": 1.0,
+      "interface": {
+        "cmd": "/app/job.sh",
+      }
+    }
+  ]
+}
+----
+
+Serialized as a label in a Dockerfile snippet:
+----
+LABEL com.jobpack.manifest="{\"manifestVersion\":\"0.0.1\",\"jobs\":[{\"name\":\"random-number-gen\",\"version\":\"0.1.0
+\",\"title\":\"Random Number Generator\",\"description\":\"Generates a random number and outputs on stdout\",
+\"authorName\":\"John Doe\",\"timeout\":10,\"cpus\":0.1,\"mem\":1.0,\"interface\":{\"cmd\":\"/app/job.sh\",}}]}"
+----
 
 == Discovery
 A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
