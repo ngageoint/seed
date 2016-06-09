@@ -7,6 +7,7 @@
       "version": "1.0.0",
       "title": "My first algorithm",
       "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
+      "tag": ["hdf5", "tiff", "csv", "image processing"],
       "authorName": "John Doe",
       "authorUrl": "http://www.example.com",
       "timeout": 3600,
