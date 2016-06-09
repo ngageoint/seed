@@ -20,10 +20,11 @@ conforms to the SemVer standard.
 contain at least 1 element. There is no other standard restriction on the array size.
 * The JobPack object MAY have any number of additional members.
 
+[source,javascript]
 ----
 {
-  "manifestVersion": "0.0",
-  "jobs": [...]
+  "manifestVersion": "0.0.1",
+  "jobs": [ ... ]
 }
 ----
 
@@ -60,20 +61,21 @@ elements defined in [[errormapping-section]]
 
 The following annotated snippet provides quick reference to the use of Job object:
 
+[source,javascript]
 ----
 {
-  "name": "my-algorithm", <1>
-  "version": "1.0.0", <2>
-  "title": "My first algorithm", <3>
-  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", <4>
-  "authorName": "John Doe", <5>
-  "authorUrl": "http://www.example.com", <6>
-  "timeout": 3600, <7>
-  "cpus": 10.0, <8>
-  "mem": 10240.0, <9>
-  "storage": 0.0, <10>
-  "interface": { ...  }, <11>
-  "errorMapping": [ ... ] <12>
+  "name": "my-algorithm",// <1>
+  "version": "1.0.0",// <2>
+  "title": "My first algorithm",// <3>
+  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",// <4>
+  "authorName": "John Doe",// <5>
+  "authorUrl": "http://www.example.com",// <6>
+  "timeout": 3600,// <7>
+  "cpus": 10.0,// <8>
+  "mem": 10240.0,// <9>
+  "storage": 0.0,// <10>
+  "interface": { ...  },// <11>
+  "errorMapping": [ ... ]// <12>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique
@@ -107,6 +109,7 @@ array size.
 objects (see <<inputdata-section>>) and MUST contain at least 1 element. There is no other standard restriction on the
 array size.
 
+[source,javascript]
 ----
 {
   "cmd": "/app/job.sh",
@@ -126,29 +129,30 @@ variable name that will be injected by the processing platform for job consumpti
 * The InputData object MUST have a member `type`. The member's value MUST be a string containing either `file` or `json`
 as the value. This value SHALL determine whether the value is directly injected or a reference to a file is given.
 * The InputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value MAY always be expected. If omitted, the default value MUST be treated as true.
+value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 * The InputData object MUST have a member `content`. The member's value MUST be an object containing at minimum a member
 `mediaType` with a value of string elements for `type` of `file` or a member of `type` when `type` is `json`. These
 elements MUST be used by the processing system to validate file input.
 
-The following annotated snippet provides quick reference to the use of InputData Objects:
+The following annotated snippet provides quick reference to the use of InputData Object:
 
+[source,javascript]
 ----
 [
   {
-    "name": "INPUT_FILE", <1>
-    "type": "file", <2>
-    "required": true, <3>
+    "name": "INPUT_FILE",// <1>
+    "type": "file",// <2>
+    "required": true,// <3>
     "content": {
-      "mediaType": [ "image/x-hdf5-image" ] <4>
+      "mediaType": [ "image/x-hdf5-image" ]// <4>
     }
   },
   {
     "name": "INPUT_STRING",
-    "type": "json", <5>
+    "type": "json",// <5>
     "required": false,
     "content": {
-      "type": "string" <6>
+      "type": "string"// <6>
     }
   }
 ]
@@ -166,8 +170,31 @@ member object must contain a `type` member identifying a valid JSON schema type.
 [[outputdata-section, OutputData Objects]]
 ====== OutputData Objects
 The OutputData object is the member responsible for indicating all output data and the means to capture that data
-following the execution of a JobPack image. Data can be gathered in two different forms: directly from a file or
-extracted as JSON from a manifest.
+following the execution of a JobPack image. Data can be captured in two different forms: directly as a file or
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are 
+expected to be gathered from a results manifest that is by JobPack standard convention named `results_manifest.json` and
+stored at the root of the job output directory. The location of the job output directory is REQUIRED to be passed into
+the container at job execution time.
+
+* The OutputData object MUST have a member `name`. The member's value MUST be a string indicating the key the processing
+system will place either the file name captured or the JSON member value in for downstream use. When used with the 
+`type` of `json` it must be a case-sensitive match of the member key in the `results_manifest.json`
+* The OutputData object MUST have a member `type`. The member's value MUST be a string containing either `file` or 
+`json` as the value. This value SHALL determine whether a file or a result manifest member value is to be captured. 
+* The OutputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this
+output value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+* The OutputData object MUST have a member `content`. The member's value MUST be an object that defines either the file
+capture information or the JSON type
+** The Content object for OutputData objects with member `type` of value `file` MUST follow the following format:
+*** The Content object MUST have a member `mediaType`. The member's value MUST indicate the IANA MIME type for
+the file being captured by OutputData.
+*** The Content object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the 
+capture of files.
+*** The Content object MAY have a member `count`. The member's value MUST be a string that accepts 3 possibilities: 
+positive numeric values or a `*`. Numeric values indicate an explicit match expected for `pattern` while `*` indicates
+1 or more matched.
+** The Content object for OutputData objects with member `type` of value `json` MUST have a member `type`. The member's
+value must be a valid JSON schema type.
 
 
 [[errormapping-section, ErrorMapping Objects]]
