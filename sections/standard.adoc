@@ -64,18 +64,18 @@ The following annotated snippet provides quick reference to the use of Job objec
 [source,javascript]
 ----
 {
-  "name": "my-algorithm",// <1>
-  "version": "1.0.0",// <2>
-  "title": "My first algorithm",// <3>
-  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",// <4>
-  "authorName": "John Doe",// <5>
-  "authorUrl": "http://www.example.com",// <6>
+  "name": "my-algorithm", // <1>
+  "version": "1.0.0", // <2>
+  "title": "My first algorithm", // <3>
+  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <4>
+  "authorName": "John Doe", // <5>
+  "authorUrl": "http://www.example.com", // <6>
   "timeout": 3600,// <7>
-  "cpus": 10.0,// <8>
-  "mem": 10240.0,// <9>
-  "storage": 0.0,// <10>
-  "interface": { ...  },// <11>
-  "errorMapping": [ ... ]// <12>
+  "cpus": 10.0, // <8>
+  "mem": 10240.0, // <9>
+  "storage": 0.0, // <10>
+  "interface": { ...  }, // <11>
+  "errorMapping": [ ... ] // <12>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique
@@ -126,12 +126,12 @@ runtime.
 
 * The InputData object MUST have a member `name`. The member's value MUST be a string indicating the environment
 variable name that will be injected by the processing platform for job consumption.
-* The InputData object MUST have a member `type`. The member's value MUST be a string containing either `file` or `json`
+* The InputData object MUST have a member `type`. The member's value MUST be a string containing either `FILE` or `JSON`
 as the value. This value SHALL determine whether the value is directly injected or a reference to a file is given.
 * The InputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 * The InputData object MUST have a member `content`. The member's value MUST be an object containing at minimum a member
-`mediaType` with a value of string elements for `type` of `file` or a member of `type` when `type` is `json`. These
+`mediaType` with a value of string elements for `type` of `FILE` or a member of `type` when `type` is `JSON`. These
 elements MUST be used by the processing system to validate file input.
 
 The following annotated snippet provides quick reference to the use of InputData Object:
@@ -140,32 +140,32 @@ The following annotated snippet provides quick reference to the use of InputData
 ----
 [
   {
-    "name": "INPUT_FILE",// <1>
-    "type": "file",// <2>
-    "required": true,// <3>
+    "name": "INPUT_FILE", // <1>
+    "type": "FILE", // <2>
+    "required": true, // <3>
     "content": {
-      "mediaType": [ "image/x-hdf5-image" ]// <4>
+      "mediaType": [ "image/x-hdf5-image" ] // <4>
     }
   },
   {
     "name": "INPUT_STRING",
-    "type": "json",// <5>
+    "type": "JSON", // <5>
     "required": false,
     "content": {
-      "type": "string"// <6>
+      "type": "string" // <6>
     }
   }
 ]
 ----
 <1> Required string containing name used to inject data via environment variables.
-<2> Required string containing type differentiation between `file` and `json`. For member `type` set to `file` content
+<2> Required string containing type differentiation between `FILE` and `JSON`. For member `type` set to `FILE` content
 member object must contain a `mediaType` member identifying the accepted MIME types.
 <3> Optional boolean indicating whether this job can be successfully executed without this particular value or file.
 Default is `true`.
-<4> Required array containing a list of accepted MIME types for `file` input.
-<5> Required string containing type differentiation between `file` and `json`. For member `type` set to `json` content
+<4> Required array containing a list of accepted MIME types for `FILE` input.
+<5> Required string containing type differentiation between `FILE` and `JSON`. For member `type` set to `JSON` content
 member object must contain a `type` member identifying a valid JSON schema type.
-<6> Required string containing a valid JSON schema type for `json` input.
+<6> Required string containing a valid JSON schema type for `JSON` input.
 
 [[outputdata-section, OutputData Objects]]
 ====== OutputData Objects
@@ -177,25 +177,64 @@ stored at the root of the job output directory. The location of the job output d
 the container at job execution time.
 
 * The OutputData object MUST have a member `name`. The member's value MUST be a string indicating the key the processing
-system will place either the file name captured or the JSON member value in for downstream use. When used with the 
-`type` of `json` it must be a case-sensitive match of the member key in the `results_manifest.json`
-* The OutputData object MUST have a member `type`. The member's value MUST be a string containing either `file` or 
-`json` as the value. This value SHALL determine whether a file or a result manifest member value is to be captured. 
+system will place either the file name captured or the JSON member value in for downstream use. When used with the
+`type` of `JSON` it must be a case-sensitive match of the member key in the `results_manifest.json`
+* The OutputData object MUST have a member `type`. The member's value MUST be a string containing either `FILE` or
+`JSON` as the value. This value SHALL determine whether a file or a result manifest member value is to be captured.
 * The OutputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this
 output value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 * The OutputData object MUST have a member `content`. The member's value MUST be an object that defines either the file
-capture information or the JSON type
-** The Content object for OutputData objects with member `type` of value `file` MUST follow the following format:
+capture information or the JSON type.
+** The Content object for OutputData objects with member `type` of value `FILE` MUST follow the following format:
 *** The Content object MUST have a member `mediaType`. The member's value MUST indicate the IANA MIME type for
 the file being captured by OutputData.
 *** The Content object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the 
 capture of files.
-*** The Content object MAY have a member `count`. The member's value MUST be a string that accepts 3 possibilities: 
-positive numeric values or a `*`. Numeric values indicate an explicit match expected for `pattern` while `*` indicates
+*** The Content object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
+positive numeric values or a `\*`. Numeric values indicate an explicit match expected for `pattern` while `\*` indicates
 1 or more matched.
-** The Content object for OutputData objects with member `type` of value `json` MUST have a member `type`. The member's
-value must be a valid JSON schema type.
+** The Content object for OutputData objects with member `type` of value `JSON` MUST follow the following format:
+*** The Content object MUST have a member `type`. The member's value MUST indicate the JSON schema type of the member
+being captured by OutputData from the result manifest.
 
+The following annotated snippet provides quick reference to the use of OutputData Object:
+
+[source,javascript]
+----
+[
+  {
+    "name": "output_file_tiffs", // <1>
+    "type": "file", // <2>
+    "required": true, // <3>
+    "content": {
+      "mediaType": "image/tiff", // <4>
+      "count": "2", // <5>
+      "pattern": "outfile*.tif" // <6>
+    }
+  },
+  {
+    "name": "cell_count", // <7>
+    "type": "json", // <8>
+    "required": true,
+    "content": {
+      "type": "integer" // <9>
+    }
+  }
+]
+----
+<1> Required string containing output identifier.
+<2> Required string containing output type. Valid values are `file` and `json`.
+<3> Optional boolean indicating whether processing system should assume failure if output data is missing. Default value
+is true.
+<4> Required string (only for `file` type) containing IANA MIME type on `file` type output.
+<5> Optional string (only for `file` type) containing either a numeric count or `\*` for unbounded output. Default value
+is `"1"`.
+<6> Required string (only for `file` type) containing glob expression for file capture. Processing system is expected to
+capture output relative to JOB_OUTPUT_DIR.
+<7> Required string containing output identifier. MUST be used by processing framework to match member for capture from
+result manifest.
+<8> Required string containing output type. Valid values are `file` and `json`.
+<9> Required string (only for `json` type) containing JSON schema type of member extracted from result manifest.
 
 [[errormapping-section, ErrorMapping Objects]]
 ===== ErrorMapping Objects

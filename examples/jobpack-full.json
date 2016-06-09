@@ -33,7 +33,7 @@
             "required": true,
             "content": {
               "mediaType": "image/tiff",
-              "count": "1",
+              "count": "2",
               "pattern": "outfile*.tif"
             }
           },
@@ -43,7 +43,6 @@
             "required": true,
             "content": {
               "mediaType": "text/csv",
-              "multiple": false,
               "pattern": "outfile*.csv"
             }
           },
@@ -63,19 +62,19 @@
           "code": 1,
           "title": "Error Name",
           "description": "Error Description",
-          "category": "SYSTEM"
+          "category": "system"
         },
         {
           "code": 2,
           "title": "Error Name",
           "description": "Error Description",
-          "category": "DATA"
+          "category": "data"
         },
         {
           "code": 3,
           "title": "Error Name",
           "description": "Error Description",
-          "category": "ALGORITHM"
+          "category": "algorithm"
         }
       ]
     }
