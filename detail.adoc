@@ -119,8 +119,10 @@ Docker Registry does not natively support any type of search, but does provide a
 entire registry contents. Using this along with tag and manifest inspection will allow label inspection.
 
 The following steps may be taken to find and identify labels of JobPack compliant images within Docker Registry:
+
 NOTE: All references to `{registry}`, `{image-id}` and `{tag}` in the following URLs should be replaced with your
 environment specific values.
+
 * Perform HTTP GET against catalog endpoint to find `-jobpack` suffixed images:
 ** URL: http://{registry}/v2/_catalog
 * Perform HTTP GET against tags endpoint for each image matched:
