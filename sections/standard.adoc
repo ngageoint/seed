@@ -90,7 +90,7 @@ system-wide.
 <7> Required integer containing job timeout value in seconds.
 <8> Required number containing CPU needs of job. Whole or fractional values allowed.
 <9> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<10> Optional storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<10> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
 <11> Required <<interface-section>>.
 <12> Optional array of <<errormapping-section>>.
 
@@ -193,7 +193,7 @@ system will place either the file name captured or the JSON member value in for 
 output value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 * The OutputData object MUST have a member `content`. The member's value MUST be an object that defines either the file
 capture information or the JSON type.
-** The Content object for OutputData objects with member `type` of value `FILE` MUST follow the following format:
+** The Content object for OutputData objects with member `type` of value `file` MUST follow the following format:
 *** The Content object MUST have a member `mediaType`. The member's value MUST indicate the IANA MIME type for
 the file being captured by OutputData.
 *** The Content object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the 
@@ -201,7 +201,7 @@ capture of files.
 *** The Content object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
 positive numeric values or a `\*`. Numeric values indicate an explicit match expected for `pattern` while `*` indicates
 1 or more matched.
-** The Content object for OutputData objects with member `type` of value `JSON` MUST follow the following format:
+** The Content object for OutputData objects with member `type` of value `json` MUST follow the following format:
 *** The Content object MUST have a member `type`. The member's value MUST indicate the JSON schema type of the member
 being captured by OutputData from the result manifest.
 
