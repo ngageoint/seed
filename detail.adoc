@@ -24,14 +24,14 @@ services.
 Dockerfile snippet containing required label for JobPack compliance:
 
 ----
-include::examples/Dockerfile-snippet[]
+include::examples/complete/Dockerfile[]
 ----
 
 The com.jobpack.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
 example including required and optional keys:
 
 ----
-include::examples/jobpack-full.json[]
+include::examples/complete/jobpack.json[]
 ----
 
 === Definitions
@@ -59,6 +59,7 @@ variable expansion may be leveraged in the `interface.args` member. The followin
 ** ALLOCATED_STORAGE: Value of `storage` member.
 ** All `name` member values of `interface.inputData` elements: Indicate the absolute path of input files. Environment
 variable name case MUST map exactly from `name` value.
+* Extended metadata for output files may be
 
 === Examples
 The JobPack standard is intended to support both simple and complex job packaging. To that end the standard allows for
@@ -67,40 +68,30 @@ JobPack use and a more realistic, fully exercised standard.
 
 ==== Random Number Generator Job
 Minimal manifest demonstrating the simplest possible JobPack definition.
-
 ----
-{
-  "manifestVersion": "0.0.1",
-  "jobs":
-  [
-    {
-      "name": "random-number-gen",
-      "version": "0.1.0",
-      "title": "Random Number Generator",
-      "description": "Generates a random number and outputs on stdout",
-      "authorName": "John Doe",
-      "timeout": 10,
-      "cpus": 0.1,
-      "mem": 1.0,
-      "interface": {
-        "cmd": "/app/job.sh",
-      }
-    }
-  ]
-}
+include::examples/random-number/jobpack.json[]
 ----
 
 Serialized as a label in a Dockerfile snippet:
 ----
-LABEL com.jobpack.manifest="{\"manifestVersion\":\"0.0.1\",\"jobs\":[{\"name\":\"random-number-gen\",\"version\":\"0.1.0
-\",\"title\":\"Random Number Generator\",\"description\":\"Generates a random number and outputs on stdout\",
-\"authorName\":\"John Doe\",\"timeout\":10,\"cpus\":0.1,\"mem\":1.0,\"interface\":{\"cmd\":\"/app/job.sh\",}}]}"
+include::examples/random-number/Dockerfile[]
+----
+
+==== Image Watermark Job
+Image watermark job taking a single image and returning with watermark applied using JobPack definition.
+----
+include::examples/watermark/jobpack.json[]
+----
+
+Serialized as a label in a Dockerfile snippet:
+----
+include::examples/watermark/Dockerfile[]
 ----
 
 == Discovery
 A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
 Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
-offerings and the following sections describe the steps that may be taken to access the labels defined by CJSD.
+offerings and the following sections describe the steps that may be taken to access the labels defined by JobPack.
 
 === Docker Hub
 
