@@ -80,9 +80,10 @@ The following annotated snippet provides quick reference to the use of Job objec
   "errorMapping": [ ... ] // <12>
 }
 ----
-<1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined should be unique
-system-wide.
-<2> Required string containing job version identifier in SemVer format. `name` and `version` members combined should be unique system-wide.
+<1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined
+should be unique system-wide.
+<2> Required string containing job version identifier in SemVer format. `name` and `version` members combined should be
+unique system-wide.
 <3> Required string containing short job title.
 <4> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
 <5> Required string containing job author name or organization.
@@ -117,66 +118,79 @@ The following annotated snippet provides quick reference to the use of Interface
 {
   "cmd": "/app/job.sh", // <1>
   "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
-  "inputData": [ { "name": "INPUT_FILE", ... }, ... ], // <3>
-  "outputData": [ ... ] <4>
+  "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
+  "outputData": { ... } <4>
 }
 ----
 <1> Required string indicating the job executable. It should be an absolute path for clarity.
 <2> Optional string indicating the job arguments. Shell expansion may be used to inject existing environment variables
 and executable arguments. Linux shell escaping may be needed in the case of special characters.
-<3> Optional array of InputData objects. This is the means to inject external data into the job container.
-<4> Optional array of OutputData objects. This is the means to capture results from the job container.
+<3> Optional InputData object. This is the means to inject external data into the job container.
+<4> Optional OutputData object. This is the means to capture results from the job container.
 
-[[inputdata-section, InputData Objects]]
-====== InputData Objects
+[[inputdata-section, InputData Object]]
+====== InputData Object
 The InputData object is the member responsible for indicating all mutable content available to the JobPack image at
 runtime.
 
-* The InputData object MUST have a member `name`. The member's value MUST be a string indicating the environment
-variable name that will be injected by the processing platform for job consumption.
-* The InputData object MUST have a member `type`. The member's value MUST be a string containing either `FILE` or `JSON`
-as the value. This value SHALL determine whether the value is directly injected or a reference to a file is given.
-* The InputData object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value SHOULD always be expected. If omitted, the default value MUST be treated as true.
-* The InputData object MUST have a member `content`. The member's value MUST be an object containing at minimum a member
-`mediaType` with a value of string elements for `type` of `FILE` or a member of `type` when `type` is `JSON`. These
-elements MUST be used by the processing system to validate file input.
+* The InputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
+sub-section.
+* The InputData object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
+sub-section.
 
 The following annotated snippet provides quick reference to the use of InputData object:
 
 [source,javascript]
 ----
-[
-  {
-    "name": "INPUT_FILE", // <1>
-    "type": "FILE", // <2>
-    "required": true, // <3>
-    "content": {
-      "mediaType": [ "image/x-hdf5-image" ] // <4>
+{
+  "files": [ <1>
+    {
+      "name": "INPUT_FILE", // <2>
+      "mediaType": [ "image/x-hdf5-image" ], // <3>
+      "required": true // <4>
     }
-  },
-  {
-    "name": "INPUT_STRING",
-    "type": "JSON", // <5>
-    "required": false,
-    "content": {
-      "type": "string" // <6>
+  ]
+  "json": [ <5>
+    {
+      "name": "INPUT_STRING",
+      "type": "string", // <6>
+      "required": false // <7>
     }
-  }
-]
+  ]
+}
 ----
-<1> Required string containing name used to inject data via environment variables.
-<2> Required string containing type differentiation between `FILE` and `JSON`. For member `type` set to `FILE` content
-member object must contain a `mediaType` member identifying the accepted MIME types.
-<3> Optional boolean indicating whether this job can be successfully executed without this particular value or file.
-Default is `true`.
-<4> Required array containing a list of accepted MIME types for `FILE` input.
-<5> Required string containing type differentiation between `FILE` and `JSON`. For member `type` set to `JSON` content
-member object must contain a `type` member identifying a valid JSON schema type.
-<6> Required string containing a valid JSON schema type for `JSON` input.
+<1> Optional array containing elements defined by Files Elements sub-section.
+<2> Required string containing name used to inject data via environment variables.
+<3> Required array containing a list of accepted Media types.
+<4> Optional boolean indicating whether job requires this particular file. Default is `true`.
+<5> Optional array containing elements defined by JSON Elements sub-section.
+<6> Required string containing a valid JSON schema type for input validation.
+<7> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
 
-[[outputdata-section, OutputData Objects]]
-====== OutputData Objects
+======= Files Elements
+The Files elements contain the objects responsible for indicating file content that will be made available within a
+JobPack container at runtime.
+
+* The Files object MUST have a member `name`. The member's value MUST be a string indicating the environment
+variable name that will be injected by the processing platform for job consumption.
+* The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
+the file being captured by OutputData.
+* The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
+value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+
+======= JSON Elements
+The JSON elements is the member responsible for indicating file content that will be made available within a JobPack
+container at runtime.
+
+* The Files object MUST have a member `name`. The member's value MUST be a string indicating the environment
+variable name that will be injected by the processing platform for job consumption.
+* The Files object MUST have a member `type`. The member's value MUST be a string and indicate a valid JSON schema type.
+* The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
+value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+
+
+[[outputdata-section, OutputData Object]]
+====== OutputData Object
 The OutputData object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a JobPack image. Data can be captured in two different forms: directly as a file or
 extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are 
@@ -194,7 +208,7 @@ output value SHOULD always be expected. If omitted, the default value MUST be tr
 * The OutputData object MUST have a member `content`. The member's value MUST be an object that defines either the file
 capture information or the JSON type.
 ** The Content object for OutputData objects with member `type` of value `file` MUST follow the following format:
-*** The Content object MUST have a member `mediaType`. The member's value MUST indicate the IANA MIME type for
+*** The Content object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
 the file being captured by OutputData.
 *** The Content object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the 
 capture of files.
@@ -234,7 +248,7 @@ The following annotated snippet provides quick reference to the use of OutputDat
 <2> Required string containing output type. Valid values are `file` and `json`.
 <3> Optional boolean indicating whether processing system should assume failure if output data is missing. Default value
 is true.
-<4> Required string (only for `file` type) containing IANA MIME type on `file` type output.
+<4> Required string (only for `file` type) containing IANA Media type on `file` type output.
 <5> Optional string (only for `file` type) containing either a numeric count or `\*` for unbounded output. Default value
 is `1`.
 <6> Required string (only for `file` type) containing glob expression for file capture. Processing system is expected to

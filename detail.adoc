@@ -39,6 +39,8 @@ include::examples/complete/jobpack.json[]
 http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
 * Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
 http://semver.org/spec/v2.0.0.html
+* Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
+http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
 * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
 
