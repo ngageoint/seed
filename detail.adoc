@@ -35,12 +35,14 @@ include::examples/complete/jobpack.json[]
 ----
 
 === Definitions
+* GeoJSON, and the terms Geometry and Polygon are defined in
+https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
+* Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
+http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
 * JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
 http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
 * Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
 http://semver.org/spec/v2.0.0.html
-* Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
-http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
 * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
 
@@ -50,18 +52,49 @@ include::sections/standard.adoc[]
 == Usage
 
 === Implementing
-A few requirements must be satisfied when implementing a system capable of executing JobPack standardized images. These
-are outlined below:
+A few requirements must be satisfied when implementing a system capable of executing JobPack standardized images.
 
-* Environment variable injection must be performed. May be consumed by job directly as environment variables or shell
-variable expansion may be leveraged in the `interface.args` member. The following minimum variables MUST be provided:
-** JOB_OUTPUT_DIR: Root path job must place all products that should be captured as output.
-** ALLOCATED_CPUS: Value of `cpus` member.
-** ALLOCATED_MEM: Value of `mem` member.
-** ALLOCATED_STORAGE: Value of `storage` member.
-** All `name` member values of `interface.inputData` elements: Indicate the absolute path of input files. Environment
-variable name case MUST map exactly from `name` value.
-* Extended metadata for output files may be
+==== Environment Variables
+Environment variable injection must be performed. These may be consumed by job directly as environment variables or
+shell variable expansion may be leveraged in the `interface.args` member.
+
+The following minimum variables MUST be provided:
+* JOB_OUTPUT_DIR: Root path all output products must be placed by job for processing system capture.
+* ALLOCATED_CPUS: Value of `cpus` member.
+* ALLOCATED_MEM: Value of `mem` member.
+* ALLOCATED_STORAGE: Value of `storage` member.
+* All `name` member values of `interface.inputData.file` elements: Indicate the absolute path of input files.
+environment variable name case MUST map exactly from `name` value.
+
+==== Output File metadata
+There is often a need by the processing system to capture additional job extracted metadata on output files. The JobPack
+standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
+describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
+must be formatted according to link:{ctx_path}/schema/metadata.schema.json[defined schema]. This allows for both spatial
+and temporal metadata to be specified.
+
+The following snippet demonstrates the optional values that may be specified:
+
+Metadata JSON
+----
+{
+	"geometry": { <1>
+		"type": "Polygon",
+		"coordinates": [
+			[ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
+		]
+	},
+	"time": { <2>
+		"start": "2016-08-06T00:00:00.000Z", <3>
+		"end": "2016-08-06T00:00:00.000Z" <4>
+	}
+}
+----
+<1> Optional GeoJSON Geometry object defining spatial extent of file.
+<2> Optional Time object defining temporal extent of file.
+<3> Required string containing an ISO 8601 date indicating the start temporal extent of file.
+<3> Required string containing an ISO 8601 date indicating the end temporal extent of file. If the data is a single
+point-in-time the end date should match the start date.
 
 === Examples
 The JobPack standard is intended to support both simple and complex job packaging. To that end the standard allows for
