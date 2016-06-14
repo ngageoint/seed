@@ -39,6 +39,7 @@ include::examples/complete/jobpack.json[]
 https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
 * Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
 http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
+* ISO 8601 and the specifics of the date format are defined in https://tools.ietf.org/html/rfc3339[IETF RFC 3339]
 * JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
 http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
 * Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
@@ -92,9 +93,10 @@ Metadata JSON
 ----
 <1> Optional GeoJSON Geometry object defining spatial extent of file.
 <2> Optional Time object defining temporal extent of file.
-<3> Required string containing an ISO 8601 date indicating the start temporal extent of file.
-<3> Required string containing an ISO 8601 date indicating the end temporal extent of file. If the data is a single
-point-in-time the end date should match the start date.
+<3> Required string containing an ISO 8601 date indicating the start temporal extent of file. String must include full
+time down to minute precision.
+<3> Required string containing an ISO 8601 date indicating the end temporal extent of file. String must include full
+time down to minute precision. If the data is a single point-in-time the end date should match the start date.
 
 === Examples
 The JobPack standard is intended to support both simple and complex job packaging. To that end the standard allows for
