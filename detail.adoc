@@ -65,14 +65,17 @@ The following minimum variables MUST be provided:
 * ALLOCATED_CPUS: Value of `cpus` member.
 * ALLOCATED_MEM: Value of `mem` member.
 * ALLOCATED_STORAGE: Value of `storage` member.
-* All `name` member values of `interface.inputData.file` elements: Indicate the absolute path of input files.
-environment variable name case MUST map exactly from `name` value.
+* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Name case MUST map
+exactly from `name` value. It is the processing framework's responsibility to ensure data is mounted and to ensure the
+path is container resolvable.
+* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Name case MUST map
+exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded.
 
 ==== Output File metadata
 There is often a need by the processing system to capture additional job extracted metadata on output files. The JobPack
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
-must be formatted according to link:/schema/metadata.schema.json[this schema]. This allows for both spatial
+must be formatted according to link:schema/metadata.schema.json[this schema]. This allows for both spatial
 and temporal metadata to be specified.
 
 The following snippet demonstrates the optional values that may be specified:
@@ -175,7 +178,7 @@ support to inspect hosted images for label metadata. Images must be pulled local
 
 == Schema
 The following JSON Schema should be used to validate JobPack manifests prior to label serialization into a Dockerfile
-for publish. It may be downloaded here: link:/schema/jobpack.schema.json[JobPack Schema]
+for publish. It may be downloaded here: link:schema/jobpack.schema.json[JobPack Schema]
 
 ----
 include::schema/jobpack.schema.json[]
