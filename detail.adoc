@@ -60,6 +60,7 @@ Environment variable injection must be performed. These may be consumed by job d
 shell variable expansion may be leveraged in the `interface.args` member.
 
 The following minimum variables MUST be provided:
+
 * JOB_OUTPUT_DIR: Root path all output products must be placed by job for processing system capture.
 * ALLOCATED_CPUS: Value of `cpus` member.
 * ALLOCATED_MEM: Value of `mem` member.
@@ -71,12 +72,13 @@ environment variable name case MUST map exactly from `name` value.
 There is often a need by the processing system to capture additional job extracted metadata on output files. The JobPack
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
-must be formatted according to link:{ctx_path}/schema/metadata.schema.json[defined schema]. This allows for both spatial
+must be formatted according to link:/schema/metadata.schema.json[this schema]. This allows for both spatial
 and temporal metadata to be specified.
 
 The following snippet demonstrates the optional values that may be specified:
 
-Metadata JSON
+[source,javascript]
+.Metadata JSON
 ----
 {
 	"geometry": { <1>
@@ -173,7 +175,7 @@ support to inspect hosted images for label metadata. Images must be pulled local
 
 == Schema
 The following JSON Schema should be used to validate JobPack manifests prior to label serialization into a Dockerfile
-for publish. It may be downloaded here: link:{ctx_path}/schema/jobpack.schema.json[JobPack Schema]
+for publish. It may be downloaded here: link:/schema/jobpack.schema.json[JobPack Schema]
 
 ----
 include::schema/jobpack.schema.json[]
