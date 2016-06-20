@@ -1,0 +1,6 @@
+= Seed
+
+Seed is a general standard to aid in the discovery and consumption of discrete units of work contained within a Docker
+image.
+
+See the link:http://gisjedi.github.io/jobpack/detail.html[full specification] for details.

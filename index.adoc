@@ -1,5 +1,5 @@
-= Seed
-Jonathan Meyer <jon@gisjedi.com>
+= Seed Standard
+Jonathan Meyer <jonathan.meyer@appliedis.com>
 v0.0.1, 2016-06-20
 :toc:
 

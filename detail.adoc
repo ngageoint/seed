@@ -1,6 +1,6 @@
 = Seed Standard Definition
-Jonathan Meyer <jon@gisjedi.com>
-v0.0.1, 2016-06-14
+Jonathan Meyer <jonathan.meyer@appliedis.com>
+v0.0.1, 2016-06-20
 :toc: left
 :toclevels: 5
 :sectlinks:
