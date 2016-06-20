@@ -1,4 +1,4 @@
-= Seed Standard
+= Seed
 Jonathan Meyer <jonathan.meyer@appliedis.com>
 v0.0.1, 2016-06-20
 :toc:

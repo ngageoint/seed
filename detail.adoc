@@ -31,7 +31,7 @@ The com.seed.manifest label contents must be serialized as a string-escaped JSON
 example including required and optional keys:
 
 ----
-include::examples/complete/seed-manifest.json[]
+include::examples/complete/seed.manifest.json[]
 ----
 
 === Definitions
@@ -111,7 +111,7 @@ Seed use and a more realistic, fully exercised standard.
 ==== Random Number Generator Job
 Minimal manifest demonstrating the simplest possible Seed definition.
 ----
-include::examples/random-number/seed-manifest.json[]
+include::examples/random-number/seed.manifest.json[]
 ----
 
 Serialized as a label in a Dockerfile snippet:
@@ -122,7 +122,7 @@ include::examples/random-number/Dockerfile[]
 ==== Image Watermark Job
 Image watermark job taking a single image and returning with watermark applied using Seed definition.
 ----
-include::examples/watermark/seed-manifest.json[]
+include::examples/watermark/seed.manifest.json[]
 ----
 
 Serialized as a label in a Dockerfile snippet:
