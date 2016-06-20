@@ -1,24 +1,24 @@
-The JobPack standard is intended to provide a complete definition of the runtime processing, memory and storage
+The Seed standard is intended to provide a complete definition of the runtime processing, memory and storage
 requirements of one or more discrete units of work, in addition to the inputs, outputs and potential errors produced.
 Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
 REQUIRED properties. The following sections detail every possible REQUIRED and OPTIONAL manifest property in both root
 and child objects.
 
-A complete JobPack object contained within a com.jobpack.manifest label is always a serialized object (in JSON terms).
-In JobPack, an object consists of a collection of name/value pairs -- also called members. For each member, the name is
-always a string. Member values are either a string, number, object, array or one of the literals: true, false, and null.
-An array consists of elements where each element is a value as described above.
+A complete Seed object contained within a com.ngageoint.seed.manifest label is always a string-escaped serialized
+object. In Seed, an object consists of a collection of name/value pairs -- also called members. For each member, the
+name is always a string. Member values are either a string, number, object, array or one of the literals: true, false,
+and null. An array consists of elements where each element is a value as described above.
 
-[[jobpack-section, JobPack Object]]
-=== JobPack Object
-The JobPack object is the root JSON object that MUST be placed within a com.jobpack.manifest Docker image label. At a
-minimum this object MUST define the `manifestVersion` and `jobs` names.
+[[seed-section, Seed Object]]
+=== Seed Object
+The Seed object is the root JSON object that MUST be placed within a com.ngageoint.seed.manifest Docker image label.
+At a minimum this object MUST define the `manifestVersion` and `jobs` names.
 
-* The JobPack object MUST have a member with the name `manifestVersion`. The member's value MUST be a string that
+* The Seed object MUST have a member with the name `manifestVersion`. The member's value MUST be a string that
 conforms to the SemVer standard.
-* The JobPack object MUST have a member with the name `jobs`. The member's value is an array of `Job` objects and MUST
+* The Seed object MUST have a member with the name `jobs`. The member's value is an array of `Job` objects and MUST
 contain at least 1 element. There is no other standard restriction on the array size.
-* The JobPack object MAY have any number of additional members.
+* The Seed object MAY have any number of additional members.
 
 [source,javascript]
 ----
@@ -130,7 +130,7 @@ and executable arguments. Linux shell escaping may be needed in the case of spec
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
-The InputData object is the member responsible for indicating all mutable content available to the JobPack image at
+The InputData object is the member responsible for indicating all mutable content available to the Seed image at
 runtime.
 
 * The InputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
@@ -185,9 +185,9 @@ The following annotated snippet provides quick reference to the use of InputData
 [[outputdata-section, OutputData Object]]
 ====== OutputData Object
 The OutputData object is the member responsible for indicating all output data and the means to capture that data
-following the execution of a JobPack image. Data can be captured in two different forms: directly as a file or
+following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
 extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are 
-expected to be gathered from a results manifest that by JobPack standard convention MUST be provided either on container
+expected to be gathered from a results manifest that by Seed standard convention MUST be provided either on container
 STDOUT or written at the root of the job output directory as `results_manifest.json`. The location of the job output
 directory is REQUIRED to be passed into the container at job execution time.
 
@@ -234,7 +234,7 @@ The following annotated snippets provides quick reference to the use of OutputDa
 ----
 
 [source,javascript]
-.JobPack Manifest - OutputData object
+.Seed Manifest - OutputData object
 ----
 "outputData": {
   "files": [ // <1>

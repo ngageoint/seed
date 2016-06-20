@@ -1,12 +1,12 @@
-= JobPack
+= Seed
 Jonathan Meyer <jon@gisjedi.com>
-v0.0.1, 2016-06-14
+v0.0.1, 2016-06-20
 :toc:
 
-JobPack is a general standard to aid in the discovery and consumption of
-discrete units of work contained within a Docker image.
+Seed is a general standard to aid in the discovery and consumption of discrete units of work contained within a Docker
+image.
 
-To comply with the JobPack standard a Docker image must have a single label used for discovery. This can be applied
+To comply with the Seed standard a Docker image must have a single label used for discovery. This can be applied
 with the following Dockerfile snippet:
 
 ----
@@ -14,8 +14,8 @@ include::examples/complete/Dockerfile[]
 ----
 
 
-JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
-and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or Registry
+Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or Registry
 push. This requirement will be deprecated as label search support is standardized across Docker registry services.
 
 See the link:detail.html[full specification] for complete detail on manifest format.

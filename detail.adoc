@@ -1,4 +1,4 @@
-= JobPack Standard Definition
+= Seed Standard Definition
 Jonathan Meyer <jon@gisjedi.com>
 v0.0.1, 2016-06-14
 :toc: left
@@ -10,28 +10,28 @@ v0.0.1, 2016-06-14
 
 == Introduction
 
-JobPack is a general standard to aid in the discovery and consumption of
+Seed is a general standard to aid in the discovery and consumption of
 discrete units of work contained within a Docker image. While initially developed to support the Scale data processing
 system with job discovery, it is designed to be readily applied to other systems as well.
 
-JobPack compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
-and Registry services. The suffix `-jobpack` must be used when naming images to enable discovery, prior to Hub or
+Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
 Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
 services.
 
 === Format
 
-Dockerfile snippet containing required label for JobPack compliance:
+Dockerfile snippet containing required label for Seed compliance:
 
 ----
 include::examples/complete/Dockerfile[]
 ----
 
-The com.jobpack.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
+The com.seed.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
 example including required and optional keys:
 
 ----
-include::examples/complete/jobpack.json[]
+include::examples/complete/seed-manifest.json[]
 ----
 
 === Definitions
@@ -53,7 +53,7 @@ include::sections/standard.adoc[]
 == Usage
 
 === Implementing
-A few requirements must be satisfied when implementing a system capable of executing JobPack standardized images.
+A few requirements must be satisfied when implementing a system capable of executing Seed standardized images.
 
 ==== Environment Variables
 Environment variable injection must be performed. These may be consumed by job directly as environment variables or
@@ -72,11 +72,11 @@ path is container resolvable.
 exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded.
 
 ==== Output File metadata
-There is often a need by the processing system to capture additional job extracted metadata on output files. The JobPack
+There is often a need by the processing system to capture additional job extracted metadata on output files. The Seed
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
-must be formatted according to link:schema/metadata.schema.json[this schema]. This allows for both spatial
-and temporal metadata to be specified.
+must be formatted according to the link:schema/seed.metadata.schema.json[Seed Metadata Schema]. This allows for both
+spatial and temporal metadata to be specified.
 
 The following snippet demonstrates the optional values that may be specified:
 
@@ -104,14 +104,14 @@ time down to minute precision.
 time down to minute precision. If the data is a single point-in-time the end date should match the start date.
 
 === Examples
-The JobPack standard is intended to support both simple and complex job packaging. To that end the standard allows for
+The Seed standard is intended to support both simple and complex job packaging. To that end the standard allows for
 sensible defaults to take the place of a fully specified manifest. The following examples identify both a minimal
-JobPack use and a more realistic, fully exercised standard.
+Seed use and a more realistic, fully exercised standard.
 
 ==== Random Number Generator Job
-Minimal manifest demonstrating the simplest possible JobPack definition.
+Minimal manifest demonstrating the simplest possible Seed definition.
 ----
-include::examples/random-number/jobpack.json[]
+include::examples/random-number/seed-manifest.json[]
 ----
 
 Serialized as a label in a Dockerfile snippet:
@@ -120,9 +120,9 @@ include::examples/random-number/Dockerfile[]
 ----
 
 ==== Image Watermark Job
-Image watermark job taking a single image and returning with watermark applied using JobPack definition.
+Image watermark job taking a single image and returning with watermark applied using Seed definition.
 ----
-include::examples/watermark/jobpack.json[]
+include::examples/watermark/seed-manifest.json[]
 ----
 
 Serialized as a label in a Dockerfile snippet:
@@ -133,11 +133,11 @@ include::examples/watermark/Dockerfile[]
 == Discovery
 A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
 Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
-offerings and the following sections describe the steps that may be taken to access the labels defined by JobPack.
+offerings and the following sections describe the steps that may be taken to access the labels defined by Seed.
 
 None of the Docker registry services support label search in any fashion. This incurs the requirement of applying a
 secondary means to subset image results. The standard presently requires that all job image are named with the suffix
-`-jobpack`. This allows for quick filtering of results to a manageable set for discovery.
+`-seed`. This allows for quick filtering of results to a manageable set for discovery.
 
 === Docker Hub
 Docker Hub stores Docker image manifest information in a readily accessible format only for Automated Builds. This
@@ -148,9 +148,9 @@ to quickly identify manifest content after discovering available images.
 The following two steps may be taken to find and identify labels within Docker Hub:
 
 * Perform HTTP GET to find Docker images:
-** URL: https://hub.docker.com/v2/search/repositories/?query=-jobpack
+** URL: https://hub.docker.com/v2/search/repositories/?query=-seed
 * Perform HTTP POST to get label details for images found in previous request:
-** BODY: {"repos":[{"name":"myorg/myjob-jobpack","tag":"latest"}]}
+** BODY: {"repos":[{"name":"myorg/myjob-seed","tag":"latest"}]}
 ** URL: https://imagelayers.io/registry/analyze
 
 The ImageLayers service is a 3rd-party service by CenturyLink Labs, but the source code is openly available at
@@ -160,12 +160,12 @@ https://github.com/CenturyLinkLabs/imagelayers[ImageLayers] and can be used as a
 Docker Registry does not natively support any type of search, but does provide a catalog API that allows for listing the
 entire registry contents. Using this along with tag and manifest inspection will allow label inspection.
 
-The following steps may be taken to find and identify labels of JobPack compliant images within Docker Registry:
+The following steps may be taken to find and identify labels of Seed compliant images within Docker Registry:
 
 NOTE: All references to `{registry}`, `{image-id}` and `{tag}` in the following URLs should be replaced with your
 environment specific values.
 
-* Perform HTTP GET against catalog endpoint to find `-jobpack` suffixed images:
+* Perform HTTP GET against catalog endpoint to find `-seed` suffixed images:
 ** URL: http://{registry}/v2/_catalog
 * Perform HTTP GET against tags endpoint for each image matched:
 ** http://{registry}/v2/{image-id}/tags/list
@@ -177,9 +177,9 @@ There is a ticket in with Docker Trusted Registry team to natively support label
 support to inspect hosted images for label metadata. Images must be pulled locally for inspection.
 
 == Schema
-The following JSON Schema should be used to validate JobPack manifests prior to label serialization into a Dockerfile
-for publish. It may be downloaded here: link:schema/jobpack.schema.json[JobPack Schema]
+The following JSON Schema should be used to validate Seed manifests prior to label serialization into a Dockerfile
+for publish. It may be downloaded here: link:schema/seed.manifest.schema.json[Seed Manifest Schema]
 
 ----
-include::schema/jobpack.schema.json[]
+include::schema/seed.manifest.schema.json[]
 ----
