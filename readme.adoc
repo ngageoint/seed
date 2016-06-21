@@ -1,5 +1,7 @@
 = Seed
 
+image:https://badges.gitter.im/ngageoint/seed.svg[link="https://gitter.im/ngageoint/seed?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
+
 Seed is a general standard to aid in the discovery and consumption of discrete units of work contained within a Docker
 image.
 
