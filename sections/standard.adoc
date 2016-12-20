@@ -44,6 +44,8 @@ a full job abstract.
 any number of elements.
 * The Job object MUST have a member with the name `authorName`. The member's value MUST be a string and SHOULD contain
 the authoring individual or organization.
+* The Job object MAY have a member with the name `authorEmail`. The member's value MUST be a string and SHOULD contain
+the authoring email address.
 * The Job object MAY have a member with the name `authorUrl`. The member's value MUST be a string and SHOULD contain a
 publicly accessible URL with further job detail.
 * The Job object MUST have a member with the name `timeout`. This member's values MUST be a integer indicating a timeout
@@ -55,10 +57,9 @@ requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to
 * The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
 ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the default of 0.0 may be assumed.
 * The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
-[[interface-section]]
-`Interface`.
+<<interface-section>>.
 * The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
-elements defined in [[errormapping-section]]
+elements defined in <<errormapping-section>>
 * The Job object MAY have any number of additional members.
 
 The following annotated snippet provides quick reference to the use of Job object:
@@ -71,13 +72,14 @@ The following annotated snippet provides quick reference to the use of Job objec
   "title": "My first algorithm", // <3>
   "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <4>
   "authorName": "John Doe", // <5>
-  "authorUrl": "http://www.example.com", // <6>
-  "timeout": 3600,// <7>
-  "cpus": 10.0, // <8>
-  "mem": 10240.0, // <9>
-  "storage": 0.0, // <10>
-  "interface": { ...  }, // <11>
-  "errorMapping": [ ... ] // <12>
+  "authorEmail": "jdoe@example.com", <6>
+  "authorUrl": "http://www.example.com", // <7>
+  "timeout": 3600,// <8>
+  "cpus": 10.0, // <9>
+  "mem": 10240.0, // <10>
+  "storage": 0.0, // <11>
+  "interface": { ... }, // <12>
+  "errorMapping": [ ... ] // <13>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined
@@ -87,18 +89,19 @@ unique system-wide.
 <3> Required string containing short job title.
 <4> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
 <5> Required string containing job author name or organization.
-<6> Optional string containing URL to job website.
-<7> Required integer containing job timeout value in seconds.
+<6> Optional string containing job author email.
+<7> Optional string containing URL to job website.
+<8> Required integer containing job timeout value in seconds.
 <8> Required number containing CPU needs of job. Whole or fractional values allowed.
-<9> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<10> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<11> Required <<interface-section>>.
-<12> Optional array of <<errormapping-section>>.
+<10> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<11> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<12> Required <<interface-section>>.
+<13> Optional array of <<errormapping-section>>.
 
 [[interface-section, Interface Object]]
 ===== Interface Object
-The Interface object is the primary member that describes the actual executable entrypoint, as well as inputs and
-outputs defined for a job.
+The Interface object is the primary member that describes the actual executable entrypoint, environment variables,
+settings, inputs and outputs defined for a job.
 
 * The Interface object MUST have a member with the name `cmd`. The member's value MUST be a string specifying the
 absolute path to the job executable within the Docker image.
@@ -108,8 +111,14 @@ of special characters MAY be required.
 * The Interface object MAY have a member with the name `inputData`. The member's value is an array of `InputData`
 objects (see <<inputdata-section>>) and MAY contain any number of elements.
 * The Interface object MAY have a member with the name `outputData`. The member's value is an array of `OutputData`
-objects (see <<inputdata-section>>) and MAY contain any number of elements. There is no other standard restriction on
+objects (see <<outputdata-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
+* The Interface object MAY have a member with the name `settings`. The member's value is an array of `Settings`
+objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on
+the array size.
+* The Interface object MAY have a member with the name `env_vars`. The member's value is an array of
+`Environment Variables` objects (see <<env_vars-section>>) and MAY contain any number of elements. There is no other
+standard restriction on the array size.
 
 The following annotated snippet provides quick reference to the use of Interface object:
 
@@ -119,14 +128,18 @@ The following annotated snippet provides quick reference to the use of Interface
   "cmd": "/app/job.sh", // <1>
   "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
   "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
-  "outputData": { ... } <4>
+  "outputData": { ... }, // <4>
+  "env_vars": { ... }, // <5>
+  "settings": { ... } // <6>
 }
 ----
 <1> Required string indicating the job executable. It should be an absolute path for clarity.
 <2> Optional string indicating the job arguments. Shell expansion may be used to inject existing environment variables
 and executable arguments. Linux shell escaping may be needed in the case of special characters.
-<3> Optional InputData object. This is the means to inject external data into the job container.
-<4> Optional OutputData object. This is the means to capture results from the job container.
+<3> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
+<4> Optional <<outputdata-section>>. This is the means to capture results from the job container.
+<5> Optional <<env_vars-section>>. This is a means to set environment variables before a job is run.
+<6> Optional <<settings-section>>. This defines any settings that are used by the args or env_vars.
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
@@ -158,14 +171,14 @@ The following annotated snippet provides quick reference to the use of InputData
 [source,javascript]
 ----
 {
-  "files": [ <1>
+  "files": [ // <1>
     {
       "name": "INPUT_FILE", // <2>
       "mediaType": [ "image/x-hdf5-image" ], // <3>
       "required": true // <4>
     }
   ]
-  "json": [ <5>
+  "json": [ // <5>
     {
       "name": "INPUT_STRING",
       "type": "string", // <6>
@@ -186,7 +199,7 @@ The following annotated snippet provides quick reference to the use of InputData
 ====== OutputData Object
 The OutputData object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
-extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are 
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
 expected to be gathered from a results manifest that by Seed standard convention MUST be provided either on container
 STDOUT or written at the root of the job output directory as `results_manifest.json`. The location of the job output
 directory is REQUIRED to be passed into the container at job execution time.
@@ -250,7 +263,7 @@ The following annotated snippets provides quick reference to the use of OutputDa
     {
       "name": "CELL_COUNT", // <8>
       "type": "integer", // <9>
-      "key": "cellCount // <10>
+      "key": "cellCount" // <10>
     }
   ]
 }
@@ -270,6 +283,51 @@ result manifest in absence of `key` member.
 <9> Required string containing JSON schema type of member extracted from result manifest.
 <10> Optional string containing key of result manifest member for extraction. This allows mapping from a result manifest
 member key that differs from the value of `name` member.
+
+[[settings-section, Settings Object]]
+====== Settings Object
+The Settings object is the member responsible for indicating all content not related to data that is needed for the
+Job to run.
+
+* The Settings object MUST have a member `name`. The member's value is a string that correlates to referenced setting
+injections elseware in the Interface.
+* The Settings object MUST have a member `value`. The member's value is a string that indicates the desired value to
+associate with the setting object.
+is required by the job.
+
+The following annotated snippet provides quick reference to the use of the Settings object:
+
+[source,javascript]
+----
+{
+  "name": "SETTING1", // <1>
+  "value": "5432" // <2>
+}
+----
+<1> Required string containing the name to be used to lookup uses in the Interface.
+<2> Required string indicating if the value to associate with the setting name.
+
+[[env_vars-section, Environment Variables Object]]
+====== Settings Object
+The Environment Variables object is the member responsible for defining any values that need to be set as environment
+variables in that runtime that will be executing the job.
+
+* The env_vars object MAY have a member `name`. The member's value is an array of objects defined in Files Elements
+sub-section.
+* The env_vars object MAY have a member `value`. The member's value is an array of objects defined in JSON Elements
+sub-section.
+
+The following annotated snippet provides quick reference to the use of the env_vars object:
+
+[source,javascript]
+----
+{
+  "name": "DB_PORT", // <1>
+  "value": "${SETTING1}" // <2>
+}
+----
+<1> Required string containing the name portion of a name/value environment variable pair.
+<2> Required string containing the value portion of a name/value environment variable pair.
 
 
 [[errormapping-section, ErrorMapping Objects]]
