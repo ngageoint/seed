@@ -306,9 +306,9 @@ The following annotated snippet provides quick reference to the use of the Setti
 <1> Required string containing the name to be used to lookup uses in the Interface.
 <2> Required string indicating the value to associate with the setting name.
 
-[[envvars-section, Environment Variables Object]]
-====== Environment Variables Object
-The Environment Variables object is the member responsible for defining any values that need to be set as environment
+[[envvars-section, EnvVars Object]]
+====== EnvVars Object
+The EnvVars object is the member responsible for defining any values that need to be set as environment
 variables in the runtime that will be executing the job.
 
 * The envVars object MAY have a member `name`. The member's value is a case-sensitive string defining the name of the
