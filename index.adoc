@@ -1,7 +1,6 @@
 = Seed
-Jonathan Meyer <jonathan.meyer@appliedis.com>
-Mike Holt <mholt1@ball.com>
-v0.0.1, 2016-06-20
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>
+v0.0.2, 2016-12-20
 :toc:
 
 Seed is a general standard to aid in the discovery and consumption of discrete units of work contained within a Docker
