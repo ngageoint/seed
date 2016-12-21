@@ -1,6 +1,6 @@
 = Seed
-Jonathan Meyer <jonathan.meyer@appliedis.com>
-v0.0.1, 2016-06-20
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>
+v0.0.2, 2016-12-20
 :toc:
 
 Seed is a general standard to aid in the discovery and consumption of discrete units of work contained within a Docker
@@ -19,6 +19,3 @@ and Registry services. The suffix `-seed` must be used when naming images to ena
 push. This requirement will be deprecated as label search support is standardized across Docker registry services.
 
 See the link:detail.html[full specification] for complete detail on manifest format.
-
-
-

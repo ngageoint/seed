@@ -13,6 +13,7 @@
 				"image processing"
 			],
 			"authorName": "John Doe",
+			"authorEmail": "jdoe@example.com",
 			"authorUrl": "http://www.example.com",
 			"timeout": 3600,
 			"cpus": 10.0,
@@ -53,7 +54,19 @@
 							"type": "integer"
 						}
 					]
-				}
+				},
+				"envVars": [
+					{
+						"name": "DB_PORT",
+						"value": "${SETTING1}"
+					}
+				],
+				"settings": [
+					{
+						"name": "SETTING1",
+						"value": "5432"
+					}
+				]
 			},
 			"errorMapping": [
 				{

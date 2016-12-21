@@ -1,6 +1,6 @@
 = Seed Standard Definition
-Jonathan Meyer <jonathan.meyer@appliedis.com>
-v0.0.1, 2016-06-20
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>
+v0.0.2, 2016-12-20
 :toc: left
 :toclevels: 5
 :sectlinks:
@@ -11,8 +11,9 @@ v0.0.1, 2016-06-20
 == Introduction
 
 Seed is a general standard to aid in the discovery and consumption of
-discrete units of work contained within a Docker image. While initially developed to support the Scale data processing
-system with job discovery, it is designed to be readily applied to other systems as well.
+discrete units of work contained within a Docker image. While initially developed to support the
+http://ngageoint.github.io/scale/[Scale] data processing system with job discovery, it is designed to be readily
+applied to other systems as well.
 
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
