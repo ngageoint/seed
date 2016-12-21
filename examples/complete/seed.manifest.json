@@ -55,7 +55,7 @@
 						}
 					]
 				},
-				"env_vars": [
+				"envVars": [
 					{
 						"name": "DB_PORT",
 						"value": "${SETTING1}"

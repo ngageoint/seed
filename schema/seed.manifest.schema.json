@@ -191,7 +191,7 @@
 									}
 								}
 							},
-							"env_vars": {
+							"envVars": {
 								"type": "object",
 								"items": {
 									"type": "object",
@@ -200,7 +200,7 @@
 											"type": "string"
 										},
 										"value": {
-												"type": "string"
+											"type": "string"
 										},
 									},
 									"required": [

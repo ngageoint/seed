@@ -116,8 +116,8 @@ the array size.
 * The Interface object MAY have a member with the name `settings`. The member's value is an array of `Settings`
 objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
-* The Interface object MAY have a member with the name `env_vars`. The member's value is an array of
-`Environment Variables` objects (see <<env_vars-section>>) and MAY contain any number of elements. There is no other
+* The Interface object MAY have a member with the name `envVars`. The member's value is an array of
+`Environment Variables` objects (see <<envvars-section>>) and MAY contain any number of elements. There is no other
 standard restriction on the array size.
 
 The following annotated snippet provides quick reference to the use of Interface object:
@@ -129,7 +129,7 @@ The following annotated snippet provides quick reference to the use of Interface
   "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
   "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
   "outputData": { ... }, // <4>
-  "env_vars": { ... }, // <5>
+  "envVars": { ... }, // <5>
   "settings": { ... } // <6>
 }
 ----
@@ -138,8 +138,8 @@ The following annotated snippet provides quick reference to the use of Interface
 and executable arguments. Linux shell escaping may be needed in the case of special characters.
 <3> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
 <4> Optional <<outputdata-section>>. This is the means to capture results from the job container.
-<5> Optional <<env_vars-section>>. This is a means to set environment variables before a job is run.
-<6> Optional <<settings-section>>. This defines any settings that are used by the args or env_vars.
+<5> Optional <<envvars-section>>. This is a means to set environment variables before a job is run.
+<6> Optional <<settings-section>>. This defines any settings that are used by the args or envVars.
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
@@ -290,10 +290,9 @@ The Settings object is the member responsible for indicating all content not rel
 Job to run.
 
 * The Settings object MUST have a member `name`. The member's value is a string that correlates to referenced setting
-injections elseware in the Interface.
+injections elsewhere in the Interface.
 * The Settings object MUST have a member `value`. The member's value is a string that indicates the desired value to
 associate with the setting object.
-is required by the job.
 
 The following annotated snippet provides quick reference to the use of the Settings object:
 
@@ -305,19 +304,19 @@ The following annotated snippet provides quick reference to the use of the Setti
 }
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.
-<2> Required string indicating if the value to associate with the setting name.
+<2> Required string indicating the value to associate with the setting name.
 
-[[env_vars-section, Environment Variables Object]]
+[[envvars-section, Environment Variables Object]]
 ====== Settings Object
 The Environment Variables object is the member responsible for defining any values that need to be set as environment
-variables in that runtime that will be executing the job.
+variables in the runtime that will be executing the job.
 
-* The env_vars object MAY have a member `name`. The member's value is an array of objects defined in Files Elements
-sub-section.
-* The env_vars object MAY have a member `value`. The member's value is an array of objects defined in JSON Elements
-sub-section.
+* The envVars object MAY have a member `name`. The member's value is a case-sensitive string defining the name of the
+environment variable.
+* The envVars object MAY have a member `value`. The member's value is a case-sensitive string defining the value of the
+environment variable.
 
-The following annotated snippet provides quick reference to the use of the env_vars object:
+The following annotated snippet provides quick reference to the use of the envVars object:
 
 [source,javascript]
 ----
