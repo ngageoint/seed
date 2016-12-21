@@ -307,7 +307,7 @@ The following annotated snippet provides quick reference to the use of the Setti
 <2> Required string indicating the value to associate with the setting name.
 
 [[envvars-section, Environment Variables Object]]
-====== Settings Object
+====== Environment Variables Object
 The Environment Variables object is the member responsible for defining any values that need to be set as environment
 variables in the runtime that will be executing the job.
 
