@@ -64,6 +64,7 @@
 				"settings": [
 					{
 						"name": "SETTING1",
+						"secret": false
 					}
 				]
 			},

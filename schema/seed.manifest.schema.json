@@ -217,6 +217,10 @@
 										"name": {
 											"type": "string"
 										},
+										"secret": {
+											"type": "boolean",
+											"default": false
+										},
 									},
 									"required": [
 										"name"
