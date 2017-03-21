@@ -289,10 +289,8 @@ member key that differs from the value of `name` member.
 The Settings object is the member responsible for indicating all content not related to data that is needed for the
 Job to run.
 
-* The Settings object MUST have a member `name`. The member's value is a string that correlates to referenced setting
-injections elsewhere in the Interface.
-* The Settings object MUST have a member `value`. The member's value is a string that indicates the desired value to
-associate with the setting object.
+* The Settings object MUST have a member `name`. The member's value is a string that correlates setting references
+ elsewhere in the Interface to an external settings repository, and guides the injection of a related value.
 
 The following annotated snippet provides quick reference to the use of the Settings object:
 
@@ -300,11 +298,9 @@ The following annotated snippet provides quick reference to the use of the Setti
 ----
 {
   "name": "SETTING1", // <1>
-  "value": "5432" // <2>
 }
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.
-<2> Required string indicating the value to associate with the setting name.
 
 [[envvars-section, EnvVars Object]]
 ====== EnvVars Object
