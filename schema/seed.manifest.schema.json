@@ -217,13 +217,13 @@
 										"name": {
 											"type": "string"
 										},
-										"value": {
-											"type": "string"
-										}
+										"secret": {
+											"type": "boolean",
+											"default": false
+										},
 									},
 									"required": [
-										"name",
-										"value"
+										"name"
 									]
 								}
 							}
