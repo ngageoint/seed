@@ -300,7 +300,7 @@ The following annotated snippet provides quick reference to the use of the Setti
 ----
 {
   "name": "SETTING1", // <1>
-  "secret": true, // <1>
+  "secret": true, // <2>
 }
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.
