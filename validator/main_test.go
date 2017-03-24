@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 	"testing"
+	"os"
+	"path/filepath"
 )
 
 func TestValidateSeedSpec(t *testing.T) {
@@ -17,8 +19,14 @@ func TestValidateSeedSpec(t *testing.T) {
 		{"seed-test/invalid-missing-jobs", false, "jobs: jobs is required"},
 		{"seed-test/invalid-missing-job-interface-inputdata-files-name", false, "name: name is required"},
 	}
+	envSpecUri := os.Getenv("SPEC_PATH")
+	absSpecPath := ""
+	if (len(envSpecUri) > 0) {
+		absPath, _ := filepath.Abs(envSpecUri)
+		absSpecPath = filepath.Join("file://", absPath)
+	}
 	for _, c := range cases {
-		result := ValidateSeedSpec("", c.image)
+		result := ValidateSeedSpec(absSpecPath, c.image)
 		isValid := result.Valid()
 		if (isValid != c.expected ) {
 			t.Errorf("ValidateSeedSpec(%q) == %v, expected %v", c.image, isValid, c.expected)
