@@ -3,6 +3,9 @@ sudo: required
 services:
   - docker
 
+env:
+  - SPEC_PATH="../schema/seed.manifest.schema.json"
+
 before_install:
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
