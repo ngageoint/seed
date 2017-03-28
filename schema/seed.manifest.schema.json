@@ -196,7 +196,7 @@
 								}
 							},
 							"envVars": {
-								"type": "object",
+								"type": "array",
 								"items": {
 									"type": "object",
 									"properties": {
@@ -213,8 +213,30 @@
 									]
 								}
 							},
+							"mounts": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"path": {
+											"type": "string"
+										},
+										"mode": {
+											"enum": ["ro", "rw"],
+											"default": "ro"
+										}
+									},
+									"required": [
+										"name",
+										"path"
+									]
+								}
+							},
 							"settings": {
-								"type": "object",
+								"type": "array",
 								"items": {
 									"type": "object",
 									"properties": {

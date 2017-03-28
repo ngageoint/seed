@@ -62,6 +62,13 @@
 						"value": "${SETTING1}"
 					}
 				],
+				"mounts": [
+					{
+						"name": "MOUNT1",
+						"path": "/the/container/path",
+						"mode": "ro"
+					}
+				],
 				"settings": [
 					{
 						"name": "SETTING1",
