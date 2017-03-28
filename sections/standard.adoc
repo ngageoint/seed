@@ -54,6 +54,9 @@ period measured in seconds. Consuming systems MUST honor this value as a hard li
 fractional CPUs allocated for the job.
 * The Job object MUST have a member with the name `mem`. This member's value MUST be a number indicating the memory
 requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate allocations below 1 MiB.
+* The Job object MAY have a member with the name `shared_mem`. This member's value MUST be a number indicating the
+shared memory (/dev/shm) requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate
+allocations below 1 MiB. If omitted, the default of 0.0 may be assumed.
 * The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
 ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the default of 0.0 may be assumed.
 * The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
@@ -77,9 +80,10 @@ The following annotated snippet provides quick reference to the use of Job objec
   "timeout": 3600,// <8>
   "cpus": 10.0, // <9>
   "mem": 10240.0, // <10>
-  "storage": 0.0, // <11>
-  "interface": { ... }, // <12>
-  "errorMapping": [ ... ] // <13>
+  "shared_mem": 0.0, // <11>
+  "storage": 0.0, // <12>
+  "interface": { ... }, // <13>
+  "errorMapping": [ ... ] // <14>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined
@@ -92,11 +96,12 @@ unique system-wide.
 <6> Optional string containing job author email.
 <7> Optional string containing URL to job website.
 <8> Required integer containing job timeout value in seconds.
-<8> Required number containing CPU needs of job. Whole or fractional values allowed.
+<9> Required number containing CPU needs of job. Whole or fractional values allowed.
 <10> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<11> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<12> Required <<interface-section>>.
-<13> Optional array of <<errormapping-section>>.
+<11> Optional number containing shared memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<12> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<13> Required <<interface-section>>.
+<14> Optional array of <<errormapping-section>>.
 
 [[interface-section, Interface Object]]
 ===== Interface Object

@@ -49,6 +49,10 @@
 					"mem": {
 						"type": "number"
 					},
+					"shared_mem": {
+						"type": "number",
+						"default": 0.0
+					},
 					"storage": {
 						"type": "number",
 						"default": 0.0
