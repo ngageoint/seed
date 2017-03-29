@@ -18,6 +18,7 @@
 			"timeout": 3600,
 			"cpus": 10.0,
 			"mem": 10240.0,
+			"shared_mem": 0.0,
 			"storage": 0.0,
 			"interface": {
 				"cmd": "/app/job.sh",
@@ -59,6 +60,13 @@
 					{
 						"name": "DB_PORT",
 						"value": "${SETTING1}"
+					}
+				],
+				"mounts": [
+					{
+						"name": "MOUNT1",
+						"path": "/the/container/path",
+						"mode": "ro"
 					}
 				],
 				"settings": [
