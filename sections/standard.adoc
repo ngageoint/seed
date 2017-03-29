@@ -54,6 +54,9 @@ period measured in seconds. Consuming systems MUST honor this value as a hard li
 fractional CPUs allocated for the job.
 * The Job object MUST have a member with the name `mem`. This member's value MUST be a number indicating the memory
 requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate allocations below 1 MiB.
+* The Job object MAY have a member with the name `shared_mem`. This member's value MUST be a number indicating the
+shared memory (/dev/shm) requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate
+allocations below 1 MiB. If omitted, the default of 0.0 may be assumed.
 * The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
 ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the default of 0.0 may be assumed.
 * The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
@@ -77,9 +80,10 @@ The following annotated snippet provides quick reference to the use of Job objec
   "timeout": 3600,// <8>
   "cpus": 10.0, // <9>
   "mem": 10240.0, // <10>
-  "storage": 0.0, // <11>
-  "interface": { ... }, // <12>
-  "errorMapping": [ ... ] // <13>
+  "shared_mem": 0.0, // <11>
+  "storage": 0.0, // <12>
+  "interface": { ... }, // <13>
+  "errorMapping": [ ... ] // <14>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `version` members combined
@@ -92,16 +96,17 @@ unique system-wide.
 <6> Optional string containing job author email.
 <7> Optional string containing URL to job website.
 <8> Required integer containing job timeout value in seconds.
-<8> Required number containing CPU needs of job. Whole or fractional values allowed.
+<9> Required number containing CPU needs of job. Whole or fractional values allowed.
 <10> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<11> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<12> Required <<interface-section>>.
-<13> Optional array of <<errormapping-section>>.
+<11> Optional number containing shared memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<12> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
+<13> Required <<interface-section>>.
+<14> Optional array of <<errormapping-section>>.
 
 [[interface-section, Interface Object]]
 ===== Interface Object
 The Interface object is the primary member that describes the actual executable entrypoint, environment variables,
-settings, inputs and outputs defined for a job.
+mounts, settings, inputs and outputs defined for a job.
 
 * The Interface object MUST have a member with the name `cmd`. The member's value MUST be a string specifying the
 absolute path to the job executable within the Docker image.
@@ -112,6 +117,9 @@ of special characters MAY be required.
 objects (see <<inputdata-section>>) and MAY contain any number of elements.
 * The Interface object MAY have a member with the name `outputData`. The member's value is an array of `OutputData`
 objects (see <<outputdata-section>>) and MAY contain any number of elements. There is no other standard restriction on
+the array size.
+* The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
+objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
 * The Interface object MAY have a member with the name `settings`. The member's value is an array of `Settings`
 objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on
@@ -130,7 +138,8 @@ The following annotated snippet provides quick reference to the use of Interface
   "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
   "outputData": { ... }, // <4>
   "envVars": { ... }, // <5>
-  "settings": { ... } // <6>
+  "mounts": { ... }, // <6>
+  "settings": { ... } // <7>
 }
 ----
 <1> Required string indicating the job executable. It should be an absolute path for clarity.
@@ -139,7 +148,8 @@ and executable arguments. Linux shell escaping may be needed in the case of spec
 <3> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
 <4> Optional <<outputdata-section>>. This is the means to capture results from the job container.
 <5> Optional <<envvars-section>>. This is a means to set environment variables before a job is run.
-<6> Optional <<settings-section>>. This defines any settings that are used by the args or envVars.
+<6> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
+<7> Optional <<settings-section>>. This defines any settings that are used by the args or envVars.
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
@@ -284,6 +294,33 @@ result manifest in absence of `key` member.
 <10> Optional string containing key of result manifest member for extraction. This allows mapping from a result manifest
 member key that differs from the value of `name` member.
 
+[[mounts-section, Mounts Object]]
+====== Mounts Object
+The Mounts object is the member responsible for indicating any additional directories that must be mounted into the
+container for the Job to run. A mount directory is typically a shared file system directory that contains some set of
+reference data that the Job requires.
+
+* The Mounts object MUST have a member `name`. The member's value is a string that correlates mount references
+ elsewhere in the Interface to an external mount configuration that specifies how the mount is provided.
+* The Mounts object MUST have a member `path`. The member's value is an absolute file system path specifying where in
+ the container the Job expects the shared directory to be mounted.
+* The Settings object MAY have a member `mode`. The member's value is a string that either specifies "ro" for read-only
+ access to the directory or "rw" for read-write access. Default value is "ro".
+
+The following annotated snippet provides quick reference to the use of the Mounts object:
+
+[source,javascript]
+----
+{
+  "name": "MOUNT1", // <1>
+  "path": "/the/container/path", // <2>
+  "mode": "ro" // <3>
+}
+----
+<1> Required string containing the name to be used to lookup uses in the Interface.
+<2> Required string indicating the absolute file system path where the directory should be mounted.
+<3> Optional string indicating whether the directory should be mounted in read-only ("ro") or read-write ("rw") mode.
+
 [[settings-section, Settings Object]]
 ====== Settings Object
 The Settings object is the member responsible for indicating all content not related to data that is needed for the
@@ -300,7 +337,7 @@ The following annotated snippet provides quick reference to the use of the Setti
 ----
 {
   "name": "SETTING1", // <1>
-  "secret": true, // <2>
+  "secret": true // <2>
 }
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.

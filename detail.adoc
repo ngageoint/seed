@@ -65,6 +65,7 @@ The following minimum variables MUST be provided:
 * JOB_OUTPUT_DIR: Root path all output products must be placed by job for processing system capture.
 * ALLOCATED_CPUS: Value of `cpus` member.
 * ALLOCATED_MEM: Value of `mem` member.
+* ALLOCATED_SHARED_MEM: Value of `shared_mem` member.
 * ALLOCATED_STORAGE: Value of `storage` member.
 * All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Name case MUST map
 exactly from `name` value. It is the processing framework's responsibility to ensure data is mounted and to ensure the
