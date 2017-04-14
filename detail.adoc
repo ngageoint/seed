@@ -35,7 +35,7 @@ include::examples/complete/seed.manifest.json[]
 ----
 
 The image created must adhere to a specific naming convention. The standard requires specification of both an algorithm
-and a packaging version, tracking changes between individually betwee the algorithm logic and the packaging of it. The
+and a packaging version, tracking changes individually between the algorithm logic and the packaging of it. The
 following image naming template maps to members defined under the `Job` object:
 
 ----
