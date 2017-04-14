@@ -13,7 +13,6 @@ with the following Dockerfile snippet:
 include::examples/complete/Dockerfile[]
 ----
 
-
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or Registry
 push. This requirement will be deprecated as label search support is standardized across Docker registry services.
