@@ -16,7 +16,7 @@ func TestValidateSeedSpec(t *testing.T) {
 		{"seed-test/watermark", true, ""},
 		{"seed-test/complete", true, ""},
 		{"seed-test/random-number", true, ""},
-		{"seed-test/invalid-missing-jobs", false, "jobs: jobs is required"},
+		{"seed-test/invalid-missing-job", false, "job: job is required"},
 		{"seed-test/invalid-missing-job-interface-inputdata-files-name", false, "name: name is required"},
 	}
 	envSpecUri := os.Getenv("SPEC_PATH")

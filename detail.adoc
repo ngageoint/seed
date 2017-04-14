@@ -1,6 +1,6 @@
 = Seed Standard Definition
 Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>
-v0.0.2, 2016-12-20
+v0.0.3, 2017-4-14
 :toc: left
 :toclevels: 5
 :sectlinks:
@@ -10,10 +10,9 @@ v0.0.2, 2016-12-20
 
 == Introduction
 
-Seed is a general standard to aid in the discovery and consumption of
-discrete units of work contained within a Docker image. While initially developed to support the
-http://ngageoint.github.io/scale/[Scale] data processing system with job discovery, it is designed to be readily
-applied to other systems as well.
+Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image. While initially developed to support the http://ngageoint.github.io/scale/[Scale] data processing system with job
+discovery, it is designed to be readily applied to other systems as well.
 
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
@@ -33,6 +32,14 @@ example including required and optional keys:
 
 ----
 include::examples/complete/seed.manifest.json[]
+----
+
+The image created must adhere to a specific naming convention. The standard requires specification of both an algorithm
+and a packaging version, tracking changes between the algorithm and the packaging of it. The following image naming
+template maps to members defined under the `Job` object:
+
+----
+<name>-<algorithmVersion>-seed:<packageVersion>
 ----
 
 === Definitions
@@ -86,23 +93,25 @@ The following snippet demonstrates the optional values that may be specified:
 .Metadata JSON
 ----
 {
-    "geometry": { <1>
+    "metadataVersion": "0.0.3", <1>
+    "geometry": { <2>
         "type": "Polygon",
 	    "coordinates": [
 	        [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
         ]
     },
-    "time": { <2>
-        "start": "2016-08-06T00:00:00.000Z", <3>
-        "end": "2016-08-06T00:00:00.000Z" <4>
+    "time": { <3>
+        "start": "2016-08-06T00:00:00.000Z", <4>
+        "end": "2016-08-06T00:00:00.000Z" <5>
     }
 }
 ----
-<1> Optional GeoJSON Geometry object defining spatial extent of file.
-<2> Optional Time object defining temporal extent of file.
-<3> Required string containing an ISO 8601 date indicating the start temporal extent of file. String must include full
+<1> Required string indicating the Seed standard it complies with.
+<2> Optional GeoJSON Geometry object defining spatial extent of file.
+<3> Optional Time object defining temporal extent of file.
+<4> Required string containing an ISO 8601 date indicating the start temporal extent of file. String must include full
 time down to minute precision.
-<3> Required string containing an ISO 8601 date indicating the end temporal extent of file. String must include full
+<5> Required string containing an ISO 8601 date indicating the end temporal extent of file. String must include full
 time down to minute precision. If the data is a single point-in-time the end date should match the start date.
 
 === Examples
@@ -138,7 +147,7 @@ Docker Trusted Registry or Docker Registry. There is significant fragmentation o
 offerings and the following sections describe the steps that may be taken to access the labels defined by Seed.
 
 None of the Docker registry services support label search in any fashion. This incurs the requirement of applying a
-secondary means to subset image results. The standard presently requires that all job image are named with the suffix
+secondary means to subset image results. The standard presently requires that all job images are named with the suffix
 `-seed`. This allows for quick filtering of results to a manageable set for discovery.
 
 === Docker Hub
