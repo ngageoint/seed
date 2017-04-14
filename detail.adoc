@@ -86,16 +86,16 @@ The following snippet demonstrates the optional values that may be specified:
 .Metadata JSON
 ----
 {
-	"geometry": { <1>
-		"type": "Polygon",
-		"coordinates": [
-			[ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
-		]
-	},
-	"time": { <2>
-		"start": "2016-08-06T00:00:00.000Z", <3>
-		"end": "2016-08-06T00:00:00.000Z" <4>
-	}
+    "geometry": { <1>
+        "type": "Polygon",
+	    "coordinates": [
+	        [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
+        ]
+    },
+    "time": { <2>
+        "start": "2016-08-06T00:00:00.000Z", <3>
+        "end": "2016-08-06T00:00:00.000Z" <4>
+    }
 }
 ----
 <1> Optional GeoJSON Geometry object defining spatial extent of file.
