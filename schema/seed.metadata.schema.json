@@ -5,6 +5,10 @@
     "description": "One geometry as defined by GeoJSON",
     "type": "object",
     "properties": {
+        "metadataVersion": {
+            "type": "string",
+            "pattern": "0.0.3"
+        },
         "geometry": {
             "type": "object",
             "required": [
@@ -124,6 +128,9 @@
             ]
         }
     },
+    "required": [
+        "metadataVersion"
+    ],
     "definitions": {
         "position": {
             "description": "A single position",
