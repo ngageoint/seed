@@ -69,21 +69,21 @@ The following annotated snippet provides quick reference to the use of Job objec
 [source,javascript]
 ----
 {
-  "name": "my-algorithm", // <1>
-  "algorithmVersion": "1.0.0", // <2>
-  "packageVersion": "1.0.0", // <3>
-  "title": "My first algorithm", // <4>
-  "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <5>
-  "authorName": "John Doe", // <6>
-  "authorEmail": "jdoe@example.com", <7>
-  "authorUrl": "http://www.example.com", // <8>
-  "timeout": 3600,// <9>
-  "cpus": 10.0, // <10>
-  "mem": 10240.0, // <11>
-  "shared_mem": 0.0, // <12>
-  "storage": 0.0, // <13>
-  "interface": { ... }, // <14>
-  "errorMapping": [ ... ] // <15>
+    "name": "my-algorithm", // <1>
+    "algorithmVersion": "1.0.0", // <2>
+    "packageVersion": "1.0.0", // <3>
+    "title": "My first algorithm", // <4>
+    "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <5>
+    "authorName": "John Doe", // <6>
+    "authorEmail": "jdoe@example.com", <7>
+    "authorUrl": "http://www.example.com", // <8>
+    "timeout": 3600,// <9>
+    "cpus": 10.0, // <10>
+    "mem": 10240.0, // <11>
+    "shared_mem": 0.0, // <12>
+    "storage": 0.0, // <13>
+    "interface": { ... }, // <14>
+    "errorMapping": [ ... ] // <15>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `algorithmVersion` members
@@ -115,11 +115,10 @@ absolute path to the job executable within the Docker image.
 * The Interface object MAY have a member with the name `args`. The member's value MUST be a string specifying the
 complete parameter string passed to the executable defined in `cmd` member. Based on the Linux shell, shell escaping
 of special characters MAY be required.
-* The Interface object MAY have a member with the name `inputData`. The member's value is an array of `InputData`
-objects (see <<inputdata-section>>) and MAY contain any number of elements.
-* The Interface object MAY have a member with the name `outputData`. The member's value is an array of `OutputData`
-objects (see <<outputdata-section>>) and MAY contain any number of elements. There is no other standard restriction on
-the array size.
+* The Interface object MAY have a member with the name `inputData`. This member's value MUST be an object as defined in
+<<inputdata-section>>.
+* The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
+<<outputdata-section>>.
 * The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
 objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
@@ -135,13 +134,13 @@ The following annotated snippet provides quick reference to the use of Interface
 [source,javascript]
 ----
 {
-  "cmd": "/app/job.sh", // <1>
-  "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
-  "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
-  "outputData": { ... }, // <4>
-  "envVars": { ... }, // <5>
-  "mounts": { ... }, // <6>
-  "settings": { ... } // <7>
+    "cmd": "/app/job.sh", // <1>
+    "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <2>
+    "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <3>
+    "outputData": { ... }, // <4>
+    "envVars": [ ... ], // <5>
+    "mounts": [ ... ], // <6>
+    "settings": [ ... ] // <7>
 }
 ----
 <1> Required string indicating the job executable. It should be an absolute path for clarity.
@@ -183,20 +182,21 @@ The following annotated snippet provides quick reference to the use of InputData
 [source,javascript]
 ----
 {
-  "files": [ // <1>
-    {
-      "name": "INPUT_FILE", // <2>
-      "mediaType": [ "image/x-hdf5-image" ], // <3>
-      "required": true // <4>
-    }
-  ]
-  "json": [ // <5>
-    {
-      "name": "INPUT_STRING",
-      "type": "string", // <6>
-      "required": false // <7>
-    }
-  ]
+    "files": [ // <1>
+        {
+            "name": "INPUT_FILE", // <2>
+            "mediaType": [ "image/x-hdf5-image" ], // <3>
+            "required": true // <4>
+        },
+        ...
+    ]
+    "json": [ // <5>
+        {
+            "name": "INPUT_STRING",
+            "type": "string", // <6>
+            "required": false // <7>
+        }
+    ]
 }
 ----
 <1> Optional array containing elements defined by Files Elements sub-section.
@@ -253,8 +253,8 @@ The following annotated snippets provides quick reference to the use of OutputDa
 .Result Manifest
 ----
 {
-  "cellCount": 256,
-  ...
+    "cellCount": 256,
+    ...
 }
 ----
 
@@ -262,22 +262,24 @@ The following annotated snippets provides quick reference to the use of OutputDa
 .Seed Manifest - OutputData object
 ----
 "outputData": {
-  "files": [ // <1>
-    {
-	  "name": "OUTPUT_TIFFS", // <2>
-	  "mediaType": "image/tiff", // <3>
-	  "pattern": "outfile*.tif", // <4>
-	  "count": "2", // <5>
-	  "required": true // <6>
-	}
-  ],
-  "json": [ // <7>
-    {
-      "name": "CELL_COUNT", // <8>
-      "type": "integer", // <9>
-      "key": "cellCount" // <10>
-    }
-  ]
+    "files": [ // <1>
+        {
+            "name": "OUTPUT_TIFFS", // <2>
+            "mediaType": "image/tiff", // <3>
+            "pattern": "outfile*.tif", // <4>
+            "count": "2", // <5>
+            "required": true // <6>
+        },
+        ...
+    ],
+    "json": [ // <7>
+        {
+            "name": "CELL_COUNT", // <8>
+            "type": "integer", // <9>
+            "key": "cellCount" // <10>
+        },
+        ...
+    ]
 }
 ----
 <1> Optional array containing elements defined by Files Elements sub-section.
@@ -313,11 +315,14 @@ The following annotated snippet provides quick reference to the use of the Mount
 
 [source,javascript]
 ----
-{
-  "name": "MOUNT1", // <1>
-  "path": "/the/container/path", // <2>
-  "mode": "ro" // <3>
-}
+[
+    {
+        "name": "MOUNT1", // <1>
+        "path": "/the/container/path", // <2>
+        "mode": "ro" // <3>
+    },
+    ...
+]
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.
 <2> Required string indicating the absolute file system path where the directory should be mounted.
@@ -337,10 +342,13 @@ The following annotated snippet provides quick reference to the use of the Setti
 
 [source,javascript]
 ----
-{
-  "name": "SETTING1", // <1>
-  "secret": true // <2>
-}
+[
+    {
+        "name": "SETTING1", // <1>
+        "secret": true // <2>
+    },
+    ...
+]
 ----
 <1> Required string containing the name to be used to lookup uses in the Interface.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
@@ -359,10 +367,13 @@ The following annotated snippet provides quick reference to the use of the envVa
 
 [source,javascript]
 ----
-{
-  "name": "DB_PORT", // <1>
-  "value": "${SETTING1}" // <2>
-}
+[
+    {
+        "name": "DB_PORT", // <1>
+        "value": "${SETTING1}" // <2>
+    },
+    ...
+]
 ----
 <1> Required string containing the name portion of a name/value environment variable pair.
 <2> Required string containing the value portion of a name/value environment variable pair.
@@ -387,12 +398,13 @@ The following annotated snippet provides quick reference to the use of ErrorMapp
 [source,javascript]
 ----
 [
-  {
-    "code": 1, // <1>
-    "title": "Error Name", // <2>
-    "description": "Error Description", // <3>
-    "category": "system" // <4>
-  }
+    {
+        "code": 1, // <1>
+        "title": "Error Name", // <2>
+        "description": "Error Description", // <3>
+        "category": "system" // <4>
+    },
+    ...
 ]
 ----
 <1> Required integer indicating job process exit code.
