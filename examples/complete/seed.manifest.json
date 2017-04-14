@@ -1,101 +1,101 @@
 {
-	"manifestVersion": "0.0.1",
-	"jobs": [
-		{
-			"name": "my-algorithm",
-			"version": "1.0.0",
-			"title": "My first algorithm",
-			"description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
-			"tag": [
-				"hdf5",
-				"tiff",
-				"csv",
-				"image processing"
-			],
-			"authorName": "John Doe",
-			"authorEmail": "jdoe@example.com",
-			"authorUrl": "http://www.example.com",
-			"timeout": 3600,
-			"cpus": 10.0,
-			"mem": 10240.0,
-			"shared_mem": 0.0,
-			"storage": 0.0,
-			"interface": {
-				"cmd": "/app/job.sh",
-				"args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
-				"inputData": {
-					"files": [
-						{
-							"name": "INPUT_FILE",
-							"required": true,
-							"mediaType": [
-								"image/x-hdf5-image"
-							]
-						}
-					]
-				},
-				"outputData": {
-					"files": [
-						{
-							"name": "output_file_tiffs",
-							"mediaType": "image/tiff",
-							"count": "2",
-							"pattern": "outfile*.tif"
-						},
-						{
-							"name": "output_file_csv",
-							"mediaType": "text/csv",
-							"pattern": "outfile*.csv"
-						}
-					],
-					"json": [
-						{
-							"name": "cell_count",
-							"key": "cellCount",
-							"type": "integer"
-						}
-					]
-				},
-				"envVars": [
-					{
-						"name": "DB_PORT",
-						"value": "${SETTING1}"
-					}
-				],
-				"mounts": [
-					{
-						"name": "MOUNT1",
-						"path": "/the/container/path",
-						"mode": "ro"
-					}
-				],
-				"settings": [
-					{
-						"name": "SETTING1",
-						"secret": false
-					}
-				]
-			},
-			"errorMapping": [
-				{
-					"code": 1,
-					"title": "Error Name",
-					"description": "Error Description",
-					"category": "system"
-				},
-				{
-					"code": 2,
-					"title": "Error Name",
-					"description": "Error Description",
-					"category": "data"
-				},
-				{
-					"code": 3,
-					"title": "Error Name",
-					"description": "Error Description",
-					"category": "algorithm"
-				}
-			]
-		}
-	]
+    "manifestVersion": "0.0.1",
+    "jobs": [
+        {
+            "name": "my-algorithm",
+            "version": "1.0.0",
+            "title": "My first algorithm",
+            "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
+            "tag": [
+                "hdf5",
+                "tiff",
+                "csv",
+                "image processing"
+            ],
+            "authorName": "John Doe",
+            "authorEmail": "jdoe@example.com",
+            "authorUrl": "http://www.example.com",
+            "timeout": 3600,
+            "cpus": 10.0,
+            "mem": 10240.0,
+            "shared_mem": 0.0,
+            "storage": 0.0,
+            "interface": {
+                "cmd": "/app/job.sh",
+                "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+                "inputData": {
+                    "files": [
+                        {
+                            "name": "INPUT_FILE",
+                            "required": true,
+                            "mediaType": [
+                                "image/x-hdf5-image"
+                            ]
+                        }
+                    ]
+                },
+                "outputData": {
+                    "files": [
+                        {
+                            "name": "output_file_tiffs",
+                            "mediaType": "image/tiff",
+                            "count": "2",
+                            "pattern": "outfile*.tif"
+                        },
+                        {
+                            "name": "output_file_csv",
+                            "mediaType": "text/csv",
+                            "pattern": "outfile*.csv"
+                        }
+                    ],
+                    "json": [
+                        {
+                            "name": "cell_count",
+                            "key": "cellCount",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                "envVars": [
+                    {
+                        "name": "DB_PORT",
+                        "value": "${SETTING1}"
+                    }
+                ],
+                "mounts": [
+                    {
+                        "name": "MOUNT1",
+                        "path": "/the/container/path",
+                        "mode": "ro"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "SETTING1",
+                        "secret": false
+                    }
+                ]
+            },
+            "errorMapping": [
+                {
+                    "code": 1,
+                    "title": "Error Name",
+                    "description": "Error Description",
+                    "category": "system"
+                },
+                {
+                    "code": 2,
+                    "title": "Error Name",
+                    "description": "Error Description",
+                    "category": "data"
+                },
+                {
+                    "code": 3,
+                    "title": "Error Name",
+                    "description": "Error Description",
+                    "category": "algorithm"
+                }
+            ]
+        }
+    ]
 }
