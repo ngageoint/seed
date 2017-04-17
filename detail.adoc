@@ -24,7 +24,7 @@ services.
 Dockerfile snippet containing required label for Seed compliance:
 
 ----
-include::examples/complete/Dockerfile[]
+include::examples/complete/Dockerfile-snippet[]
 ----
 
 The com.seed.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
