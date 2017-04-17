@@ -10,7 +10,7 @@ To comply with the Seed standard a Docker image must have a single label used fo
 with the following Dockerfile snippet:
 
 ----
-include::examples/complete/Dockerfile[]
+include::examples/complete/Dockerfile-snippet[]
 ----
 
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
