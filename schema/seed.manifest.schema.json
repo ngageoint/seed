@@ -53,7 +53,7 @@
                 "mem": {
                     "type": "number"
                 },
-                "shared_mem": {
+                "sharedMem": {
                     "type": "number",
                     "default": 0.0
                 },
