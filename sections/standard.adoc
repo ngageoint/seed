@@ -54,7 +54,7 @@ period measured in seconds. Consuming systems MUST honor this value as a hard li
 fractional CPUs allocated for the job.
 * The Job object MUST have a member with the name `mem`. This member's value MUST be a number indicating the memory
 requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate allocations below 1 MiB.
-* The Job object MAY have a member with the name `shared_mem`. This member's value MUST be a number indicating the
+* The Job object MAY have a member with the name `sharedMem`. This member's value MUST be a number indicating the
 shared memory (/dev/shm) requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate
 allocations below 1 MiB. If omitted, the default of 0.0 may be assumed.
 * The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
@@ -80,7 +80,7 @@ The following annotated snippet provides quick reference to the use of Job objec
     "timeout": 3600,// <9>
     "cpus": 10.0, // <10>
     "mem": 10240.0, // <11>
-    "shared_mem": 0.0, // <12>
+    "sharedMem": 0.0, // <12>
     "storage": 0.0, // <13>
     "interface": { ... }, // <14>
     "errorMapping": [ ... ] // <15>
