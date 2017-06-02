@@ -17,7 +17,7 @@ type SeedJob_1_4 struct {
 	SharedMem float64
 	Storage float64
 	Interface JobInterface
-	ErrorMapping ErrorMap
+	ErrorMapping []ErrorMap
 }
 
 type JobInterface struct {

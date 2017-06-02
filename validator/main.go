@@ -2,21 +2,27 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
+	"seed/objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
+type NameError struct{
+}
+
 func main() {
 	schemaUri, dockerImage := GetArgs()
-	result := ValidateSeedSpec(schemaUri, dockerImage)
-	DisplayResults(result, dockerImage)
+	result, validImageName := ValidateSeedSpec(schemaUri, dockerImage)
+	DisplayResults(result, dockerImage, validImageName)
 }
 
 // Validates the Seed manifest in the LABEL of a Docker image against the schema at the specified URI or defaults to the Seed schema on GitHub. 
-func ValidateSeedSpec(schemaUri string, dockerImage string) gojsonschema.Result {
+func ValidateSeedSpec(schemaUri string, dockerImage string) (gojsonschema.Result, string) {
 	defaultSchemaUri := "https://ngageoint.github.io/seed/schema/seed.manifest.schema.json"
 	seedManifestKey := "com.ngageoint.seed.manifest"
 	if (len(schemaUri) == 0) {
@@ -26,7 +32,9 @@ func ValidateSeedSpec(schemaUri string, dockerImage string) gojsonschema.Result 
 	out := DockerInspect(dockerImage)
 	seedManifest := ParseLabel(out, seedManifestKey)
 	result := Validate(schemaUri, seedManifest)
-	return result
+	validName := ValidImageName(seedManifest)
+
+	return result, validName
 }
 
 // Retrieve command line arguments
@@ -65,9 +73,28 @@ func ParseLabel(stdout []byte, seedManifestKey string) string {
 	if err != nil {
 		panic(err.Error())
 	}
-	seedManifest := labelMap[seedManifestKey]
-	// TODO: test for seed manifest key not found
+	seedManifest, ok := labelMap[seedManifestKey]
+	if !ok {
+		err = errors.New("Docker image label is missing seed manifest key")
+		panic(err.Error())
+	}
+
 	return seedManifest
+}
+
+// Returns a valid image name in this format from a given seed manifest: <name>-<algorithmVersion>-seed:<packageVersion>
+func ValidImageName(seedManifest string) string {
+	var seed objects.Seed_0_0_3
+	err := json.Unmarshal([]byte(seedManifest), &seed)
+	if err != nil {
+		panic(err.Error())
+	}
+	temp1 := []string{ seed.Job.Name, seed.Job.AlgorithmVersion, "seed" }
+	firstHalf := strings.Join(temp1, "-")
+	temp2 := []string{ firstHalf, seed.Job.PackageVersion }
+	validString := strings.Join(temp2, ":")
+	
+	return validString
 }
 
 // Load JSON manifest and validate against Seed schema
@@ -81,13 +108,20 @@ func Validate(schemaUri string, seedManifest string) gojsonschema.Result {
 	return *result
 }
 
-func DisplayResults(result gojsonschema.Result, dockerImage string) {
-	if result.Valid() {
+func DisplayResults(result gojsonschema.Result, dockerImage string, validName string) {
+	isNameValid := validName == dockerImage
+	var nameError string
+	if !isNameValid {
+		str1 := fmt.Sprintln("Docker image name does not match <name>-<algorithmVersion>-seed:<packageVersion> pattern.")
+		nameError = fmt.Sprintf("%s Expected %s, given %s\n", str1, validName, dockerImage)
+	}
+	if result.Valid() && isNameValid {
 		fmt.Printf("The Docker image %s is valid\n", dockerImage)
 	} else {
 		fmt.Printf("The Docker image %s is not valid. see errors :\n", dockerImage)
 		for _, desc := range result.Errors() {
 			fmt.Printf("- %s\n", desc)
 		}
+		fmt.Printf("%s\n", nameError)
 	}
 }
