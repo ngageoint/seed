@@ -29,7 +29,8 @@ func ValidateSeedSpec(schemaUri string, dockerImage string) (gojsonschema.Result
 		schemaUri = defaultSchemaUri
 	}
 
-	out := DockerInspect(dockerImage)
+	out, err := DockerInspect(dockerImage)
+	checkError(err)
 	seedManifest := ParseLabel(out, seedManifestKey)
 	result := Validate(schemaUri, seedManifest)
 	validName := ValidImageName(seedManifest)
@@ -53,16 +54,23 @@ func GetArgs() (string, string) {
 }
 
 // Execute 'docker inspect' to parse Dockerfile and get json LABEL info from stdout
-func DockerInspect(dockerImage string) []byte {
-	cmd := "docker"
+func DockerInspect(dockerImage string) ([]byte, error) {
+	cmdstr := "docker"
 	args := []string{"inspect", "--format={{json .Config.Labels}}", dockerImage}
-	out, err := exec.Command(cmd, args...).Output()
-	if err != nil {
-		fmt.Println("An error occurred!")
-		fmt.Fprintln(os.Stderr, err)
+	cmd := exec.Command(cmdstr, args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil  { //err does not have docker error messages, need to get them from stderr/stdout
+		errStr := fmt.Sprintln(err.Error(), string(out))
+		err = errors.New(errStr)  
+	} else if strings.Contains(string(out),"Error") {
+		err = errors.New(string(out))
+	} else if len(out) == 0 {
+		fmt.Println("Empty Docker image label!");
+		if err == nil {
+			err = errors.New("Docker image has empty label")
+		}
 	}
-	// TODO: test for no output from docker inspect
-	return out
+	return out, err
 }
 
 // Convert stdout to string, parse into a map, and retrieve Seed info by key
@@ -71,12 +79,12 @@ func ParseLabel(stdout []byte, seedManifestKey string) string {
 	labelMap := make(map[string]string)
 	err := json.Unmarshal([]byte(outputJson), &labelMap)
 	if err != nil {
-		panic(err.Error())
+		checkError(err)
 	}
 	seedManifest, ok := labelMap[seedManifestKey]
 	if !ok {
 		err = errors.New("Docker image label is missing seed manifest key")
-		panic(err.Error())
+		checkError(err)
 	}
 
 	return seedManifest
@@ -123,5 +131,12 @@ func DisplayResults(result gojsonschema.Result, dockerImage string, validName st
 			fmt.Printf("- %s\n", desc)
 		}
 		fmt.Printf("%s\n", nameError)
+	}
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 }
