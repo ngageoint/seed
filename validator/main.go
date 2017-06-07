@@ -62,7 +62,7 @@ func DockerInspect(dockerImage string) ([]byte, error) {
 	if err != nil  { //err does not have docker error messages, need to get them from stderr/stdout
 		errStr := fmt.Sprintln(err.Error(), string(out))
 		err = errors.New(errStr)  
-	} else if strings.Contains(string(out),"Error") {
+	} else if strings.HasPrefix(string(out),"Error:") {
 		err = errors.New(string(out))
 	} else if len(out) == 0 {
 		fmt.Println("Empty Docker image label!");
