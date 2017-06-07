@@ -13,11 +13,11 @@ func TestValidateSeedSpec(t *testing.T) {
 		expected bool
 		expectedErrorMsg string
 	}{
-		{"seed-test/watermark", true, ""},
-		{"seed-test/complete", true, ""},
-		{"seed-test/random-number", true, ""},
+		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
+		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
+		{"random-number-gen-0.1.0-seed:0.1.0,", true, ""},
 		{"seed-test/invalid-missing-job", false, "job: job is required"},
-		{"seed-test/invalid-missing-job-interface-inputdata-files-name", false, "name: name is required"},
+		{"missing-filename-0.1.0-seed:0.1.0", false, "name: name is required"},
 	}
 	envSpecUri := os.Getenv("SPEC_PATH")
 	absSpecPath := ""
@@ -26,7 +26,7 @@ func TestValidateSeedSpec(t *testing.T) {
 		absSpecPath = filepath.Join("file://", absPath)
 	}
 	for _, c := range cases {
-		result := ValidateSeedSpec(absSpecPath, c.image)
+		result, _ := ValidateSeedSpec(absSpecPath, c.image)
 		isValid := result.Valid()
 		if (isValid != c.expected ) {
 			t.Errorf("ValidateSeedSpec(%q) == %v, expected %v", c.image, isValid, c.expected)
