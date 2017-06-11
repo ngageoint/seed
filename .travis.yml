@@ -13,8 +13,6 @@ before_install:
 
 install:
   - go get github.com/xeipuuv/gojsonschema
-  - go install ./objects
-  - go build validator/main.go
 
 script:
   - docker run -v $TRAVIS_BUILD_DIR:/documents/ --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output *.adoc

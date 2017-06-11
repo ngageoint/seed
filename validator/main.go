@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"seed/objects"
+	"../objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
