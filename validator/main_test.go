@@ -13,11 +13,11 @@ func TestValidateSeedSpec(t *testing.T) {
 		expected bool
 		expectedErrorMsg string
 	}{
-		{"seed-test/watermark", true, ""},
-		{"seed-test/complete", true, ""},
-		{"seed-test/random-number", true, ""},
+		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
+		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
+		{"random-number-gen-0.1.0-seed:0.1.0", true, ""},
 		{"seed-test/invalid-missing-job", false, "job: job is required"},
-		{"seed-test/invalid-missing-job-interface-inputdata-files-name", false, "name: name is required"},
+		{"missing-filename-0.1.0-seed:0.1.0", false, "name: name is required"},
 	}
 	envSpecUri := os.Getenv("SPEC_PATH")
 	absSpecPath := ""
@@ -26,7 +26,7 @@ func TestValidateSeedSpec(t *testing.T) {
 		absSpecPath = filepath.Join("file://", absPath)
 	}
 	for _, c := range cases {
-		result := ValidateSeedSpec(absSpecPath, c.image)
+		result, _ := ValidateSeedSpec(absSpecPath, c.image)
 		isValid := result.Valid()
 		if (isValid != c.expected ) {
 			t.Errorf("ValidateSeedSpec(%q) == %v, expected %v", c.image, isValid, c.expected)
@@ -36,6 +36,29 @@ func TestValidateSeedSpec(t *testing.T) {
 			if (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
 				t.Errorf("Error message contained `%s`, expected `%s`", errorMsg, c.expectedErrorMsg)
 			}
+		}
+	}
+}
+
+func TestValidImageName(t *testing.T) {
+	cases := []struct {
+		image string
+		expected string
+	}{
+		{"image-watermark-0.1.0-seed:0.1.0", "image-watermark-0.1.0-seed:0.1.0"},
+		{"my-algorithm-0.1.0-seed:0.1.0", "my-algorithm-0.1.0-seed:0.1.0"},
+		{"seed-test/invalid-missing-job", "--seed:"},
+		{"seed-test/watermark", "image-watermark-0.1.0-seed:0.1.0" },
+	}
+	for _, c := range cases {
+		out, err := DockerInspect(c.image)
+		seedManifest := ParseLabel(out, "com.ngageoint.seed.manifest")
+		result := ValidImageName(string(seedManifest))
+		if err != nil {
+			continue
+		}
+		if (result != c.expected ) {
+			t.Errorf("ValidImageName(%q) == %v, expected %v", c.image, result, c.expected)
 		}
 	}
 }
