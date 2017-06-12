@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	// TODO: Consider removal of Go struct in favor of generic interface for JSON unmarshalling.
 	"../objects"
 	"github.com/xeipuuv/gojsonschema"
 )
