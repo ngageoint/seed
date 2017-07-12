@@ -1,0 +1,80 @@
+{
+  "manifest_version": "0.0.3",
+  "job": {
+    "name": "addition-algorithm",
+    "algorithmVersion": "0.0.1",
+    "packageVersion": "1.0.0",
+    "title": "Number Addition",
+    "description": "Adds numbers together",
+    "authorName": "Emily Smith",
+    "timeout": 10,
+    "cpus": 0.1,
+    "mem": 1.0,
+    "interface": {
+      "cmd": "run.sh",
+      "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+      "inputData": {
+        "files": [
+          {
+            "name": "INPUT_FILE",
+            "required": "true",
+            "mediaType": [
+              "text/plain"
+            ]
+          }
+        ]
+      },
+      "outputData": {
+        "files": [
+          {
+            "name": "OUTPUT_FILE",
+            "mediaType": "text/plain",
+            "pattern": "*_output.txt",
+            "count": "4"
+          }
+        ],
+        "json": [
+          {
+            "name": "x",
+            "type": "INTEGER"
+          },
+          {
+            "name": "y",
+            "type": "INTEGER"
+          },
+          {
+            "name": "z",
+            "key": "total",
+            "type": "integer"
+          }
+        ]
+      },
+      "envVars": [
+        {
+          "name": "MAGIC_ADD",
+          "value": "7"
+        }
+      ],
+      "mounts": [
+        {
+          "name": "MOUNT1",
+          "path": "/usr/bin/",
+          "mode": "ro"
+        },
+        {
+          "name": "MOUNT2",
+          "path": "/tmp/",
+          "mode": "rw"
+        }
+      ]
+    },
+    "errorMapping": [
+      {
+        "code": 1,
+        "title": "No Input Provided",
+        "description": "No input files have been given. No data to add.",
+        "category": "data"
+      }
+    ]
+  }
+}
