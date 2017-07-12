@@ -1,4 +1,9 @@
-# IntelliJ files
+# Excluding extensionless binaries from cli directory
+cli/*
+!cli/**/
+!cli/*.*
+
+# Exclude project files
 .idea
 *.iml
 
