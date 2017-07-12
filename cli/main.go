@@ -383,6 +383,9 @@ func DefineFlags() {
 		}
 	case "run":
 		runCmd.Parse(os.Args[2:])
+		if len(os.Args) < 3 {
+			PrintRunUsage()
+		}
 	case "search":
 		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
 		PrintSearchUsage()
@@ -421,7 +424,7 @@ func PrintBuildUsage() {
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] -o JOB_OUTPUT_DIRECTORY [OPTIONS]\n")
-	fmt.Fprintf(os.Stderr, "\nRuns Docker image. Input data defined in seed spec must be specified via the -i option.\n\n")
+	//fmt.Fprintf(os.Stderr, "\nRuns Docker image. Input data defined in seed spec must be specified via the -i option.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
 		"  -%s,  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
