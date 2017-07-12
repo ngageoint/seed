@@ -1,0 +1,196 @@
+= Seed Standard Definition
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>
+v0.0.3, 2017-4-14
+:toc: left
+:toclevels: 5
+:sectlinks:
+:sectnums:
+:sectnumlevels: 5
+:icons: font
+
+== Introduction
+
+Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image. While initially developed to support the http://ngageoint.github.io/scale/[Scale] data processing system with job
+discovery, it is designed to be readily applied to other systems as well.
+
+Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
+Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
+services.
+
+=== Format
+
+Dockerfile snippet containing required label for Seed compliance:
+
+----
+include::examples/complete/Dockerfile-snippet[]
+----
+
+The com.seed.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
+example including required and optional keys:
+
+----
+include::examples/complete/seed.manifest.json[]
+----
+
+The image created must adhere to a specific naming convention. The standard requires specification of both an algorithm
+and a packaging version, tracking changes individually between the algorithm logic and the packaging of it. The
+following image naming template maps to members defined under the `Job` object:
+
+----
+<name>-<algorithmVersion>-seed:<packageVersion>
+----
+
+=== Definitions
+* GeoJSON, and the terms Geometry and Polygon are defined in
+https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
+* Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
+http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
+* ISO 8601 and the specifics of the date format are defined in https://tools.ietf.org/html/rfc3339[IETF RFC 3339]
+* JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
+http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
+* Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
+http://semver.org/spec/v2.0.0.html
+* The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in http://www.ietf.org/rfc/rfc2119.txt[IETF RFC 2119].
+
+== Standard
+include::sections/standard.adoc[]
+
+== Usage
+
+=== Implementing
+A few requirements must be satisfied when implementing a system capable of executing Seed standardized images.
+
+==== Environment Variables
+Environment variable injection must be performed. These may be consumed by job directly as environment variables or
+shell variable expansion may be leveraged in the `interface.args` member.
+
+The following minimum variables MUST be provided:
+
+* JOB_OUTPUT_DIR: Root path all output products must be placed by job for processing system capture.
+* ALLOCATED_CPUS: Value of `cpus` member.
+* ALLOCATED_MEM: Value of `mem` member.
+* ALLOCATED_SHARED_MEM: Value of `sharedMem` member.
+* ALLOCATED_STORAGE: Value of `storage` member.
+* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Name case MUST map
+exactly from `name` value. It is the processing framework's responsibility to ensure data is mounted and to ensure the
+path is container resolvable.
+* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Name case MUST map
+exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded.
+
+==== Output File metadata
+There is often a need by the processing system to capture additional job extracted metadata on output files. The Seed
+standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
+describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
+must be formatted according to the link:schema/seed.metadata.schema.json[Seed Metadata Schema]. This allows for both
+spatial and temporal metadata to be specified.
+
+The following snippet demonstrates the optional values that may be specified:
+
+[source,javascript]
+.Metadata JSON
+----
+{
+    "metadataVersion": "0.0.3", <1>
+    "geometry": { <2>
+        "type": "Polygon",
+	    "coordinates": [
+	        [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
+        ]
+    },
+    "time": { <3>
+        "start": "2016-08-06T00:00:00.000Z", <4>
+        "end": "2016-08-06T00:00:00.000Z" <5>
+    }
+}
+----
+<1> Required string indicating the Seed standard it complies with.
+<2> Optional GeoJSON Geometry object defining spatial extent of file.
+<3> Optional Time object defining temporal extent of file.
+<4> Required string containing an ISO 8601 date indicating the start temporal extent of file. String must include full
+time down to minute precision.
+<5> Required string containing an ISO 8601 date indicating the end temporal extent of file. String must include full
+time down to minute precision. If the data is a single point-in-time the end date should match the start date.
+
+=== Examples
+The Seed standard is intended to support both simple and complex job packaging. To that end the standard allows for
+sensible defaults to take the place of a fully specified manifest. The following examples identify both a minimal
+Seed use and a more realistic, fully exercised standard.
+
+==== Random Number Generator Job
+Minimal manifest demonstrating the simplest possible Seed definition.
+----
+include::examples/random-number/seed.manifest.json[]
+----
+
+Serialized as a label in a Dockerfile snippet:
+----
+include::examples/random-number/Dockerfile[]
+----
+
+==== Image Watermark Job
+Image watermark job taking a single image and returning with watermark applied using Seed definition.
+----
+include::examples/watermark/seed.manifest.json[]
+----
+
+Serialized as a label in a Dockerfile snippet:
+----
+include::examples/watermark/Dockerfile[]
+----
+
+== Discovery
+A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
+Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
+offerings and the following sections describe the steps that may be taken to access the labels defined by Seed.
+
+None of the Docker registry services support label search in any fashion. This incurs the requirement of applying a
+secondary means to subset image results. The standard presently requires that all job images are named with the suffix
+`-seed`. This allows for quick filtering of results to a manageable set for discovery.
+
+=== Docker Hub
+Docker Hub stores Docker image manifest information in a readily accessible format only for Automated Builds. This
+enforces the need for all developers wishing to support simple discovery from Docker Hub to support Hub builds, as
+opposed to local image builds followed by a docker push. Given this caveat, a service such as ImageLayers can be used
+to quickly identify manifest content after discovering available images.
+
+The following two steps may be taken to find and identify labels within Docker Hub:
+
+* Perform HTTP GET to find Docker images:
+** URL: https://hub.docker.com/v2/search/repositories/?query=-seed
+* Perform HTTP POST to get label details for images found in previous request:
+** BODY: {"repos":[{"name":"myorg/myjob-seed","tag":"latest"}]}
+** URL: https://imagelayers.io/registry/analyze
+
+The ImageLayers service is a 3rd-party service by CenturyLink Labs, but the source code is openly available at
+https://github.com/CenturyLinkLabs/imagelayers[ImageLayers] and can be used as a reference implementation.
+
+=== Docker Registry
+Docker Registry does not natively support any type of search, but does provide a catalog API that allows for listing the
+entire registry contents. Using this along with tag and manifest inspection will allow label inspection.
+
+The following steps may be taken to find and identify labels of Seed compliant images within Docker Registry:
+
+NOTE: All references to `{registry}`, `{image-id}` and `{tag}` in the following URLs should be replaced with your
+environment specific values.
+
+* Perform HTTP GET against catalog endpoint to find `-seed` suffixed images:
+** URL: http://{registry}/v2/_catalog
+* Perform HTTP GET against tags endpoint for each image matched:
+** http://{registry}/v2/{image-id}/tags/list
+* Perform HTTP GET against manifests endpoint to retrieve labels per tag (extract labels from history JSON member):
+** http://{registry}/v2/{image-id}/manifests/{tag}
+
+=== Docker Trusted Registry
+There is a ticket in with Docker Trusted Registry team to natively support label search. Presently there is no API
+support to inspect hosted images for label metadata. Images must be pulled locally for inspection.
+
+== Schema
+The following JSON Schema should be used to validate Seed manifests prior to label serialization into a Dockerfile
+for publish. It may be downloaded here: link:schema/seed.manifest.schema.json[Seed Manifest Schema]
+
+----
+include::schema/seed.manifest.schema.json[]
+----

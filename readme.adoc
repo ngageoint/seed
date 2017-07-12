@@ -21,7 +21,7 @@ purpose, requirements and interface.
 
 == Development
 
-All Seed documentation is made via the excellent AsciiDoc standard. Travis CI is used to compile all the 
+All Seed documentation is made via the excellent AsciiDoc standard. Travis CI is used to compile all the
 documentation into html / pdf releases and update the GitHub pages site with all available Seed releases.
 
 Generation of new releases may be done from a clean master branch:
