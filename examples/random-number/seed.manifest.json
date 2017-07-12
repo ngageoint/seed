@@ -5,13 +5,24 @@
         "algorithmVersion": "0.1.0",
         "packageVersion": "0.1.0",
         "title": "Random Number Generator",
-        "description": "Generates a random number and outputs on stdout",
+        "description": "Generates a random number and outputs to number.txt",
         "authorName": "John Doe",
         "timeout": 10,
         "cpus": 0.1,
         "mem": 1.0,
         "interface": {
-            "cmd": "/app/job.sh"
+            "cmd": "/app/job.sh",
+            "args": "${JOB_OUTPUT_DIR}",
+            "outputData": {
+                "files": [
+                    {
+                        "name": "OUTPUT_NUMBER",
+                        "mediaType": "text/plain",
+                        "count": "1",
+                        "pattern": "number.txt"
+                    }
+                ]
+            }
         }
     }
 }
