@@ -175,7 +175,7 @@ type Seed struct {
       seed.json exists. Otherwise error.
    input: no default; args should match file InputData as described in
       seed.json. You'll need to search / replace this with container
-      resolvable paths. It's the algorithm developers respobsibility to
+      resolvable paths. It's the algorithm developers responsibility to
       create parameter expansion
    output: no default; single directory where output files are placed. Glob
       capture expressions are described in seed.json
@@ -207,7 +207,7 @@ func main() {
 	if err = jsonParser.Decode(&seed); err != nil {
 		fmt.Fprintf(os.Stderr,
 			"ERROR: A valid %s must be present in the working directory. Error parsing %s",
-			SeedFileName, SeedFileName)
+			SeedFileName, seedFileName)
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(2)
 	}

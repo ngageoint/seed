@@ -1,0 +1,83 @@
+= Seed CLI
+
+The Seed team provides a fully featured Command-Line Interface (CLI) for algorithm developers looking to provide Seed
+compliant packaging of their jobs. Using the CLI will enable you to quickly iterate without getting bogged down
+learning how to interface directly with the underlying container technologies (Docker). It also simplifies the process
+of attaching Seed metadata to your algorithm prior to publish.
+
+== Usage
+
+Seed CLI offers sub-commands that correlate to common operations performed by an algorithm developer. These
+can be seen from the command-line by launching the CLI without any arguments:
+
+----
+seed
+----
+
+The full list of available commands will be returned as output. High-level overview of each command and its expected
+usage can be found in the following sections.
+
+=== Build
+
+The first step when starting to package an algorithm for Seed compliance is to define the requirements and interface.
+This is done by a combination of execution environment configuration (`Dockerfile`), resource requirement definition and
+input / output specification (`seed.manifest.json`). By default, the `seed build` command assumes both a `Dockerfile`
+`seed.manifest.json` reside in the current working directory. Using these two files in conjuction the build command
+is able to construct an re-usable Seed compliant image.
+
+A simple example of this would be the random-number.
+
+----
+seed build -d ../examples/random-number
+----
+
+This will result in a new Docker image that contains `com.ngageoint.seed.manifest` LABEL and is named according to spec
+constraint: random-number-0.1.0-seed:0.1.0
+
+This image can now be executed via the `seed run` command or pushed to a remote image registry by way of `seed publish`.
+
+=== Run
+
+The primary purpose of the CLI is to easily enable algorithm execution. The common stumbling blocks for new developers
+are being able to feed data into and retrieve out fo the containers as a part of execution. The `seed run` command
+facilitates this through introspection of the Seed interface indicating exactly what input data is required, allowing
+for simply specifying the system locations of data and handling all mounting and output validation and capture
+operations for the developer.
+
+Attempts will also be made to execute `seed build` if no Seed algorithm is specified to compile an algorithm image from
+the current working directory.
+
+For an Seed interface with a single `inputData.files` element with a `name` of `MY_INPUT` the `seed run` command would
+be as follows:
+
+----
+seed run -in process-file:0.1.0-seed:0.1.0 -i MY_INPUT=/tmp/file_input.txt -o /tmp/outputs
+----
+
+This will volume mount `/tmp/file_input.txt` as read only and `/tmp/outputs` into the container, replacing these values
+with the container relative locations and injecting into the defined `args` placeholders for consumption by the
+algorithm.
+
+=== List
+
+Allows for listing all Seed compliant images residing on the local system.
+
+=== Search
+
+Allows for discovery of Seed compliant images hosted within a Docker registry.
+
+=== Publish
+
+Allows for publish of Seed compliant images to a remote Docker registry.
+
+== Development
+
+If you wish develop on the Seed CLI, you will need an installation of Golang. There are presently no external package
+dependencies, so building the project will be as easy as:
+
+----
+go build -o seed
+
+# Optionally add it to your system binary folder
+go build -o /usr/local/bin/seed
+----
