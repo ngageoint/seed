@@ -11,14 +11,14 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"strings"
 	"strconv"
+	"strings"
 	// TODO: Consider removal of Go struct in favor of generic interface for JSON unmarshalling.
 	"github.com/xeipuuv/gojsonschema"
 )
 
-type RunResult struct{
-	Valid bool
+type RunResult struct {
+	Valid     bool
 	RunErrors []string
 }
 
@@ -29,8 +29,8 @@ func (s *stringList) String() string {
 }
 
 func (s *stringList) Set(value string) error {
-    *s = strings.Split(value, ",")
-    return nil
+	*s = strings.Split(value, ",")
+	return nil
 }
 
 func main() {
@@ -48,10 +48,10 @@ func main() {
 	DisplayResults(specResult, dockerImage, nameError, runResult)
 }
 
-// Validates the Seed manifest in the LABEL of a Docker image against the schema at the specified URI or defaults to the Seed schema on GitHub. 
+// Validates the Seed manifest in the LABEL of a Docker image against the schema at the specified URI or defaults to the Seed schema on GitHub.
 func ValidateSeedSpec(schemaUri string, seedManifest string) gojsonschema.Result {
 	defaultSchemaUri := "https://ngageoint.github.io/seed/schema/seed.manifest.schema.json"
-	if (len(schemaUri) == 0) {
+	if len(schemaUri) == 0 {
 		schemaUri = defaultSchemaUri
 	}
 
@@ -73,32 +73,32 @@ func GetArgs() (string, string) {
 	flag.Var(&settings, "settings", "Optional comma separated list of setting names and values. e.g. DB_PORT=9999,DB_NAME=database")
 
 	flag.Parse()
-	
+
 	for _, file := range inputFiles {
 		pair := strings.Split(file, "=")
 		if len(pair) != 2 {
 			fmt.Println("Error parsing input file string %v")
 		}
-		os.Setenv(pair[0],pair[1])
+		os.Setenv(pair[0], pair[1])
 	}
-	
+
 	for _, mount := range mounts {
 		pair := strings.Split(mount, "=")
 		if len(pair) != 2 {
 			fmt.Println("Error parsing input file string %v")
 		}
-		os.Setenv(pair[0],pair[1])
+		os.Setenv(pair[0], pair[1])
 	}
-	
+
 	for _, setting := range settings {
 		pair := strings.Split(setting, "=")
 		if len(pair) != 2 {
 			fmt.Println("Error parsing input file string %v")
 		}
-		os.Setenv(pair[0],pair[1])
+		os.Setenv(pair[0], pair[1])
 	}
 
-	if (len(dockerImage) == 0) {
+	if len(dockerImage) == 0 {
 		fmt.Println("\n\"seedvalidator\" requires a docker image be specified.\n\nUsage: seedvalidator -image DOCKERIMAGE \n")
 		os.Exit(1)
 	}
@@ -111,13 +111,13 @@ func DockerInspect(dockerImage string) ([]byte, error) {
 	args := []string{"inspect", "--format={{json .Config.Labels}}", dockerImage}
 	cmd := exec.Command(cmdstr, args...)
 	labels, err := cmd.CombinedOutput()
-	if err != nil  { //err does not have docker error messages, need to get them from stderr/stdout
+	if err != nil { //err does not have docker error messages, need to get them from stderr/stdout
 		errStr := fmt.Sprintln(err.Error(), string(labels))
-		err = errors.New(errStr)  
-	} else if strings.HasPrefix(string(labels),"Error:") {
+		err = errors.New(errStr)
+	} else if strings.HasPrefix(string(labels), "Error:") {
 		err = errors.New(string(labels))
 	} else if len(labels) == 0 {
-		fmt.Println("Empty Docker image label!");
+		fmt.Println("Empty Docker image label!")
 		if err == nil {
 			err = errors.New("Docker image has empty label")
 		}
@@ -145,7 +145,7 @@ func ParseLabel(stdout []byte, seedManifestKey string) string {
 
 func GetSeedManifest(dockerImage string) (string, error) {
 	out, err := DockerInspect(dockerImage)
-	
+
 	if err != nil {
 		return "", err
 	}
@@ -165,9 +165,9 @@ func ValidImageName(dockerImage, seedManifest string) (bool, string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	temp1 := []string{ seed.Job.Name, seed.Job.AlgorithmVersion, "seed" }
+	temp1 := []string{seed.Job.Name, seed.Job.AlgorithmVersion, "seed"}
 	firstHalf := strings.Join(temp1, "-")
-	temp2 := []string{ firstHalf, seed.Job.PackageVersion }
+	temp2 := []string{firstHalf, seed.Job.PackageVersion}
 	validString := strings.Join(temp2, ":")
 
 	isNameValid := validString == dockerImage
@@ -176,7 +176,7 @@ func ValidImageName(dockerImage, seedManifest string) (bool, string) {
 		str1 := fmt.Sprintln("Docker image name does not match <name>-<algorithmVersion>-seed:<packageVersion> pattern.")
 		nameError = fmt.Sprintf("%v Expected %v, given %v\n", str1, validString, dockerImage)
 	}
-	
+
 	return isNameValid, nameError
 }
 
@@ -195,11 +195,11 @@ func Validate(schemaUri string, seedManifest string) gojsonschema.Result {
 func RunImage(dockerImage, seedManifest string) RunResult {
 	var result RunResult
 	result.Valid = true
-	
+
 	var seed Seed_0_0_5
 	err := json.Unmarshal([]byte(seedManifest), &seed)
 	checkError(err)
-	
+
 	inFiles := seed.Job.Interface.InputData.Files
 	var volumes []string
 	for _, file := range inFiles {
@@ -222,7 +222,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 		volStr := fmt.Sprintf("%v:/%v", absPath, filename)
 		volumes = append(volumes, "-v", volStr)
 	}
-	
+
 	outFiles := seed.Job.Interface.OutputData.Files
 	dockerOutDir := ""
 	outAbsPath := ""
@@ -239,7 +239,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 		outVolume := outAbsPath + ":/" + dockerOutDir
 		volumes = append(volumes, "-v", outVolume)
 	}
-	
+
 	mounts := seed.Job.Interface.Mounts
 	for _, mount := range mounts {
 		envName := fmt.Sprintf("${%v}", mount.Name)
@@ -259,7 +259,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 		volStr := fmt.Sprintf("%v:/%v", absPath, mount.Path)
 		volumes = append(volumes, "-v", volStr)
 	}
-	
+
 	settings := seed.Job.Interface.Settings
 	var envVars []string
 	for _, setting := range settings {
@@ -293,14 +293,14 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 
 	cmd := exec.Command(cmdstr, args...)
 	out, err := cmd.CombinedOutput()
-	
+
 	if err != nil {
 		errString := fmt.Sprintf("Error running image: %v \n %v", string(out), err)
 		result.RunErrors = append(result.RunErrors, errString)
-	} else {	
+	} else {
 		fmt.Printf("Ran image successfully with following output: %v", string(out))
 	}
-	
+
 	//output files ----------------------
 	for _, file := range outFiles {
 		if !file.Required {
@@ -318,11 +318,11 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 		}
 		if len(matches) < count {
 			format := "Insufficient output. Expected %v files matching pattern %v, found %v"
-			errString := fmt.Sprintf(format,  count, file.Pattern, len(matches))
+			errString := fmt.Sprintf(format, count, file.Pattern, len(matches))
 			result.RunErrors = append(result.RunErrors, errString)
 		}
 	}
-	
+
 	//output JSON ------------
 	outJson := seed.Job.Interface.OutputData.Json
 	documentLoader := gojsonschema.NewStringLoader(string(out))
@@ -334,7 +334,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 			stdOutErr := fmt.Sprintf("%v", err)
 			manifestPath := filepath.Join(outAbsPath, "results_manifest.json")
 			resultsManifest, err := ioutil.ReadFile(manifestPath)
-			if err != nil { 
+			if err != nil {
 				errString := fmt.Sprintf("Unable to read json from std out: %v", stdOutErr)
 				result.RunErrors = append(result.RunErrors, errString)
 				errString = fmt.Sprintf("Unable to read results manifest file: %v", manifestPath)
@@ -343,30 +343,30 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 				documentLoader = gojsonschema.NewStringLoader(string(resultsManifest))
 				_, err := documentLoader.LoadJSON()
 				processJson = (err == nil)
-				if err != nil { 
+				if err != nil {
 					errString := fmt.Sprintf("Error loading results manifest file: %v", manifestPath)
 					result.RunErrors = append(result.RunErrors, errString)
 				}
 			}
 		}
 	}
-	
+
 	if processJson {
 		schemaFmt := "{ \"type\": \"object\", \"properties\": { %s }, \"required\": [ %s ] }"
 		schema := ""
 		required := ""
 		for i, json := range outJson {
-		
+
 			key := json.Name
 			if json.Key != "" {
 				key = json.Key
 			}
-		
+
 			schema += fmt.Sprintf("\"%s\": { \"type\": \"%s\" }", key, json.Type)
-			if i + 1 < len(outJson) {
+			if i+1 < len(outJson) {
 				schema += ", "
 			}
-		
+
 			if json.Required {
 				required += fmt.Sprintf("\"%s\",", key)
 			}
@@ -383,10 +383,9 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 		for _, desc := range schemaResult.Errors() {
 			result.RunErrors = append(result.RunErrors, fmt.Sprintf("- %s\n", desc))
 		}
-	
+
 	}
-	
-	
+
 	result.Valid = (len(result.RunErrors) == 0)
 	return result
 }

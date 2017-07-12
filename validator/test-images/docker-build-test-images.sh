@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Ensure current directory is the one containing this script
-cd `dirname $0` 
+cd `dirname $0`
 
 docker build ../../spec/examples/complete/ -t my-algorithm-0.1.0-seed:0.1.0
 docker build ../../spec/examples/random-number/ -t random-number-gen-0.1.0-seed:0.1.0

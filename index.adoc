@@ -1,0 +1,20 @@
+= Seed
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>
+v0.0.3, 2017-04-14
+:toc:
+
+Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image.
+
+To comply with the Seed standard a Docker image must have a single label used for discovery. This can be applied
+with the following Dockerfile snippet:
+
+----
+include::examples/complete/Dockerfile-snippet[]
+----
+
+Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or Registry
+push. This requirement will be deprecated as label search support is standardized across Docker registry services.
+
+See the link:detail.html[full specification] for complete detail on manifest format.

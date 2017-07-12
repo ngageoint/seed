@@ -1,16 +1,16 @@
 package main
 
 import (
-	"strings"
-	"testing"
 	"os"
 	"path/filepath"
+	"strings"
+	"testing"
 )
 
 func TestValidateSeedSpec(t *testing.T) {
 	cases := []struct {
-		image string
-		expected bool
+		image            string
+		expected         bool
 		expectedErrorMsg string
 	}{
 		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
@@ -22,7 +22,7 @@ func TestValidateSeedSpec(t *testing.T) {
 	}
 	envSpecUri := os.Getenv("SPEC_PATH")
 	absSpecPath := ""
-	if (len(envSpecUri) > 0) {
+	if len(envSpecUri) > 0 {
 		absPath, _ := filepath.Abs(envSpecUri)
 		absSpecPath = filepath.Join("file://", absPath)
 	}
@@ -34,12 +34,12 @@ func TestValidateSeedSpec(t *testing.T) {
 		}
 		result := ValidateSeedSpec(absSpecPath, seedManifest)
 		isValid := result.Valid()
-		if (isValid != c.expected ) {
+		if isValid != c.expected {
 			t.Errorf("ValidateSeedSpec(%q) == %v, expected %v", c.image, isValid, c.expected)
 		}
-		if (len(result.Errors()) > 0) {
+		if len(result.Errors()) > 0 {
 			errorMsg := result.Errors()[0].String()
-			if (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
+			if !strings.Contains(errorMsg, c.expectedErrorMsg) {
 				t.Errorf("Error message contained `%s`, expected `%s`", errorMsg, c.expectedErrorMsg)
 			}
 		}
@@ -48,15 +48,15 @@ func TestValidateSeedSpec(t *testing.T) {
 
 func TestValidImageName(t *testing.T) {
 	cases := []struct {
-		image string
-		valid bool
+		image            string
+		valid            bool
 		expectedErrorMsg string
 	}{
 		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
 		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
 		{"extractor-0.1.0-seed:0.1.0", true, ""},
 		{"seed-test/invalid-missing-job", false, "Expected --seed:, given seed-test/invalid-missing-job"},
-		{"seed-test/watermark", false, "Expected image-watermark-0.1.0-seed:0.1.0, given seed-test/watermark" },
+		{"seed-test/watermark", false, "Expected image-watermark-0.1.0-seed:0.1.0, given seed-test/watermark"},
 	}
 	for _, c := range cases {
 		seedManifest, err := GetSeedManifest(c.image)
@@ -64,7 +64,7 @@ func TestValidImageName(t *testing.T) {
 		if err != nil {
 			continue
 		}
-		if (valid != c.valid ) {
+		if valid != c.valid {
 			t.Errorf("ValidImageName(%q) == %v, expected %v", c.image, valid, c.valid)
 		}
 		if (len(errorMsg) > 0) && (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
@@ -75,8 +75,8 @@ func TestValidImageName(t *testing.T) {
 
 func TestRunImage(t *testing.T) {
 	cases := []struct {
-		image string
-		valid bool
+		image            string
+		valid            bool
 		expectedErrorMsg string
 	}{
 		{"extractor-0.1.0-seed:0.1.0", true, ""},
@@ -87,12 +87,12 @@ func TestRunImage(t *testing.T) {
 			continue
 		}
 		result := RunImage(c.image, seedManifest)
-		if (result.Valid != c.valid ) {
+		if result.Valid != c.valid {
 			t.Errorf("RunImage(%q) == %v, expected %v", c.image, result.Valid, c.valid)
 		}
-		if (len(result.RunErrors) > 0) {
+		if len(result.RunErrors) > 0 {
 			errorMsg := result.RunErrors[0]
-			if (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
+			if !strings.Contains(errorMsg, c.expectedErrorMsg) {
 				t.Errorf("Error message contained `%s`, expected `%s`", errorMsg, c.expectedErrorMsg)
 			}
 		}
