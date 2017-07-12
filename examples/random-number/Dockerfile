@@ -1,3 +1,7 @@
 FROM alpine
 
+COPY job.sh /job.sh
+
 LABEL com.ngageoint.seed.manifest="{\"manifestVersion\":\"0.0.3\",\"job\":{\"name\":\"random-number-gen\",\"algorithmVersion\":\"0.1.0\",\"packageVersion\":\"0.1.0\",\"title\":\"Random Number Generator\",\"description\":\"Generates a random number and outputs on stdout\",\"authorName\":\"John Doe\",\"timeout\":10,\"cpus\":0.1,\"mem\":1.0,\"interface\":{\"cmd\":\"\/app\/job.sh\"}}}"
+
+ENTRYPOINT ["sh", "/job.sh"]
