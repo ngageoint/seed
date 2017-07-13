@@ -37,120 +37,18 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"./constants"
+
+	"./objects"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 var buildCmd *flag.FlagSet
 var runCmd *flag.FlagSet
+var validateCmd *flag.FlagSet
 var directory string
-
-//JobDirectoryFlag defines the location of the seed spec and Dockerfile
-const JobDirectoryFlag = "directory"
-
-//ShortJobDirectoryFlag defines the shorthand location of the seed spec and Dockerfile
-const ShortJobDirectoryFlag = "d"
-
-//InputDataFlag defines the InputDataFlag
-const InputDataFlag = "inputData"
-
-//ShortInputDataFlag defines the shorthand input data flag
-const ShortInputDataFlag = "i"
-
-//JobOutputDirFlag defines the job output directory
-const JobOutputDirFlag = "outDir"
-
-//ShortJobOutputDirFlag defines the shorthand output directory
-const ShortJobOutputDirFlag = "o"
-
-//ShortImgNameFlag defines image name to run
-const ShortImgNameFlag = "in"
-
-//ImgNameFlag defines image name to run
-const ImgNameFlag = "imageName"
-
-//RmFlag defines if the docker image should be removed after docker run is executed
-const RmFlag = "rm"
-
-//SeedFileName defines the filename for the seed file
-const SeedFileName = "seed.manifest.json"
-
-//ResultsFileManifestName defines the filename for the results_manifest file
-const ResultsFileManifestName = "results_manifest.json"
-
-type arrayFlags []string
-
-//String converts an arrayFlags object to a single, comma separated string.
-func (flags *arrayFlags) String() string {
-	var buff bytes.Buffer
-	for i, f := range *flags {
-		buff.WriteString(f)
-
-		if i < (len(*flags) - 1) {
-			buff.WriteString(",")
-		}
-	}
-	return buff.String()
-}
-
-//Set defines the setter function for *arrayFlags.
-func (flags *arrayFlags) Set(value string) error {
-	*flags = append(*flags, value)
-	return nil
-}
-
-//Seed represents a seed.manifest.json object.
-type Seed struct {
-	ManifestVersion string `json:"manifest_version"`
-	Job             struct {
-		Name             string `json:"name"`
-		AlgorithmVersion string `json:"algorithmVersion"`
-		PackageVersion   string `json:"packageVersion"`
-		Interface        struct {
-			Args      string `json:"args"`
-			InputData struct {
-				Files []struct {
-					Name      string   `json:"name"`
-					MediaType []string `json:"mediaType"`
-					Pattern   string   `json:"pattern"`
-					Path      string   `json:"path"`
-				}
-			}
-			OutputData struct {
-				Files []struct {
-					Name      string `json:"name"`
-					MediaType string `json:"mediaType"`
-					Pattern   string `json:"pattern"`
-					Count     string `json:"count"`
-					Required  bool   `json:"required"`
-				}
-				Json []struct {
-					Name     string `json:"name"`
-					Type     string `json:"type"`
-					Key      string `json:"key"`
-					Required bool   `json:"required"`
-				}
-			}
-			EnvVars []struct {
-				Name  string `json:"name"`
-				Value string `json:"value"`
-			}
-			Mounts []struct {
-				Name string `json:"name"`
-				Path string `json:"path"`
-				Mode string `json:"mode"`
-			}
-			Settings []struct {
-				Name   string `json:"name"`
-				Secret string `json:"secret"`
-			}
-			ErrorMapping []struct {
-				Code        int    `json:"code"`
-				Title       string `json:"title"`
-				Description string `json:"description"`
-				Category    string `json:"category"`
-			}
-		}
-	}
-}
+var curDirectory string
 
 /* Run command defaults:
    image name and tag: if not specified, attempt to guess from CWD if a
@@ -167,29 +65,63 @@ func main() {
 	// Parse input flags
 	DefineFlags()
 
-	seedFileName := SeedFileName
-	if directory != "." {
-		seedFileName = path.Join(directory, SeedFileName)
+	// Define the current working directory
+	curDir, _ := os.Getwd()
+
+	// set path to seed file - relative to current directory or given directory
+	// TODO - directory might be a relative path (assuming it is for now)
+	// GetFullPath(directory) will figure out the absolute path
+	seedFileName := constants.SeedFileName
+	if directory == "." {
+		directory = curDir
+		curDirectory = curDir
+		seedFileName = path.Join(curDir, seedFileName)
+	} else {
+		seedFileName = path.Join(curDir, directory, seedFileName)
+		curDirectory = curDir
 	}
 
-	// Verify seed.json exists If not, error
+	// Verify seed.json exists within specified directory.
+	// If not, error and exit
 	if _, err := os.Stat(seedFileName); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "ERROR: %s cannot be found. Exiting seed testrunner...\n", seedFileName)
+		fmt.Fprintf(os.Stderr, "ERROR: %s cannot be found. Exiting seed...\n",
+			seedFileName)
 		os.Exit(1)
 	}
 
-	// Parse through seed file
+	// Validate seed.json. Exit if invalid
+	if validateCmd.Parsed() {
+		schemaFile := validateCmd.Lookup(constants.SchemaFlag).Value.String()
+
+		//TODO don't assume schema file is relative to current directory
+		if schemaFile != "" {
+			schemaFile = "file://" + path.Join(curDir, validateCmd.Lookup(constants.SchemaFlag).Value.String())
+		} else {
+			schemaFile = constants.SeedSchemaURL
+		}
+
+		ValidateSeedFile(schemaFile, seedFileName)
+		os.Exit(0)
+	} else {
+		valid := ValidateSeedFile(constants.SeedSchemaURL, seedFileName)
+		if !valid {
+			fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
+			os.Exit(1)
+		}
+	}
+
+	// Open and parse seed file into struct
 	seedFile, err := os.Open(seedFileName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error opening %s. Error received is: %s\n", seedFileName, err.Error())
 		os.Exit(1)
 	}
 	jsonParser := json.NewDecoder(seedFile)
-	var seed Seed
+	var seed objects.Seed
 	if err = jsonParser.Decode(&seed); err != nil {
 		fmt.Fprintf(os.Stderr,
-			"ERROR: A valid %s must be present in the working directory. Error parsing %s.\n%s\n",
-			SeedFileName, seedFileName, err.Error())
+			"ERROR: A valid %s must be present in the working directory. Error parsing %s.\nError received is: %s\n",
+			constants.SeedFileName, seedFileName, err.Error())
 		os.Exit(2)
 	}
 
@@ -198,33 +130,59 @@ func main() {
 		DockerBuild(&seed, "")
 	}
 
+	// Run Docker image
 	if runCmd.Parsed() {
 		DockerRun(&seed)
 	}
 }
 
 //DockerBuild Builds the docker image with the given image tag.
-func DockerBuild(seed *Seed, imageName string) {
+func DockerBuild(seed *objects.Seed, imageName string) {
 
 	// Retrieve docker image name
 	if imageName == "" {
 		imageName = BuildImageName(seed)
 	}
 
-	jobDirectory := buildCmd.Lookup(JobDirectoryFlag).Value.String()
+	jobDirectory := buildCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 
 	// Build Docker image
-	fmt.Fprintf(os.Stderr, "INFO: Building %s", imageName)
-	buildOutput, err := exec.Command("docker", "build", "-t", imageName, jobDirectory).Output()
+	fmt.Fprintf(os.Stderr, "INFO: Building %s\n", imageName)
+	buildCmd := exec.Command("docker", "build", "-t", imageName, jobDirectory)
+
+	// attach stderr pipe
+	errPipe, err := buildCmd.StderrPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %s", err.Error())
-	} else {
-		fmt.Fprintf(os.Stdout, string(buildOutput))
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to build command stderr. %s\n", err.Error())
+	}
+
+	// Attach stdout pipe
+	outPipe, err := buildCmd.StdoutPipe()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to build command stdout. %s\n", err.Error())
+	}
+
+	// Run docker build
+	if err := buildCmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: error executing docker build. %s\n", err.Error())
+	}
+
+	// Print out any std out
+	slurp, _ := ioutil.ReadAll(outPipe)
+	if string(slurp) != "" {
+		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
+	}
+
+	// check for errors on stderr
+	slurperr, _ := ioutil.ReadAll(errPipe)
+	if string(slurperr) != "" {
+		fmt.Fprintf(os.Stderr, "ERROR: Error building image '%s':\n%s\n",
+			imageName, string(slurperr))
 	}
 }
 
 //DockerRun Runs the provided docker command.
-func DockerRun(seed *Seed) {
+func DockerRun(seed *objects.Seed) {
 
 	// Builds the image name
 	imageName := BuildImageName(seed)
@@ -243,13 +201,13 @@ func DockerRun(seed *Seed) {
 	// build docker run command
 	dockerArgs := []string{"run"}
 
-	if runCmd.Lookup(RmFlag).Value.String() == "true" {
+	if runCmd.Lookup(constants.RmFlag).Value.String() == "true" {
 		dockerArgs = append(dockerArgs, "--rm")
 	} //, imageName}
 	var mountsArgs []string
 
 	// expand INPUT_FILEs to specified inputData files
-	if runCmd.Lookup(InputDataFlag).Value.String() != "" {
+	if runCmd.Lookup(constants.InputDataFlag).Value.String() != "" {
 		inMounts := DefineInputs(seed)
 		if inMounts != nil {
 			mountsArgs = append(mountsArgs, inMounts...)
@@ -257,7 +215,7 @@ func DockerRun(seed *Seed) {
 	}
 
 	// mount the JOB_OUTPUT_DIR (outDir flag)
-	if runCmd.Lookup(JobOutputDirFlag).Value.String() != "" {
+	if runCmd.Lookup(constants.JobOutputDirFlag).Value.String() != "" {
 		outDir := SetOutputDir(seed)
 		if outDir != "" {
 			mountsArgs = append(mountsArgs, "-v")
@@ -298,12 +256,43 @@ func DockerRun(seed *Seed) {
 	fmt.Fprintf(os.Stderr, "\nINFO: Running Docker command:\n%s\n", cmd.String())
 
 	// Run Docker command and capture output
-	runOutput, err := exec.Command("docker", dockerArgs...).Output()
+	runCmd := exec.Command("docker", dockerArgs...)
+	// attach stderr pipe
+	errPipe, err := runCmd.StderrPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error running docker command. %s\n", err.Error())
-	} else {
-		fmt.Fprintf(os.Stdout, "%s", string(runOutput))
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stderr. %s\n", err.Error())
 	}
+
+	// Attach stdout pipe
+	outPipe, err := runCmd.StdoutPipe()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stdout. %s\n", err.Error())
+	}
+
+	// Run docker build
+	if err := runCmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: error executing docker run. %s\n", err.Error())
+	}
+
+	// Print out any std out
+	slurp, _ := ioutil.ReadAll(outPipe)
+	if string(slurp) != "" {
+		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
+	}
+
+	// check for errors on stderr
+	slurperr, _ := ioutil.ReadAll(errPipe)
+	if string(slurperr) != "" {
+		fmt.Fprintf(os.Stderr, "ERROR: Error running image '%s':\n%s\n",
+			imageName, string(slurperr))
+	}
+
+	// runOutput, err := exec.Command("docker", dockerArgs...).Output()
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "ERROR: Error running docker command. %s\n", err.Error())
+	// } else {
+	// 	fmt.Fprintf(os.Stdout, "%s", string(runOutput))
+	// }
 
 	// Validate output against pattern
 	if seed.Job.Interface.OutputData.Files != nil ||
@@ -313,21 +302,14 @@ func DockerRun(seed *Seed) {
 }
 
 //DefineFlags defines the flags available for the seed runner.
-// Possible flags include:
-// seed build optional arguments:
-//		-j, -jobName			The job name
-//		-a, -algVersion		The algorithm version
-//		-p, -pkgVersion		The package version
-// seed run required arguments:
-// 		-i, -inputData		One or more input data files
-//		-o, -outDir				Output directory
-//		-rm								Removes the image after running
 func DefineFlags() {
 
 	// build command flags
-	buildCmd = flag.NewFlagSet("build", flag.ContinueOnError)
-	buildCmd.StringVar(&directory, JobDirectoryFlag, ".", "Directory of seed spec and Dockerfile (default is current directory).")
-	buildCmd.StringVar(&directory, ShortJobDirectoryFlag, ".", "Directory of seed spec and Dockerfile (default is current directory).")
+	buildCmd = flag.NewFlagSet(constants.BuildCommand, flag.ContinueOnError)
+	buildCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
+		"Directory of seed spec and Dockerfile (default is current directory).")
+	buildCmd.StringVar(&directory, constants.ShortJobDirectoryFlag, ".",
+		"Directory of seed spec and Dockerfile (default is current directory).")
 
 	// Print usage function
 	buildCmd.Usage = func() {
@@ -335,24 +317,33 @@ func DefineFlags() {
 	}
 
 	// Run command flags
-	runCmd = flag.NewFlagSet("run", flag.ContinueOnError)
-	runCmd.StringVar(&directory, JobDirectoryFlag, ".", "Location of the seed spec and Dockerfile")
-	runCmd.StringVar(&directory, ShortJobDirectoryFlag, ".", "Location of the seed spec and Dockerfile")
+	runCmd = flag.NewFlagSet(constants.RunCommand, flag.ContinueOnError)
+	runCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
+		"Location of the seed spec and Dockerfile")
+	runCmd.StringVar(&directory, constants.ShortJobDirectoryFlag, ".",
+		"Location of the seed spec and Dockerfile")
 
 	var imgNameFlag string
-	runCmd.StringVar(&imgNameFlag, ImgNameFlag, "", "Name of Docker image to run")
-	runCmd.StringVar(&imgNameFlag, ShortImgNameFlag, "", "Name of Docker image to run")
+	runCmd.StringVar(&imgNameFlag, constants.ImgNameFlag, "",
+		"Name of Docker image to run")
+	runCmd.StringVar(&imgNameFlag, constants.ShortImgNameFlag, "",
+		"Name of Docker image to run")
 
-	var inputs arrayFlags
-	runCmd.Var(&inputs, InputDataFlag, "Defines the full path to any input data arguments")
-	runCmd.Var(&inputs, ShortInputDataFlag, "Defines the full path to input data arguments")
+	var inputs objects.ArrayFlags
+	runCmd.Var(&inputs, constants.InputDataFlag,
+		"Defines the full path to any input data arguments")
+	runCmd.Var(&inputs, constants.ShortInputDataFlag,
+		"Defines the full path to input data arguments")
 
 	var outdir string
-	runCmd.StringVar(&outdir, JobOutputDirFlag, "", "Full path to the algorithm output directory")
-	runCmd.StringVar(&outdir, ShortJobOutputDirFlag, "", "Full path to the algorithm output directory")
+	runCmd.StringVar(&outdir, constants.JobOutputDirFlag, "",
+		"Full path to the algorithm output directory")
+	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
+		"Full path to the algorithm output directory")
 
 	var rmVar bool
-	runCmd.BoolVar(&rmVar, RmFlag, false, "Specifying the -rm flag automatically removes the image after executing docker run")
+	runCmd.BoolVar(&rmVar, constants.RmFlag, false,
+		"Specifying the -rm flag automatically removes the image after executing docker run")
 
 	// Run usage function
 	runCmd.Usage = func() {
@@ -371,27 +362,55 @@ func DefineFlags() {
 		PrintSearchUsage()
 	}
 
+	// Publish command
+	publishCmd := flag.NewFlagSet(constants.PublishCommand, flag.ExitOnError)
+	publishCmd.Usage = func() {
+		PrintPublishUsage()
+	}
+
+	// Validate command
+	validateCmd = flag.NewFlagSet(constants.ValidateCommand, flag.ExitOnError)
+	validateCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
+		"Location of the seed.manifest.json spec to validate")
+	validateCmd.StringVar(&directory, constants.ShortJobDirectoryFlag, ".",
+		"Location of the seed.manifest.json spec to validate")
+	var schema string
+	validateCmd.StringVar(&schema, constants.SchemaFlag, "", "JSON schema file to validate seed against.")
+	validateCmd.StringVar(&schema, constants.ShortSchemaFlag, "", "JSON schema file to validate seed against.")
+
+	validateCmd.Usage = func() {
+		PrintValidateUsage()
+	}
+
 	if len(os.Args) == 1 {
 		PrintUsage()
 	}
 
 	switch os.Args[1] {
-	case "build":
+	case constants.BuildCommand:
 		buildCmd.Parse(os.Args[2:])
 		if len(os.Args) > 2 && os.Args[2] != "-d" {
 			directory = os.Args[2]
 		}
-	case "run":
+	case constants.RunCommand:
 		runCmd.Parse(os.Args[2:])
 		if len(os.Args) < 3 {
 			PrintRunUsage()
 		}
-	case "search":
+	case constants.SearchCommand:
 		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
 		PrintSearchUsage()
-	case "list":
+	case constants.ListCommand:
 		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
 		PrintListUsage()
+	case constants.PublishCommand:
+		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
+		PrintPublishUsage()
+	case constants.ValidateCommand:
+		validateCmd.Parse(os.Args[2:])
+		if len(os.Args) > 2 && os.Args[2] != "-d" {
+			directory = os.Args[2]
+		}
 	default:
 		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
 		os.Exit(2)
@@ -417,29 +436,33 @@ func PrintBuildUsage() {
 	fmt.Fprintf(os.Stderr, "Options:\n")
 	fmt.Fprintf(os.Stderr,
 		"  -%s,  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
-		ShortJobDirectoryFlag, JobDirectoryFlag)
+		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
 	os.Exit(1)
 }
 
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] -o JOB_OUTPUT_DIRECTORY [OPTIONS]\n")
-	//fmt.Fprintf(os.Stderr, "\nRuns Docker image. Input data defined in seed spec must be specified via the -i option.\n")
+	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
 		"  -%s,  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
-		ShortJobDirectoryFlag, JobDirectoryFlag)
-	fmt.Fprintf(os.Stderr, "  -%s,  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n", ShortInputDataFlag, InputDataFlag)
-	fmt.Fprintf(os.Stderr, "  -%s, -%s\tDocker image name to run\n", ShortImgNameFlag, ImgNameFlag)
+		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
+	fmt.Fprintf(os.Stderr, "  -%s,  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
+		constants.ShortInputDataFlag, constants.InputDataFlag)
+	fmt.Fprintf(os.Stderr, "  -%s, -%s\tDocker image name to run\n",
+		constants.ShortImgNameFlag, constants.ImgNameFlag)
 	fmt.Fprintf(os.Stderr, "  -%s,  -%s   \tJob Output Directory Location\n",
-		ShortJobOutputDirFlag, JobOutputDirFlag)
-	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n", RmFlag)
+		constants.ShortJobOutputDirFlag, constants.JobOutputDirFlag)
+	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n",
+		constants.RmFlag)
 	os.Exit(1)
 }
 
 //PrintListUsage prints the seed list usage information, then exits the program
 func PrintListUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed list \n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed list [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr, "\nAllows for listing all Seed compliant images residing on the local system.\n")
 	fmt.Fprintf(os.Stderr, "\nLists all '-seed' docker images on the local machine.\n")
 	os.Exit(1)
 }
@@ -447,8 +470,30 @@ func PrintListUsage() {
 //PrintSearchUsage prints the seed search usage information, then exits the program
 func PrintSearchUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed search [OPTIONS] \n")
-	fmt.Fprintf(os.Stderr, "\nSearches the remote registry for -seed docker images.\n")
+	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr, "  -r, -repo Specifies a specific registry to search (default is docker.io)\n")
+	os.Exit(1)
+}
+
+//PrintPublishUsage prints the seed publish usage information, then exits the program
+func PrintPublishUsage() {
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [OPTIONS] \n")
+	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
+	// fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	// fmt.Fprintf(os.Stderr, "  -r, -repo Specifies a specific registry to search (default is docker.io)\n")
+	os.Exit(1)
+}
+
+//PrintValidateUsage prints the seed validate usage, then exits the program
+func PrintValidateUsage() {
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed validate [OPTIONS] \n")
+	fmt.Fprintf(os.Stderr, "\nValidates the %s is compliant with the seed spec.\n", constants.SeedFileName)
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	fmt.Fprintf(os.Stderr, "  -%s, -%s\tSpecifies a directory in which seed file is located (default is current directory)\n",
+		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
+	fmt.Fprintf(os.Stderr, "  -%s, -%s   \tSpecifies an external JSON schema file to validate the seed file against\n",
+		constants.ShortSchemaFlag, constants.SchemaFlag)
 	os.Exit(1)
 }
 
@@ -456,11 +501,11 @@ func PrintSearchUsage() {
 // (via commnad flags -jobName -algVersion -pkgVersion) or the seed.json, or
 // combination of th etwo. Returns image name in the form of
 // 	jobName-algVersion-seed:pkgVersion
-func BuildImageName(seed *Seed) string {
+func BuildImageName(seed *objects.Seed) string {
 	var buffer bytes.Buffer
 
-	if runCmd.Parsed() && runCmd.Lookup(ImgNameFlag).Value.String() != "" {
-		buffer.WriteString(runCmd.Lookup(ImgNameFlag).Value.String())
+	if runCmd.Parsed() && runCmd.Lookup(constants.ImgNameFlag).Value.String() != "" {
+		buffer.WriteString(runCmd.Lookup(constants.ImgNameFlag).Value.String())
 	} else {
 		buffer.WriteString(seed.Job.Name)
 		buffer.WriteString("-")
@@ -477,11 +522,11 @@ func BuildImageName(seed *Seed) string {
 // flags 'inputData' and sets the path in the json object. Returns:
 // 	[]string: docker command args for input files in the format:
 //	"-v /path/to/file1:/path/to/file1 -v /path/to/file2:/path/to/file2 etc"
-func DefineInputs(seed *Seed) []string {
+func DefineInputs(seed *objects.Seed) []string {
 
 	// TODO: validate number of inputData flags to number of Interface.InputData.Files
 	var mountArgs []string
-	inputStr := runCmd.Lookup(InputDataFlag).Value.String()
+	inputStr := runCmd.Lookup(constants.InputDataFlag).Value.String()
 	var inputs []string
 	inputs = strings.Split(inputStr, ",")
 
@@ -516,8 +561,8 @@ func DefineInputs(seed *Seed) []string {
 
 //SetOutputDir replaces the JOB_OUTPUT_DIR argument with the given output directory.
 // Returns output directory string
-func SetOutputDir(seed *Seed) string {
-	outputDir := runCmd.Lookup(JobOutputDirFlag).Value.String()
+func SetOutputDir(seed *objects.Seed) string {
+	outputDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 	seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args,
 		"$JOB_OUTPUT_DIR", outputDir, -1)
 	seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args,
@@ -526,7 +571,7 @@ func SetOutputDir(seed *Seed) string {
 }
 
 //DefineEnvironmentVariables defines any seed specified environment variables.
-func DefineEnvironmentVariables(seed *Seed) []string {
+func DefineEnvironmentVariables(seed *objects.Seed) []string {
 	if seed.Job.Interface.EnvVars != nil {
 		var envVars []string
 		for _, envVar := range seed.Job.Interface.EnvVars {
@@ -540,7 +585,7 @@ func DefineEnvironmentVariables(seed *Seed) []string {
 }
 
 //DefineMounts defines any seed specified mounts. TODO
-func DefineMounts(seed *Seed) []string {
+func DefineMounts(seed *objects.Seed) []string {
 	if seed.Job.Interface.Mounts != nil {
 		/*
 			fmt.Println("Found some mounts....")
@@ -565,17 +610,17 @@ func DefineMounts(seed *Seed) []string {
 //DefineSettings defines any seed specified docker settings. TODO
 // Return []string of docker command arguments in form of:
 //	"-?? setting1=val1 -?? setting2=val2 etc"
-func DefineSettings(seed *Seed) []string {
+func DefineSettings(seed *objects.Seed) []string {
 	return nil
 }
 
 //ValidateOutput validates the output of the docker run command. Output data is
 // validated as defined in the seed.Job.Interface.OutputData.
-func ValidateOutput(seed *Seed) {
+func ValidateOutput(seed *objects.Seed) {
 	// Validate any OutputData.Files
 	if seed.Job.Interface.OutputData.Files != nil {
 		fmt.Fprintf(os.Stderr, "INFO: Validating output files...\n")
-		outDir := runCmd.Lookup(JobOutputDirFlag).Value.String()
+		outDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 
 		// For each defined OutputData file:
 		//	#1 Check file media type
@@ -623,18 +668,18 @@ func ValidateOutput(seed *Seed) {
 
 		fmt.Fprintf(os.Stderr, "INFO: Validating results_manifest.json...\n")
 		// look for results manifest
-		outDir := runCmd.Lookup(JobOutputDirFlag).Value.String()
-		manfile := path.Join(outDir, ResultsFileManifestName)
+		outDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
+		manfile := path.Join(outDir, constants.ResultsFileManifestName)
 		if _, err := os.Stat(manfile); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "ERROR: %s specified but cannot be found. %s\n Exiting testrunner.\n",
-				ResultsFileManifestName, err.Error())
+				constants.ResultsFileManifestName, err.Error())
 			return
 		}
 
-		bites, err := ioutil.ReadFile(path.Join(outDir, ResultsFileManifestName))
+		bites, err := ioutil.ReadFile(path.Join(outDir, constants.ResultsFileManifestName))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Error reading %s.%s\n",
-				ResultsFileManifestName, err.Error())
+				constants.ResultsFileManifestName, err.Error())
 			return
 		}
 
@@ -667,6 +712,37 @@ func ValidateOutput(seed *Seed) {
 				}
 			}
 		}
-
 	}
+}
+
+//ValidateSeedFile Validates the seed.manifest.json file based on the given schema
+func ValidateSeedFile(schemaFile string, seedFileName string) bool {
+	fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s...\n", seedFileName)
+	schemaLoader := gojsonschema.NewReferenceLoader(schemaFile)
+	docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
+	result, err := gojsonschema.Validate(schemaLoader, docLoader)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "\nERROR: Error validating seed file against schema. Error is: %s\n", err.Error())
+		return false
+	}
+
+	if !result.Valid() {
+		fmt.Fprintf(os.Stderr, "\nERROR: %s is not valid. See errors:\n", seedFileName)
+		for _, e := range result.Errors() {
+			fmt.Fprintf(os.Stderr, "-ERROR %v\n", e.Description())
+			fmt.Fprintf(os.Stderr, "\tField: %s\n", e.Field())
+			fmt.Fprintf(os.Stderr, "\tContext: %s\n", e.Context().String())
+		}
+		fmt.Fprintf(os.Stderr, "\n")
+		return false
+	}
+
+	fmt.Fprintf(os.Stderr, "\nSUCCESS: %s is valid.\n\n", seedFileName)
+	return true
+}
+
+//GetFullPath returns the full path of the given file. This expands relative file
+// paths and verifes non-relative paths
+func GetFullPath(file string) string {
+	return "TODO"
 }

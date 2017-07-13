@@ -1,5 +1,5 @@
 {
-  "manifest_version": "0.0.3",
+  "manifestVersion": "0.0.3",
   "job": {
     "name": "addition-algorithm",
     "algorithmVersion": "0.0.1",
@@ -11,13 +11,12 @@
     "cpus": 0.1,
     "mem": 1.0,
     "interface": {
-      "cmd": "run.sh",
       "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
       "inputData": {
         "files": [
           {
             "name": "INPUT_FILE",
-            "required": "true",
+            "required": true,
             "mediaType": [
               "text/plain"
             ]
@@ -36,11 +35,11 @@
         "json": [
           {
             "name": "x",
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "y",
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "z",
