@@ -63,22 +63,34 @@ include::sections/standard.adoc[]
 === Implementing
 A few requirements must be satisfied when implementing a system capable of executing Seed standardized images.
 
+[[environment-variables, Environment Variables]]
 ==== Environment Variables
-Environment variable injection must be performed. These may be consumed by job directly as environment variables or
-shell variable expansion may be leveraged in the `interface.args` member.
+Environment variable injection MUST be performed. These MAY be consumed by a job directly as environment variables or
+shell variable expansion MAY be leveraged in the `interface.args` member. Implementing frameworks MAY perform
+variable expansion, but it MUST follow Bash expansion conventions.
 
 The following minimum variables MUST be provided:
 
-* JOB_OUTPUT_DIR: Root path all output products must be placed by job for processing system capture.
+* JOB_OUTPUT_DIR: Root path all output products MUST be placed by job for processing system capture.
 * ALLOCATED_CPUS: Value of `cpus` member.
 * ALLOCATED_MEM: Value of `mem` member.
 * ALLOCATED_SHARED_MEM: Value of `sharedMem` member.
 * ALLOCATED_STORAGE: Value of `storage` member.
-* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Name case MUST map
-exactly from `name` value. It is the processing framework's responsibility to ensure data is mounted and to ensure the
-path is container resolvable.
-* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Name case MUST map
-exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded.
+* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Case MUST map
+exactly from `name` value. Processing framework's MUST ensure data is mounted and provide a container resolvable
+absolute path. This environment variable MUST be left unset if `required` is false and the input is not present.
+* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Case MUST map
+exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded. This
+environment variable MUST be left unset if `required` is false and the input is not present.
+
+Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
+use of Bash. Taking the example of an optional `inputData.files` element, the following `args` value will expand with
+a preceding switch only when the input is available:
+
+`${MY_INPUT/#/-d }`
+
+This will expand to `-d ${MY_INPUT}` only when `MY_INPUT` is set, otherwise the entire expression will be omitted. It
+is important to note this is specifically a Bash shell feature and is not present with competing Linux shells.
 
 ==== Output File metadata
 There is often a need by the processing system to capture additional job extracted metadata on output files. The Seed
