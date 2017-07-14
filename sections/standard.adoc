@@ -21,7 +21,7 @@ conforms to the SemVer standard.
 [source,javascript]
 ----
 {
-  "seedVersion": "0.0.3",
+  "seedVersion": "SEED_VERSION",
   "job": { ... }
 }
 ----
