@@ -12,16 +12,16 @@ and null. An array consists of elements where each element is a value as describ
 [[seed-section, Seed Object]]
 === Seed Object
 The Seed object is the root JSON object that MUST be placed within a com.ngageoint.seed.manifest Docker image label.
-At a minimum this object MUST define the `manifestVersion` and `job` names.
+At a minimum this object MUST define the `seedVersion` and `job` names.
 
-* The Seed object MUST have a member with the name `manifestVersion`. The member's value MUST be a string that
+* The Seed object MUST have a member with the name `seedVersion`. The member's value MUST be a string that
 conforms to the SemVer standard.
 * The Seed object MUST have a member with the name `job`. The member's value is a `Job` object.
 
 [source,javascript]
 ----
 {
-  "manifestVersion": "0.0.3",
+  "seedVersion": "0.0.3",
   "job": { ... }
 }
 ----
