@@ -17,7 +17,7 @@ FILES=$(grep -r SEED_VERSION examples validator sections *.adoc | cut -d ':' -f 
 
 for FILE in ${FILES}
 do
-    sed -i "" -e "s/SEED_VERSION/"$1"/" ${FILE}
+    sed -i "" -e "s/SEED_VERSION/"$1"/g" ${FILE}
 done
 
 # Update schemas
