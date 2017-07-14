@@ -1,3 +1,3 @@
 FROM alpine
 
-LABEL com.ngageoint.seed.manifest=SEED_MANIFEST
+LABEL com.ngageoint.seed.manifest="SEED_MANIFEST"
