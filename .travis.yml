@@ -5,8 +5,10 @@ services:
 
 env:
   - SPEC_PATH="../schema/seed.manifest.schema.json"
+  - SEED_VERSION=0.0.5
 
 before_install:
+  - ./set-version.sh ${SEED_VERSION}
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
