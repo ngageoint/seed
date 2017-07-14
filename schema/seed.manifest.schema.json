@@ -3,7 +3,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "manifestVersion": {
+        "seedVersion": {
             "type": "string",
             "pattern": "0.0.3"
         },
@@ -322,7 +322,7 @@
         }
     },
     "required": [
-        "manifestVersion",
+        "seedVersion",
         "job"
     ]
 }
