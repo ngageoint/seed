@@ -1,3 +1,3 @@
 FROM alpine
 
-LABEL com.ngageoint.seed.manifest="{\"manifestVersion\":\"0.0.3\"}"
+LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"SEED_VERSION\"}"

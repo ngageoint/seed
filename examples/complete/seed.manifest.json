@@ -1,5 +1,5 @@
 {
-    "manifestVersion": "0.0.3",
+    "seedVersion": "0.0.3",
     "job": {
         "name": "my-algorithm",
         "algorithmVersion": "0.1.0",
