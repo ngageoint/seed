@@ -1,6 +1,6 @@
 = Seed Standard Definition
 Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>
-v0.0.3, 2017-4-14
+vSEED_VERSION, UPDATE_TIME
 :toc: left
 :toclevels: 5
 :sectlinks:
@@ -105,7 +105,7 @@ The following snippet demonstrates the optional values that may be specified:
 .Metadata JSON
 ----
 {
-    "metadataVersion": "0.0.3", <1>
+    "seedVersion": "SEED_VERSION", <1>
     "geometry": { <2>
         "type": "Polygon",
 	    "coordinates": [
