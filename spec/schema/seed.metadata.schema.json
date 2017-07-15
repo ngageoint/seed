@@ -1,185 +1,185 @@
-[1;39m{
-  [0m[34;1m"$schema"[0m[1;39m: [0m[0;32m"http://json-schema.org/draft-04/schema#"[0m[1;39m,
-  [0m[34;1m"id"[0m[1;39m: [0m[0;32m"http://json-schema.org/geojson/geometry.json#"[0m[1;39m,
-  [0m[34;1m"title"[0m[1;39m: [0m[0;32m"geometry"[0m[1;39m,
-  [0m[34;1m"description"[0m[1;39m: [0m[0;32m"One geometry as defined by GeoJSON"[0m[1;39m,
-  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
-  [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-    [0m[34;1m"seedVersion"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
-      [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"0.0.3"[0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"geometry"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
-      [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
-        [0;32m"type"[0m[1;39m,
-        [0;32m"coordinates"[0m[1;39m
-      [1;39m][0m[1;39m,
-      [0m[34;1m"oneOf"[0m[1;39m: [0m[1;39m[
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"Point"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"Point"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/position"[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"MultiPoint"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"MultiPoint"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/positionArray"[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"LineString"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"LineString"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/lineString"[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"MultiLineString"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"MultiLineString"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
-              [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
-                [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/lineString"[0m[1;39m
-              [1;39m}[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"Polygon"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"Polygon"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/polygon"[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"title"[0m[1;39m: [0m[0;32m"MultiPolygon"[0m[1;39m,
-          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-            [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
-                [0;32m"MultiPolygon"[0m[1;39m
-              [1;39m][0m[1;39m
-            [1;39m}[0m[1;39m,
-            [0m[34;1m"coordinates"[0m[1;39m: [0m[1;39m{
-              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
-              [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
-                [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/polygon"[0m[1;39m
-              [1;39m}[0m[1;39m
-            [1;39m}[0m[1;39m
-          [1;39m}[0m[1;39m
-        [1;39m}[0m[1;39m
-      [1;39m][0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"time"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
-      [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
-      [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
-        [0m[34;1m"start"[0m[1;39m: [0m[1;39m{
-          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
-          [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(([+-][0-9]{2}:[0-9]{2})|Z)?"[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [0m[34;1m"end"[0m[1;39m: [0m[1;39m{
-          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
-          [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(([+-][0-9]{2}:[0-9]{2})|Z)?"[0m[1;39m
-        [1;39m}[0m[1;39m
-      [1;39m}[0m[1;39m,
-      [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
-        [0;32m"start"[0m[1;39m,
-        [0;32m"end"[0m[1;39m
-      [1;39m][0m[1;39m
-    [1;39m}[0m[1;39m
-  [1;39m}[0m[1;39m,
-  [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
-    [0;32m"seedVersion"[0m[1;39m
-  [1;39m][0m[1;39m,
-  [0m[34;1m"definitions"[0m[1;39m: [0m[1;39m{
-    [0m[34;1m"position"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"description"[0m[1;39m: [0m[0;32m"A single position"[0m[1;39m,
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
-      [0m[34;1m"minItems"[0m[1;39m: [0m[0;39m2[0m[1;39m,
-      [0m[34;1m"items"[0m[1;39m: [0m[1;39m[
-        [1;39m{
-          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m
-        [1;39m}[0m[1;39m
-      [1;39m][0m[1;39m,
-      [0m[34;1m"additionalItems"[0m[1;39m: [0m[0;39mfalse[0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"positionArray"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"description"[0m[1;39m: [0m[0;32m"An array of positions"[0m[1;39m,
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
-      [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
-        [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/position"[0m[1;39m
-      [1;39m}[0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"lineString"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"description"[0m[1;39m: [0m[0;32m"An array of two or more positions"[0m[1;39m,
-      [0m[34;1m"allOf"[0m[1;39m: [0m[1;39m[
-        [1;39m{
-          [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/positionArray"[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"minItems"[0m[1;39m: [0m[0;39m2[0m[1;39m
-        [1;39m}[0m[1;39m
-      [1;39m][0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"linearRing"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"description"[0m[1;39m: [0m[0;32m"An array of four positions where the first equals the last"[0m[1;39m,
-      [0m[34;1m"allOf"[0m[1;39m: [0m[1;39m[
-        [1;39m{
-          [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/positionArray"[0m[1;39m
-        [1;39m}[0m[1;39m,
-        [1;39m{
-          [0m[34;1m"minItems"[0m[1;39m: [0m[0;39m4[0m[1;39m
-        [1;39m}[0m[1;39m
-      [1;39m][0m[1;39m
-    [1;39m}[0m[1;39m,
-    [0m[34;1m"polygon"[0m[1;39m: [0m[1;39m{
-      [0m[34;1m"description"[0m[1;39m: [0m[0;32m"An array of linear rings"[0m[1;39m,
-      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
-      [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
-        [0m[34;1m"$ref"[0m[1;39m: [0m[0;32m"#/definitions/linearRing"[0m[1;39m
-      [1;39m}[0m[1;39m
-    [1;39m}[0m[1;39m
-  [1;39m}[0m[1;39m
-[1;39m}[0m
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://json-schema.org/geojson/geometry.json#",
+  "title": "geometry",
+  "description": "One geometry as defined by GeoJSON",
+  "type": "object",
+  "properties": {
+    "seedVersion": {
+      "type": "string",
+      "pattern": "0.0.3"
+    },
+    "geometry": {
+      "type": "object",
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "oneOf": [
+        {
+          "title": "Point",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "Point"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/position"
+            }
+          }
+        },
+        {
+          "title": "MultiPoint",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiPoint"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/positionArray"
+            }
+          }
+        },
+        {
+          "title": "LineString",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "LineString"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/lineString"
+            }
+          }
+        },
+        {
+          "title": "MultiLineString",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiLineString"
+              ]
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/lineString"
+              }
+            }
+          }
+        },
+        {
+          "title": "Polygon",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "Polygon"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/polygon"
+            }
+          }
+        },
+        {
+          "title": "MultiPolygon",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiPolygon"
+              ]
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/polygon"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(([+-][0-9]{2}:[0-9]{2})|Z)?"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(([+-][0-9]{2}:[0-9]{2})|Z)?"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    }
+  },
+  "required": [
+    "seedVersion"
+  ],
+  "definitions": {
+    "position": {
+      "description": "A single position",
+      "type": "array",
+      "minItems": 2,
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "additionalItems": false
+    },
+    "positionArray": {
+      "description": "An array of positions",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/position"
+      }
+    },
+    "lineString": {
+      "description": "An array of two or more positions",
+      "allOf": [
+        {
+          "$ref": "#/definitions/positionArray"
+        },
+        {
+          "minItems": 2
+        }
+      ]
+    },
+    "linearRing": {
+      "description": "An array of four positions where the first equals the last",
+      "allOf": [
+        {
+          "$ref": "#/definitions/positionArray"
+        },
+        {
+          "minItems": 4
+        }
+      ]
+    },
+    "polygon": {
+      "description": "An array of linear rings",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/linearRing"
+      }
+    }
+  }
+}
