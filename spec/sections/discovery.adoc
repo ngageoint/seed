@@ -1,0 +1,45 @@
+
+A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
+Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
+offerings and the following sections describe the steps that may be taken to access the labels defined by Seed.
+
+None of the Docker registry services support label search in any fashion. This incurs the requirement of applying a
+secondary means to subset image results. The standard presently requires that all job images are named with the suffix
+`-seed`. This allows for quick filtering of results to a manageable set for discovery.
+
+=== Docker Hub
+Docker Hub stores Docker image manifest information in a readily accessible format only for Automated Builds. This
+enforces the need for all developers wishing to support simple discovery from Docker Hub to support Hub builds, as
+opposed to local image builds followed by a docker push. Given this caveat, a service such as ImageLayers can be used
+to quickly identify manifest content after discovering available images.
+
+The following two steps may be taken to find and identify labels within Docker Hub:
+
+* Perform HTTP GET to find Docker images:
+** URL: https://hub.docker.com/v2/search/repositories/?query=-seed
+* Perform HTTP POST to get label details for images found in previous request:
+** BODY: {"repos":[{"name":"myorg/myjob-seed","tag":"latest"}]}
+** URL: https://imagelayers.io/registry/analyze
+
+The ImageLayers service is a 3rd-party service by CenturyLink Labs, but the source code is openly available at
+https://github.com/CenturyLinkLabs/imagelayers[ImageLayers] and can be used as a reference implementation.
+
+=== Docker Registry
+Docker Registry does not natively support any type of search, but does provide a catalog API that allows for listing the
+entire registry contents. Using this along with tag and manifest inspection will allow label inspection.
+
+The following steps may be taken to find and identify labels of Seed compliant images within Docker Registry:
+
+NOTE: All references to `{registry}`, `{image-id}` and `{tag}` in the following URLs should be replaced with your
+environment specific values.
+
+* Perform HTTP GET against catalog endpoint to find `-seed` suffixed images:
+** URL: http://{registry}/v2/_catalog
+* Perform HTTP GET against tags endpoint for each image matched:
+** http://{registry}/v2/{image-id}/tags/list
+* Perform HTTP GET against manifests endpoint to retrieve labels per tag (extract labels from history JSON member):
+** http://{registry}/v2/{image-id}/manifests/{tag}
+
+=== Docker Trusted Registry
+There is a ticket in with Docker Trusted Registry team to natively support label search. Presently there is no API
+support to inspect hosted images for label metadata. Images must be pulled locally for inspection.
