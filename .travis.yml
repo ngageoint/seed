@@ -9,7 +9,7 @@ env:
 
 before_install:
   - ./set-version.sh ${SEED_VERSION}
-  - examples/inject-manifests.sh
+  - ./examples/inject-manifests.sh
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
@@ -31,9 +31,4 @@ after_failure:
   - docker logs asciidoc-to-pdf
 
 after_success:
-  - cd output ; cp -R ../examples examples ; cp -R ../schema schema
-  - git init
-  - git config user.name "${GH_USER_NAME}"
-  - git config user.email "{GH_USER_EMAIL}"
-  - git add . ; git commit -m "Deploy to GitHub Pages"
-  - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
+  - ./push-docs.sh
