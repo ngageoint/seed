@@ -9,6 +9,7 @@ env:
 
 before_install:
   - ./set-version.sh ${SEED_VERSION}
+  - examples/inject-manifests.sh
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
