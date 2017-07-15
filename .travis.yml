@@ -11,13 +11,12 @@ env:
 before_install:
   - ./set-version.sh 0.0.5
   - ./spec/examples/inject-manifests.sh
-  - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
 
 script:
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output *.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output *.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc detail.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output detail.adoc
   - go test -v ./...
 
 after_failure:
@@ -25,7 +24,7 @@ after_failure:
   - docker logs asciidoc-to-pdf
 
 deploy:
-  local_dir: output
+  local_dir: spec/output
   provider: pages
   skip_cleanup: true
   github_token: $GH_TOKEN
