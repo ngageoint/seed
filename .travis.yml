@@ -5,10 +5,9 @@ services:
 
 env:
   - SPEC_PATH="../schema/seed.manifest.schema.json"
-  - SEED_VERSION=0.0.5
 
 before_install:
-  - ./set-version.sh ${SEED_VERSION}
+  - ./set-version.sh 0.0.5
   - ./examples/inject-manifests.sh
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
@@ -30,5 +29,11 @@ after_failure:
   - docker logs asciidoc-to-html
   - docker logs asciidoc-to-pdf
 
-after_success:
-  - ./push-docs.sh
+deploy:
+  local_dir: output
+  provider: pages
+  skip_cleanup: true
+  github_token: $GH_TOKEN
+  on:
+    branch: master
+    condition: "${TRAVIS_PULL_REQUEST}" == "false"
