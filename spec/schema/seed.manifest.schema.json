@@ -1,328 +1,328 @@
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-        "seedVersion": {
-            "type": "string",
-            "pattern": "0.0.3"
-        },
-        "job": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "pattern": "[a-z0-9_-]+"
-                },
-                "algorithmVersion": {
-                    "type": "string",
-                    "pattern": "(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?"
-                },
-                "packageVersion": {
-                    "type": "string",
-                    "pattern": "(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "tag": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "authorName": {
-                    "type": "string"
-                },
-                "authorEmail": {
-                    "type": "string"
-                },
-                "authorUrl": {
-                    "type": "string"
-                },
-                "timeout": {
-                    "type": "integer"
-                },
-                "cpus": {
-                    "type": "number"
-                },
-                "mem": {
-                    "type": "number"
-                },
-                "sharedMem": {
-                    "type": "number",
-                    "default": 0.0
-                },
-                "storage": {
-                    "type": "number",
-                    "default": 0.0
-                },
-                "interface": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "cmd": {
-                            "type": "string"
-                        },
-                        "args": {
-                            "type": "string"
-                        },
-                        "inputData": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "files": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "required": {
-                                                "type": "boolean",
-                                                "default": true
-                                            },
-                                            "mediaType": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        },
-                                        "required": [
-                                            "name",
-                                            "mediaType"
-                                        ]
-                                    }
-                                },
-                                "json": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "required": {
-                                                "type": "boolean",
-                                                "default": true
-                                            },
-                                            "type": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "array",
-                                                    "boolean",
-                                                    "integer",
-                                                    "number",
-                                                    "object",
-                                                    "string"
-                                                ]
-                                            }
-                                        },
-                                        "required": [
-                                            "name",
-                                            "type"
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "outputData": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "files": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "mediaType": {
-                                                "type": "string"
-                                            },
-                                            "pattern": {
-                                                "type": "string"
-                                            },
-                                            "count": {
-                                                "type": "string",
-                                                "default": "1",
-                                                "pattern": "([0-9]+|\\*)"
-                                            },
-                                            "required": {
-                                                "type": "boolean",
-                                                "default": true
-                                            }
-                                        },
-                                        "required": [
-                                            "name",
-                                            "mediaType",
-                                            "pattern"
-                                        ]
-                                    }
-                                },
-                                "json": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "type": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "array",
-                                                    "boolean",
-                                                    "integer",
-                                                    "number",
-                                                    "object",
-                                                    "string"
-                                                ]
-                                            },
-                                            "required": {
-                                                "type": "boolean",
-                                                "default": true
-                                            }
-                                        },
-                                        "required": [
-                                            "name",
-                                            "type"
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "envVars": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "value": {
-                                        "type": "string"
-                                    }
-                                },
-                                "required": [
-                                    "name",
-                                    "value"
-                                ]
-                            }
-                        },
-                        "mounts": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "path": {
-                                        "type": "string"
-                                    },
-                                    "mode": {
-                                        "enum": [
-                                            "ro",
-                                            "rw"
-                                        ],
-                                        "default": "ro"
-                                    }
-                                },
-                                "required": [
-                                    "name",
-                                    "path"
-                                ]
-                            }
-                        },
-                        "settings": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "secret": {
-                                        "type": "boolean",
-                                        "default": false
-                                    }
-                                },
-                                "required": [
-                                    "name"
-                                ]
-                            }
-                        }
-                    },
-                    "required": [
-                        "cmd"
-                    ]
-                },
-                "errorMapping": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "code": {
-                                "type": "integer"
-                            },
-                            "title": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "category": {
-                                "type": "string",
-                                "default": "algorithm",
-                                "enum": [
-                                    "algorithm",
-                                    "data",
-                                    "system"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "code",
-                            "title"
-                        ]
-                    }
-                }
-            },
-            "required": [
-                "name",
-                "algorithmVersion",
-                "packageVersion",
-                "title",
-                "description",
-                "authorName",
-                "timeout",
-                "cpus",
-                "mem",
-                "interface"
-            ]
-        }
-    },
-    "required": [
-        "seedVersion",
-        "job"
-    ]
-}
+[1;39m{
+  [0m[34;1m"$schema"[0m[1;39m: [0m[0;32m"http://json-schema.org/draft-04/schema#"[0m[1;39m,
+  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+  [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+  [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+    [0m[34;1m"seedVersion"[0m[1;39m: [0m[1;39m{
+      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+      [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"0.0.3"[0m[1;39m
+    [1;39m}[0m[1;39m,
+    [0m[34;1m"job"[0m[1;39m: [0m[1;39m{
+      [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+      [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+      [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+        [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+          [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"[a-z0-9_-]+"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"algorithmVersion"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+          [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"packageVersion"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+          [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"title"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"description"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"tag"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+          [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+            [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+          [1;39m}[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"authorName"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"authorEmail"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"authorUrl"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"timeout"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"integer"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"cpus"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"mem"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"sharedMem"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m,
+          [0m[34;1m"default"[0m[1;39m: [0m[0;39m0[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"storage"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"number"[0m[1;39m,
+          [0m[34;1m"default"[0m[1;39m: [0m[0;39m0[0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"interface"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+          [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+          [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+            [0m[34;1m"cmd"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"args"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"inputData"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+              [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+              [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"files"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+                  [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                    [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                    [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                      [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"required"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"boolean"[0m[1;39m,
+                        [0m[34;1m"default"[0m[1;39m: [0m[0;39mtrue[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"mediaType"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+                        [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                        [1;39m}[0m[1;39m
+                      [1;39m}[0m[1;39m
+                    [1;39m}[0m[1;39m,
+                    [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                      [0;32m"name"[0m[1;39m,
+                      [0;32m"mediaType"[0m[1;39m
+                    [1;39m][0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m,
+                [0m[34;1m"json"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+                  [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                    [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                    [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                      [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"required"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"boolean"[0m[1;39m,
+                        [0m[34;1m"default"[0m[1;39m: [0m[0;39mtrue[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+                        [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
+                          [0;32m"array"[0m[1;39m,
+                          [0;32m"boolean"[0m[1;39m,
+                          [0;32m"integer"[0m[1;39m,
+                          [0;32m"number"[0m[1;39m,
+                          [0;32m"object"[0m[1;39m,
+                          [0;32m"string"[0m[1;39m
+                        [1;39m][0m[1;39m
+                      [1;39m}[0m[1;39m
+                    [1;39m}[0m[1;39m,
+                    [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                      [0;32m"name"[0m[1;39m,
+                      [0;32m"type"[0m[1;39m
+                    [1;39m][0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"outputData"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+              [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+              [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"files"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+                  [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                    [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                    [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                      [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"mediaType"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"pattern"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"count"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+                        [0m[34;1m"default"[0m[1;39m: [0m[0;32m"1"[0m[1;39m,
+                        [0m[34;1m"pattern"[0m[1;39m: [0m[0;32m"([0-9]+|\\*)"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"required"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"boolean"[0m[1;39m,
+                        [0m[34;1m"default"[0m[1;39m: [0m[0;39mtrue[0m[1;39m
+                      [1;39m}[0m[1;39m
+                    [1;39m}[0m[1;39m,
+                    [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                      [0;32m"name"[0m[1;39m,
+                      [0;32m"mediaType"[0m[1;39m,
+                      [0;32m"pattern"[0m[1;39m
+                    [1;39m][0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m,
+                [0m[34;1m"json"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+                  [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                    [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                    [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                      [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"key"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"type"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+                        [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
+                          [0;32m"array"[0m[1;39m,
+                          [0;32m"boolean"[0m[1;39m,
+                          [0;32m"integer"[0m[1;39m,
+                          [0;32m"number"[0m[1;39m,
+                          [0;32m"object"[0m[1;39m,
+                          [0;32m"string"[0m[1;39m
+                        [1;39m][0m[1;39m
+                      [1;39m}[0m[1;39m,
+                      [0m[34;1m"required"[0m[1;39m: [0m[1;39m{
+                        [0m[34;1m"type"[0m[1;39m: [0m[0;32m"boolean"[0m[1;39m,
+                        [0m[34;1m"default"[0m[1;39m: [0m[0;39mtrue[0m[1;39m
+                      [1;39m}[0m[1;39m
+                    [1;39m}[0m[1;39m,
+                    [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                      [0;32m"name"[0m[1;39m,
+                      [0;32m"type"[0m[1;39m
+                    [1;39m][0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"envVars"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+              [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                  [1;39m}[0m[1;39m,
+                  [0m[34;1m"value"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m,
+                [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                  [0;32m"name"[0m[1;39m,
+                  [0;32m"value"[0m[1;39m
+                [1;39m][0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"mounts"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+              [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                  [1;39m}[0m[1;39m,
+                  [0m[34;1m"path"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                  [1;39m}[0m[1;39m,
+                  [0m[34;1m"mode"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
+                      [0;32m"ro"[0m[1;39m,
+                      [0;32m"rw"[0m[1;39m
+                    [1;39m][0m[1;39m,
+                    [0m[34;1m"default"[0m[1;39m: [0m[0;32m"ro"[0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m,
+                [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                  [0;32m"name"[0m[1;39m,
+                  [0;32m"path"[0m[1;39m
+                [1;39m][0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"settings"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+              [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+                [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+                [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+                  [0m[34;1m"name"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+                  [1;39m}[0m[1;39m,
+                  [0m[34;1m"secret"[0m[1;39m: [0m[1;39m{
+                    [0m[34;1m"type"[0m[1;39m: [0m[0;32m"boolean"[0m[1;39m,
+                    [0m[34;1m"default"[0m[1;39m: [0m[0;39mfalse[0m[1;39m
+                  [1;39m}[0m[1;39m
+                [1;39m}[0m[1;39m,
+                [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+                  [0;32m"name"[0m[1;39m
+                [1;39m][0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m
+          [1;39m}[0m[1;39m,
+          [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+            [0;32m"cmd"[0m[1;39m
+          [1;39m][0m[1;39m
+        [1;39m}[0m[1;39m,
+        [0m[34;1m"errorMapping"[0m[1;39m: [0m[1;39m{
+          [0m[34;1m"type"[0m[1;39m: [0m[0;32m"array"[0m[1;39m,
+          [0m[34;1m"items"[0m[1;39m: [0m[1;39m{
+            [0m[34;1m"type"[0m[1;39m: [0m[0;32m"object"[0m[1;39m,
+            [0m[34;1m"additionalProperties"[0m[1;39m: [0m[0;39mfalse[0m[1;39m,
+            [0m[34;1m"properties"[0m[1;39m: [0m[1;39m{
+              [0m[34;1m"code"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"integer"[0m[1;39m
+              [1;39m}[0m[1;39m,
+              [0m[34;1m"title"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+              [1;39m}[0m[1;39m,
+              [0m[34;1m"description"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m
+              [1;39m}[0m[1;39m,
+              [0m[34;1m"category"[0m[1;39m: [0m[1;39m{
+                [0m[34;1m"type"[0m[1;39m: [0m[0;32m"string"[0m[1;39m,
+                [0m[34;1m"default"[0m[1;39m: [0m[0;32m"algorithm"[0m[1;39m,
+                [0m[34;1m"enum"[0m[1;39m: [0m[1;39m[
+                  [0;32m"algorithm"[0m[1;39m,
+                  [0;32m"data"[0m[1;39m,
+                  [0;32m"system"[0m[1;39m
+                [1;39m][0m[1;39m
+              [1;39m}[0m[1;39m
+            [1;39m}[0m[1;39m,
+            [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+              [0;32m"code"[0m[1;39m,
+              [0;32m"title"[0m[1;39m
+            [1;39m][0m[1;39m
+          [1;39m}[0m[1;39m
+        [1;39m}[0m[1;39m
+      [1;39m}[0m[1;39m,
+      [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+        [0;32m"name"[0m[1;39m,
+        [0;32m"algorithmVersion"[0m[1;39m,
+        [0;32m"packageVersion"[0m[1;39m,
+        [0;32m"title"[0m[1;39m,
+        [0;32m"description"[0m[1;39m,
+        [0;32m"authorName"[0m[1;39m,
+        [0;32m"timeout"[0m[1;39m,
+        [0;32m"cpus"[0m[1;39m,
+        [0;32m"mem"[0m[1;39m,
+        [0;32m"interface"[0m[1;39m
+      [1;39m][0m[1;39m
+    [1;39m}[0m[1;39m
+  [1;39m}[0m[1;39m,
+  [0m[34;1m"required"[0m[1;39m: [0m[1;39m[
+    [0;32m"seedVersion"[0m[1;39m,
+    [0;32m"job"[0m[1;39m
+  [1;39m][0m[1;39m
+[1;39m}[0m
