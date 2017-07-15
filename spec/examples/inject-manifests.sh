@@ -10,4 +10,4 @@ do
     sed -i "" -e "s^SEED_MANIFEST^${SEED_MANIFEST}^" ${DIRECTORY}/Dockerfile
 done
 
-cd -
+cd - > /dev/null
