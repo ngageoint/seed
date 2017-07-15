@@ -13,7 +13,7 @@ jq_in_place() {
 
 
 # Update version placeholders
-FILES=$(grep -r SEED_VERSION examples validator sections *.adoc | cut -d ':' -f 1 | sort | uniq)
+FILES=$(grep -r SEED_VERSION spec validator | cut -d ':' -f 1 | sort | uniq)
 
 for FILE in ${FILES}
 do
@@ -21,11 +21,11 @@ do
 done
 
 # Update schemas
-jq_in_place .properties.seedVersion.pattern=\"${VERSION}\" schema/seed.manifest.schema.json
-jq_in_place .properties.seedVersion.pattern=\"${VERSION}\" schema/seed.metadata.schema.json
+jq_in_place .properties.seedVersion.pattern=\"${VERSION}\" spec/schema/seed.manifest.schema.json
+jq_in_place .properties.seedVersion.pattern=\"${VERSION}\" spec/schema/seed.metadata.schema.json
 
 # Update examples
-FILES=$(grep -r seedVersion examples/ | cut -d ':' -f 1 | sort | uniq | grep -v Dockerfile)
+FILES=$(grep -r seedVersion spec/examples/ | cut -d ':' -f 1 | sort | uniq | grep -v Dockerfile)
 
 for FILE in ${FILES}
 do
