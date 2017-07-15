@@ -1,5 +1,7 @@
 sudo: required
 
+language: bash
+
 services:
   - docker
 
@@ -21,10 +23,6 @@ script:
   - docker run -v $TRAVIS_BUILD_DIR:/documents/ --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output *.adoc
   - go test -v ./...
 
-after_error:
-  - docker logs asciidoc-to-html
-  - docker logs asciidoc-to-pdf
-
 after_failure:
   - docker logs asciidoc-to-html
   - docker logs asciidoc-to-pdf
@@ -36,4 +34,4 @@ deploy:
   github_token: $GH_TOKEN
   on:
     branch: master
-    condition: "${TRAVIS_PULL_REQUEST}" == "false"
+    condition: ${TRAVIS_PULL_REQUEST} == false
