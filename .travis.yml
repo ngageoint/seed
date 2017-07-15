@@ -1,6 +1,6 @@
 sudo: required
 
-language: bash
+language: go
 
 services:
   - docker
@@ -14,9 +14,6 @@ before_install:
   - mkdir -p output
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
-
-install:
-  - go get github.com/xeipuuv/gojsonschema
 
 script:
   - docker run -v $TRAVIS_BUILD_DIR:/documents/ --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output *.adoc
@@ -34,4 +31,4 @@ deploy:
   github_token: $GH_TOKEN
   on:
     branch: master
-    condition: ${TRAVIS_PULL_REQUEST} == false
+    condition: $TRAVIS_PULL_REQUEST == false
