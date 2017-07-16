@@ -17,6 +17,6 @@ Seed compliant images must be named in a specific fashion due to the lack of lab
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or Registry
 push. This requirement will be deprecated as label search support is standardized across Docker registry services.
 
-See the latest version of the link:detail.html[full specification] for complete detail on manifest format.
+See the latest version of the link:seed.html[full specification] for complete detail on manifest format.
 
 Specification permalinks:
