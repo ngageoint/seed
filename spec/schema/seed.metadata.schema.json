@@ -7,7 +7,7 @@
   "properties": {
     "seedVersion": {
       "type": "string",
-      "pattern": "0.0.3"
+      "pattern": "0.0.4"
     },
     "geometry": {
       "type": "object",
