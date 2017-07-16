@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Ensure script directory is CWD
-cd "${0%/*}"
+pushd "${0%/*}"
 
 for VERSION in $(cat ../.versions)
 do
-    echo image:https://img.shields.io/badge/seed-${VERSION}-brightgreen.svg[link="https://ngageoint.github.io/seed/seed-${VERSION}.html"] >> index.adoc
+    echo image:https://img.shields.io/badge/seed-${VERSION}-brightgreen.svg[link="https://ngageoint.github.io/seed/${VERSION}/seed.html"] >> index.adoc
 done
 
-cd - > /dev/null
+popd > /dev/null

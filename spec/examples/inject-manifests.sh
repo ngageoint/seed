@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Ensure script directory is CWD
-cd "${0%/*}"
+pushd "${0%/*}"
 
 # Inject the manifest for each example into SEED_MANIFEST placeholder
 for DIRECTORY in $(ls -F | grep /)
@@ -10,4 +10,4 @@ do
     sed -i "" -e "s^SEED_MANIFEST^${SEED_MANIFEST}^" ${DIRECTORY}/Dockerfile
 done
 
-cd - > /dev/null
+popd > /dev/null

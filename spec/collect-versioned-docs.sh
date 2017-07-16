@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 
 # Ensure script directory is CWD
-cd "${0%/*}"/output
+OUTPUT_DIR="${0%/*}"/output
+pushd $OUTPUT_DIR
 
 if [[ "${TRAVIS_TAG}x" != "x" ]]
 then
-    sudo cp detail.html seed-${TRAVIS_TAG}.html
-    sudo cp detail.pdf seed-${TRAVIS_TAG}.pdf;
+    sudo mkdir ${TRAVIS_TAG}
+    sudo cp -R seed.* $TRAVIS_TAG/
+    sudo cp -R schema/*.json $TRAVIS_TAG/
 fi
 
 # Grab all available versions to place in gh-pages
 for VERSION in $(cat ../../.versions)
 do
-    sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed-${VERSION}.html
+    cd $OUTPUT_DIR
+    sudo mkdir $VERSION
+    cd $VERSION
+    sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.html
+    sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.pdf
+    sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.manifest.schema.json
+    sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.metadata.schema.json
 done
 
-cd - > /dev/null
+popd > /dev/null

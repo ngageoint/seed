@@ -18,8 +18,8 @@ install:
 
 script:
   - ./spec/add-version-links.sh
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc detail.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output detail.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output seed.adoc
   - echo go test -v ./...
 
 after_failure:
@@ -34,7 +34,7 @@ deploy:
   - provider: releases
     api_key: "$GH_TOKEN"
     file_glob: true
-    file: spec/output/seed-${TRAVIS_TAG}.*
+    file: spec/output/${TRAVIS_TAG}/*
     skip_cleanup: true
     on:
       tags: true
