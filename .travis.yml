@@ -9,12 +9,12 @@ env:
   - SPEC_PATH="../spec/schema/seed.manifest.schema.json"
 
 before_install:
-  - ./set-version.sh 0.0.5
-  - ./spec/examples/inject-manifests.sh
-  - docker pull asciidoctor/docker-asciidoctor
+  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh $(tail -1 .versions)-snapshot; ./spec/examples/inject-manifests.sh; fi
   - ./validator/test-images/docker-build-test-images.sh
+  - docker pull asciidoctor/docker-asciidoctor
 
 script:
+  - ./add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc detail.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output detail.adoc
   - go test -v ./...
@@ -23,11 +23,25 @@ after_failure:
   - docker logs asciidoc-to-html
   - docker logs asciidoc-to-pdf
 
+before_deploy:
+  - if [[ "${TRAVIS_TAG}x" != "x" ]] ; then cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; fi
+
+
 deploy:
-  local_dir: spec/output
-  provider: pages
-  skip_cleanup: true
-  github_token: $GH_TOKEN
-  on:
-    branch: master
-    condition: $TRAVIS_PULL_REQUEST == false
+  - provider: releases
+    api_key: "$GH_TOKEN"
+    file:
+      - "spec/output/detail.html"
+      - "spec/output/detail.pdf"
+    skip_cleanup: true
+    on:
+      tags: true
+
+  - provider: pages
+    local_dir: spec/output
+    skip_cleanup: true
+    github_token: $GH_TOKEN
+    on:
+      branch: master
+      condition: $TRAVIS_PULL_REQUEST == false
+
