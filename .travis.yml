@@ -13,6 +13,9 @@ before_install:
   - ./validator/test-images/docker-build-test-images.sh
   - docker pull asciidoctor/docker-asciidoctor
 
+install:
+  - go get github.com/xeipuuv/gojsonschema
+
 script:
   - ./add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc detail.adoc
@@ -25,7 +28,6 @@ after_failure:
 
 before_deploy:
   - if [[ "${TRAVIS_TAG}x" != "x" ]] ; then cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; fi
-
 
 deploy:
   - provider: releases
