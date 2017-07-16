@@ -6,4 +6,4 @@ image:https://travis-ci.org/ngageoint/seed.svg?branch=master[link="https://travi
 Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
 image.
 
-See the link:http://ngageoint.github.io/seed/detail.html[full specification] for details.
+See the link:http://ngageoint.github.io/seed/[specification] for details.
