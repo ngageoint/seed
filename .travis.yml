@@ -17,7 +17,7 @@ install:
   - go get github.com/xeipuuv/gojsonschema
 
 script:
-  - ./add-version-links.sh
+  - ./spec/add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc detail.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output detail.adoc
   - go test -v ./...
@@ -27,14 +27,13 @@ after_failure:
   - docker logs asciidoc-to-pdf
 
 before_deploy:
-  - if [[ "${TRAVIS_TAG}x" != "x" ]] ; then cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; cp spec/output/detail.html spec/output/seed-${TRAVIS_TAG}.html; fi
+  - ./spec/collect-versioned-docs.sh
 
 deploy:
   - provider: releases
     api_key: "$GH_TOKEN"
-    file:
-      - "spec/output/detail.html"
-      - "spec/output/detail.pdf"
+    file_glob: true
+    file: spec/output/seed-${TRAVIS_TAG}.*
     skip_cleanup: true
     on:
       tags: true
