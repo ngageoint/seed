@@ -22,7 +22,7 @@ then
         cd $VERSION
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.html
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.pdf
-        cd $VERSION/schema
+        cd schema
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.manifest.schema.json
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.metadata.schema.json
     done
