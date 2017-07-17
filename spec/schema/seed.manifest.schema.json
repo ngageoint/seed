@@ -65,7 +65,7 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "args": {
+            "cmd": {
               "type": "string"
             },
             "inputData": {
@@ -271,9 +271,13 @@
                 ]
               }
             }
+<<<<<<< HEAD
           },
           "required": [
           ]
+=======
+          }
+>>>>>>> 2714a43... Updated spec to eliminate use of duplicative args - #18
         },
         "errorMapping": {
           "type": "array",

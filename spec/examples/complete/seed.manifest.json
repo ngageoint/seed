@@ -21,7 +21,7 @@
     "sharedMem": 0.0,
     "storage": 0.0,
     "interface": {
-      "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
       "inputData": {
         "files": [
           {
