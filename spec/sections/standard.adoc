@@ -155,13 +155,18 @@ sub-section.
 sub-section.
 
 .Files Elements
+
+Critical implementation details related to `multiple` member should be referenced in
+<<environment-variables,environment variables>>.
+
 * The Files object MUST have a member `name`. The member's value MUST be a string indicating the environment
 variable name that will be injected by the processing platform for job consumption.
-* The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
-the file being captured by OutputData.
-* The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether this input
-value is one or multiple files. If true, the args placeholder will be replaced with an absolute directory containing all files.
-If false or omitted, the args placeholder will be replaced with an absolute path to a single file.
+* The Files object MUST have a member `mediaType`. The member's value is an array of strings that MUST indicate the IANA
+Media types that the job accepts.
+* The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
+physical files are processed by this `Files` element. If omitted, the default value MUST be treated as false. If true,
+the `cmd` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the `cmd`
+placeholder will be replaced with an absolute path to a single file.
 * The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
@@ -181,7 +186,7 @@ The following annotated snippet provides quick reference to the use of InputData
         {
             "name": "INPUT_FILE", // <2>
             "mediaType": [ "image/x-hdf5-image" ], // <3>
-            "multiple": false // <4>
+            "multiple": false, // <4>
             "required": true // <5>
         },
         ...
@@ -198,7 +203,8 @@ The following annotated snippet provides quick reference to the use of InputData
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing name used to inject data via environment variables.
 <3> Required array containing a list of accepted Media types.
-<4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false). Default is `false`.
+<4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
+Default is `false`.
 <5> Optional boolean indicating whether job requires this particular file. Default is `true`.
 <6> Optional array containing elements defined by JSON Elements sub-section.
 <7> Required string containing name used to inject data via environment variables.

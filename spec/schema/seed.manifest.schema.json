@@ -94,6 +94,10 @@
                         "items": {
                           "type": "string"
                         }
+                      },
+                      "multiple": {
+                        "type": "boolean",
+                        "default": false
                       }
                     },
                     "required": [
@@ -252,13 +256,7 @@
                 ]
               }
             }
-<<<<<<< HEAD
-          },
-          "required": [
-          ]
-=======
           }
->>>>>>> 2714a43... Updated spec to eliminate use of duplicative args - #18
         },
         "errorMapping": {
           "type": "array",
