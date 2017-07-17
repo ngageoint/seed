@@ -7,7 +7,7 @@ algorithm developers to understand what execution context they are provided.
 [[environment-variables, Environment Variables]]
 ==== Environment Variables
 Environment variable injection MUST be performed. These MAY be consumed by a job directly as environment variables or
-shell variable expansion MAY be leveraged in the `interface.args` member. Implementing frameworks MAY perform
+shell variable expansion MAY be leveraged in the `interface.cmd` member. Implementing frameworks MAY perform
 variable expansion, but it MUST follow Bash expansion conventions.
 
 The following minimum variables MUST be provided:
@@ -25,7 +25,7 @@ exactly from `name` value and `array`, `object` and `string` JSON types MUST be 
 environment variable MUST be left unset if `required` is false and the input is not present.
 
 Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
-use of Bash. Taking the example of an optional `inputData.files` element, the following `args` value will expand with
+use of Bash. Taking the example of an optional `inputData.files` element, the following `cmd` value will expand with
 a preceding switch only when the input is available:
 
 `${MY_INPUT/#/-d }`

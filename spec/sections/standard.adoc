@@ -107,12 +107,13 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 
 [[interface-section, Interface Object]]
 ===== Interface Object
-The Interface object is the primary member that describes the arguments, environment variables,
+The Interface object is the primary member that describes the command arguments, environment variables,
 mounts, settings, inputs and outputs defined for a job.
 
-* The Interface object MAY have a member with the name `args`. The member's value MUST be a string specifying the
-complete parameter string passed to the executable defined in the docker image's ENTRYPOINT. Based on the Linux shell, shell escaping
-of special characters MAY be required.
+* The Interface object MAY have a member with the name `cmd`. The member's value MUST be a string specifying the
+complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters
+MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be
+necessary in `cmd` string. The Seed `cmd` member can be treated as analogous to the Docker CMD statement.
 * The Interface object MAY have a member with the name `inputData`. This member's value MUST be an object as defined in
 <<inputdata-section>>.
 * The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
@@ -132,7 +133,7 @@ The following annotated snippet provides quick reference to the use of Interface
 [source,javascript]
 ----
 {
-    "args": "${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <1>
+    "cmd": "/app/job.sh  ${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <1>
     "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
     "outputData": { ... }, // <3>
     "envVars": [ ... ], // <4>
@@ -146,7 +147,7 @@ implementing framework MUST provide. Linux shell escaping MAY be needed in the c
 <3> Optional <<outputdata-section>>. This is the means to capture results from the job container.
 <4> Optional <<envvars-section>>. This is a means to set environment variables before a job is run.
 <5> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
-<6> Optional <<settings-section>>. This defines any settings that are used by the args or envVars.
+<6> Optional <<settings-section>>. This defines any settings that are used by the `interface.cmd` or envVars.
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
