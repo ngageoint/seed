@@ -66,19 +66,21 @@ func main() {
 	DefineFlags()
 
 	// Define the current working directory
-	curDir, _ := os.Getwd()
+	curDirectory, _ := os.Getwd()
 
-	// set path to seed file - relative to current directory or given directory
-	// TODO - directory might be a relative path (assuming it is for now)
-	// GetFullPath(directory) will figure out the absolute path
+	// set path to seed file -
+	// 	Either relative to current directory or located in given directory (-d option)
+	//  	-d directory might be a relative path to current directory
 	seedFileName := constants.SeedFileName
 	if directory == "." {
-		directory = curDir
-		curDirectory = curDir
-		seedFileName = path.Join(curDir, seedFileName)
+		directory = curDirectory
+		seedFileName = path.Join(curDirectory, seedFileName)
 	} else {
-		seedFileName = path.Join(curDir, directory, seedFileName)
-		curDirectory = curDir
+		if filepath.IsAbs(directory) {
+			seedFileName = path.Join(directory, seedFileName)
+		} else {
+			seedFileName = path.Join(curDirectory, directory, seedFileName)
+		}
 	}
 
 	// Verify seed.json exists within specified directory.
@@ -93,9 +95,8 @@ func main() {
 	if validateCmd.Parsed() {
 		schemaFile := validateCmd.Lookup(constants.SchemaFlag).Value.String()
 
-		//TODO don't assume schema file is relative to current directory
 		if schemaFile != "" {
-			schemaFile = "file://" + path.Join(curDir, validateCmd.Lookup(constants.SchemaFlag).Value.String())
+			schemaFile = "file://" + GetFullPath(schemaFile)
 		} else {
 			schemaFile = constants.SeedSchemaURL
 		}
@@ -650,6 +651,11 @@ func ValidateOutput(seed *objects.Seed) {
 				if count != len(matchList) {
 					fmt.Fprintf(os.Stderr, "ERROR: %v files specified, %v found.\n",
 						f.Count, strconv.Itoa(len(matchList)))
+					if len(matchList) > 0 {
+						for _, s := range matchList {
+							fmt.Fprintf(os.Stderr, s)
+						}
+					}
 				} else {
 					fmt.Fprintf(os.Stderr, "SUCCESS: %v files specified, %v found. Files found:\n",
 						f.Count, strconv.Itoa(len(matchList)))
@@ -743,6 +749,28 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 
 //GetFullPath returns the full path of the given file. This expands relative file
 // paths and verifes non-relative paths
+// Validate path for file existance??
 func GetFullPath(file string) string {
-	return "TODO"
+
+	if filepath.IsAbs(file) {
+		return file
+	}
+
+	// Expand relative file path
+	// Define the current working directory
+	curDir, _ := os.Getwd()
+
+	// Assumes relative to current directory
+	if _, err := os.Stat(path.Join(curDir, file)); !os.IsNotExist(err) {
+		return path.Join(curDir, file)
+	}
+
+	// Assumes relative to working directory
+	if directory != "." {
+		if _, err := os.Stat(path.Join(directory, file)); !os.IsNotExist(err) {
+			return path.Join(directory, file)
+		}
+	}
+
+	return file
 }
