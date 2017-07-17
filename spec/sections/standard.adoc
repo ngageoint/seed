@@ -124,30 +124,25 @@ the array size.
 * The Interface object MAY have a member with the name `settings`. The member's value is an array of `Settings`
 objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
-* The Interface object MAY have a member with the name `envVars`. The member's value is an array of
-`Environment Variables` objects (see <<envvars-section>>) and MAY contain any number of elements. There is no other
-standard restriction on the array size.
 
 The following annotated snippet provides quick reference to the use of Interface object:
 
 [source,javascript]
 ----
 {
-    "cmd": "/app/job.sh  ${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <1>
+    "cmd": "/app/job.sh ${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <1>
     "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
     "outputData": { ... }, // <3>
-    "envVars": [ ... ], // <4>
-    "mounts": [ ... ], // <5>
-    "settings": [ ... ] // <6>
+    "mounts": [ ... ], // <4>
+    "settings": [ ... ] // <5>
 }
 ----
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
 <2> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
 <3> Optional <<outputdata-section>>. This is the means to capture results from the job container.
-<4> Optional <<envvars-section>>. This is a means to set environment variables before a job is run.
-<5> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
-<6> Optional <<settings-section>>. This defines any settings that are used by the `interface.cmd` or envVars.
+<4> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
+<5> Optional <<settings-section>>. This defines any environment specific settings needed at run time.
 
 [[inputdata-section, InputData Object]]
 ====== InputData Object
@@ -336,10 +331,15 @@ The following annotated snippet provides quick reference to the use of the Mount
 [[settings-section, Settings Object]]
 ====== Settings Object
 The Settings object is the member responsible for indicating all content not related to data that is needed for the
-Job to run.
+Seed job to run. These will be exposed as environment variables at run time. Most commonly, Settings will be used for
+environment specific configuration or external credentials.
 
-* The Settings object MUST have a member `name`. The member's value is a string that correlates setting references
- elsewhere in the Interface to an external settings repository, and guides the injection of a related value.
+While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputData` /
+`outputData`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
+ messaging are necessary, this is a reasonable mechanism to accomplish that.
+
+* The Settings object MUST have a member `name`. The member's value is a string that indicates the case-sensitive
+environment variable to be injected at run time.
 * The Settings object MAY have a member `secret`. The member's value is a boolean that indicates whether the value
  associated with the named setting is secret and stored as a secure string.
 
@@ -355,34 +355,8 @@ The following annotated snippet provides quick reference to the use of the Setti
     ...
 ]
 ----
-<1> Required string containing the name to be used to lookup uses in the Interface.
+<1> Required string containing the environment variable name to be injected at run time.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
-
-[[envvars-section, EnvVars Object]]
-====== EnvVars Object
-The EnvVars object is the member responsible for defining any values that need to be set as environment
-variables in the runtime that will be executing the job.
-
-* The envVars object MAY have a member `name`. The member's value is a case-sensitive string defining the name of the
-environment variable.
-* The envVars object MAY have a member `value`. The member's value is a case-sensitive string defining the value of the
-environment variable.
-
-The following annotated snippet provides quick reference to the use of the envVars object:
-
-[source,javascript]
-----
-[
-    {
-        "name": "DB_PORT", // <1>
-        "value": "${SETTING1}" // <2>
-    },
-    ...
-]
-----
-<1> Required string containing the name portion of a name/value environment variable pair.
-<2> Required string containing the value portion of a name/value environment variable pair.
-
 
 [[errormapping-section, ErrorMapping Objects]]
 ===== ErrorMapping Objects
