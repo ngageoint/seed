@@ -65,9 +65,21 @@ include::sections/usage.adoc[]
 include::sections/discovery.adoc[]
 
 == Schema
+
+[[seed-manifest-schema, Seed Manifest]]
+=== Seed Manifest
 The following JSON Schema should be used to validate Seed manifests prior to label serialization into a Dockerfile
 for publish. It may be downloaded here: link:schema/seed.manifest.schema.json[Seed Manifest Schema]
 
 ----
 include::schema/seed.manifest.schema.json[]
+----
+
+[[seed-metadata-schema, Seed Metadata]]
+=== Seed Metadata
+The following JSON Schema should be used to validate the side-car metadata files generated alongside Seed job output
+files. It may be downloaded here: link:schema/seed.metadata.schema.json[Seed Metadata Schema]
+
+----
+include::schema/seed.metadata.schema.json[]
 ----
