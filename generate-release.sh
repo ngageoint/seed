@@ -2,10 +2,18 @@
 
 ## Usage: ./generate-release.sh 1.0.0
 
+VERSION=$1
+if [[ "${VERSION}x" == "x" ]]
+then
+    echo Missing version parameter!
+    echo Usage:
+    echo   ./generate-release.sh 1.0.0
+    exit 1
+fi
+
 # Ensure script directory is CWD
 cd "${0%/*}"
 
-VERSION=$1
 tput setaf 2
 echo "Building release $VERSION"
 tput sgr0

@@ -7,3 +7,27 @@ Seed is a general standard to aid in the discovery and consumption of a discrete
 image.
 
 See the link:http://ngageoint.github.io/seed/[specification] for details.
+
+== Usage
+
+The specification is intended to inform both algorithm and execution framework developers. Detailed examples
+are provided for Seed usage in both simple and complex algorithm scenarios and these are recommended for
+algorithm developers interested in getting started quickly.
+
+The Seed team is in the process of developing a fully featured CLI that will minimize the domain expertise
+required for an algorithm developer to get a Seed image ready for distribution. This will handle the Docker
+image construction and publish, so focus can be given to what really matters - describing your algorithm's
+purpose, requirements and interface.
+
+== Development
+
+All Seed documentation is made via the excellent AsciiDoc standard. Travis CI is used to compile all the 
+documentation into html / pdf releases and update the GitHub pages site with all available Seed releases.
+
+Generation of new releases may be done from a clean master branch:
+
+`./generate-release.sh 1.0.0`
+
+This will create a new tag, that will kick off a TravisCI tag build to create release artifacts, update
+the master branch with a pointer to that release and finally a TravisCI build of master to update GitHub
+pages with the permalink to all available releases.
