@@ -55,12 +55,6 @@
           }
         ]
       },
-      "envVars": [
-        {
-          "name": "DB_PORT",
-          "value": "${SETTING1}"
-        }
-      ],
       "mounts": [
         {
           "name": "MOUNT1",
@@ -70,7 +64,7 @@
       ],
       "settings": [
         {
-          "name": "SETTING1",
+          "name": "DB_HOST",
           "secret": false
         }
       ]

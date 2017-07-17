@@ -207,25 +207,6 @@
                 }
               }
             },
-            "envVars": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "name",
-                  "value"
-                ]
-              }
-            },
             "mounts": {
               "type": "array",
               "items": {

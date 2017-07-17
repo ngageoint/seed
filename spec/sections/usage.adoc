@@ -6,13 +6,17 @@ algorithm developers to understand what execution context they are provided.
 
 [[environment-variables, Environment Variables]]
 ==== Environment Variables
-Environment variable injection MUST be performed. These MAY be consumed by a job directly as environment variables or
-shell variable expansion MAY be leveraged in the `interface.cmd` member. Implementing frameworks MAY perform
-variable expansion, but it MUST follow Bash expansion conventions.
+Environment variable injection MUST be performed as it is the primary means of providing the context required by the
+defined interface of a Seed job. These environment variables MAY be consumed by a job directly or shell variable
+expansion MAY be leveraged in the `interface.cmd` member. Implementing frameworks MAY perform variable expansion, but it
+MUST follow Bash expansion conventions.
+
+*NOTE*: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
+`interface.settings` `name` member values MUST NOT occur.
 
 The following minimum variables MUST be provided:
 
-* JOB_OUTPUT_DIR: Root path all output products MUST be placed by job for processing system capture.
+* JOB_OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
 * ALLOCATED_CPUS: Value of `cpus` member.
 * ALLOCATED_MEM: Value of `mem` member.
 * ALLOCATED_SHARED_MEM: Value of `sharedMem` member.
@@ -23,6 +27,8 @@ absolute path. This environment variable MUST be left unset if `required` is fal
 * All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Case MUST map
 exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded. This
 environment variable MUST be left unset if `required` is false and the input is not present.
+* All `name` member values of `interface.settings` elements MUST map to environment variables. Case MUST map
+exactly from `name` value.
 
 Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
 use of Bash. Taking the example of an optional `inputData.files` element, the following `cmd` value will expand with
