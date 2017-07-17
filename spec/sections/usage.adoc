@@ -52,7 +52,7 @@ sample command: `chmod +x yourfile.txt`
 There is often a need by the processing system to capture additional job extracted metadata on output files. The Seed
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
-must be formatted according to the link:schema/seed.metadata.schema.json[Seed Metadata Schema]. This allows for both
+must be formatted according to the <<seed-metadata-schema,Seed Metadata Schema>>. This allows for both
 spatial and temporal metadata to be specified.
 
 The following snippet demonstrates the optional values that may be specified:
