@@ -8,10 +8,9 @@
     "description": "Processes an input PNG and outputs watermarked PNG.",
     "authorName": "John Doe",
     "timeout": 30,
-    "cpus": 1,
-    "mem": 64,
+    "cpus": 1.0,
+    "mem": 64.0,
     "interface": {
-      "cmd": "/app/watermark.py",
       "args": "${INPUT_IMAGE} ${JOB_OUTPUT_DIR}",
       "inputData": {
         "files": [

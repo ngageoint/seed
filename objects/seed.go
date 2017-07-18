@@ -1,6 +1,6 @@
 package objects
 
 type Seed_0_0_3 struct {
-	ManifestVersion string
+	SeedVersion string
 	Job SeedJob_1_4
 }
