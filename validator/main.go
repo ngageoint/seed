@@ -23,6 +23,17 @@ type RunResult struct{
 	RunErrors []string
 }
 
+type stringList []string
+
+func (s *stringList) String() string {
+	return fmt.Sprintf("%v", *s)
+}
+
+func (s *stringList) Set(value string) error {
+    *s = strings.Split(value, ",")
+    return nil
+}
+
 func main() {
 	schemaUri, dockerImage := GetArgs()
 
@@ -54,10 +65,40 @@ func ValidateSeedSpec(schemaUri string, seedManifest string) gojsonschema.Result
 func GetArgs() (string, string) {
 	var schemaUri string
 	var dockerImage string
+	var inputFiles, mounts, settings stringList
 
 	flag.StringVar(&schemaUri, "schema", "", "An optional URI of a schema to validate against.")
 	flag.StringVar(&dockerImage, "image", "", "A Docker image to validate against the Seed specification.")
+	flag.Var(&inputFiles, "inputFiles", "Optional comma separated list of input file names and values. e.g. INPUT_FILE=filename,INPUT_FILE2=filename2")
+	flag.Var(&mounts, "mounts", "Optional comma separated list of mount names and paths. e.g. MOUNT=/local/path,MOUNT2=...")
+	flag.Var(&settings, "settings", "Optional comma separated list of setting names and values. e.g. DB_PORT=9999,DB_NAME=database")
+
 	flag.Parse()
+	
+	for _, file := range inputFiles {
+		pair := strings.Split(file, "=")
+		if len(pair) != 2 {
+			fmt.Println("Error parsing input file string %v")
+		}
+		os.Setenv(pair[0],pair[1])
+	}
+	
+	for _, mount := range mounts {
+		pair := strings.Split(mount, "=")
+		if len(pair) != 2 {
+			fmt.Println("Error parsing input file string %v")
+		}
+		os.Setenv(pair[0],pair[1])
+	}
+	
+	for _, setting := range settings {
+		pair := strings.Split(setting, "=")
+		if len(pair) != 2 {
+			fmt.Println("Error parsing input file string %v")
+		}
+		os.Setenv(pair[0],pair[1])
+	}
+
 	if (len(dockerImage) == 0) {
 		fmt.Println("\n\"seedvalidator\" requires a docker image be specified.\n\nUsage: seedvalidator -image DOCKERIMAGE \n")
 		os.Exit(1)
@@ -152,7 +193,6 @@ func Validate(schemaUri string, seedManifest string) gojsonschema.Result {
 }
 
 func RunImage(dockerImage, seedManifest string) RunResult {
-//docker run --rm -v "$PWD/testdata":/testdata -e USERID=$UID extractor-0.1.0-seed:0.1.0 testdata/seed-scale.zip -d testdata/
 	var result RunResult
 	result.Valid = true
 	
@@ -193,7 +233,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 			dockerOutDir = filepath.Base(outdir)
 			defer os.RemoveAll(outdir) // clean up
 			os.Mkdir(dockerOutDir, 0777)
-			os.Setenv("${JOB_OUTPUT_DIR}", dockerOutDir)
+			os.Setenv("JOB_OUTPUT_DIR", dockerOutDir)
 		}
 		outAbsPath, _ = filepath.Abs(dockerOutDir)
 		outVolume := outAbsPath + ":/" + dockerOutDir
@@ -247,13 +287,9 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 	args = append(args, envVars...)
 	args = append(args, "-u", currentUser.Uid, dockerImage)
 
-	//need to use strings.Replace for output dir in case we set it as env variables set by os.Setenv don't seem to be visible here
-	imageArgs := strings.Replace(seed.Job.Interface.Args, "${JOB_OUTPUT_DIR}", dockerOutDir, -1)
-	imageArgs = os.ExpandEnv(imageArgs)
+	imageArgs := os.ExpandEnv(seed.Job.Interface.Args)
 	seedArgs := strings.Split(imageArgs, " ")
 	args = append(args, seedArgs...)
-	
-	fmt.Println(args)
 
 	cmd := exec.Command(cmdstr, args...)
 	out, err := cmd.CombinedOutput()
