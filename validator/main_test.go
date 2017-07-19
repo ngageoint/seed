@@ -16,6 +16,7 @@ func TestValidateSeedSpec(t *testing.T) {
 		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
 		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
 		{"random-number-gen-0.1.0-seed:0.1.0", true, ""},
+		{"extractor-0.1.0-seed:0.1.0", true, ""},
 		{"seed-test/invalid-missing-job", false, "job: job is required"},
 		{"missing-filename-0.1.0-seed:0.1.0", false, "name: name is required"},
 	}
@@ -53,6 +54,7 @@ func TestValidImageName(t *testing.T) {
 	}{
 		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
 		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
+		{"extractor-0.1.0-seed:0.1.0", true, ""},
 		{"seed-test/invalid-missing-job", false, "Expected --seed:, given seed-test/invalid-missing-job"},
 		{"seed-test/watermark", false, "Expected image-watermark-0.1.0-seed:0.1.0, given seed-test/watermark" },
 	}
