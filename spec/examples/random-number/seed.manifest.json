@@ -9,9 +9,8 @@
     "authorName": "John Doe",
     "timeout": 10,
     "cpus": 0.1,
-    "mem": 1,
+    "mem": 1.0,
     "interface": {
-      "cmd": "/app/job.sh"
     }
   }
 }
