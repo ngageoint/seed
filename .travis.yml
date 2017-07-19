@@ -15,7 +15,6 @@ before_install:
   - ./validator/test-images/docker-build-test-images.sh
 
 install:
-  - git clone --depth=50 --branch=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} https://github.com/$TRAVIS_REPO_SLUG.git /home/travis/gopath/src/github.com/ngageoint/seed
   - go get github.com/xeipuuv/gojsonschema
 
 script:
