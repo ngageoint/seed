@@ -14,7 +14,6 @@ type Seed struct {
 					Name      string   `json:"name"`
 					MediaType []string `json:"mediaType"`
 					Pattern   string   `json:"pattern"`
-					Path      string   `json:"path"`
 				}
 			}
 			OutputData struct {
@@ -25,7 +24,7 @@ type Seed struct {
 					Count     string `json:"count"`
 					Required  bool   `json:"required"`
 				}
-				Json []struct {
+				JSON []struct {
 					Name     string `json:"name"`
 					Type     string `json:"type"`
 					Key      string `json:"key"`

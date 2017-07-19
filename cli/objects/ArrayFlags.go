@@ -1,9 +1,11 @@
 package objects
 
 import (
-  "bytes"
+	"bytes"
 )
 
+//ArrayFlags defines the values of a flag that may be used multiple times
+//  i.e. -i KEY=VAL -i KEY2=VAL2 -i KEY3=VAL3 etc
 type ArrayFlags []string
 
 //String converts an arrayFlags object to a single, comma separated string.

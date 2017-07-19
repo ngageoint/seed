@@ -10,3 +10,4 @@ cli/*
 # scratch files during development
 output/
 validator/Output*
+examples/addition-algorithm/outputs

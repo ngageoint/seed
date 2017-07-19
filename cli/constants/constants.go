@@ -1,8 +1,5 @@
 package constants
 
-//SeedSchemaURL points to the seed file schema
-const SeedSchemaURL = "https://ngageoint.github.io/seed/schema/seed.manifest.schema.json"
-
 //BuildCommand seed build subcommand
 const BuildCommand = "build"
 
