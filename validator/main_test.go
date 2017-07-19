@@ -25,8 +25,13 @@ func TestValidateSeedSpec(t *testing.T) {
 		absPath, _ := filepath.Abs(envSpecUri)
 		absSpecPath = filepath.Join("file://", absPath)
 	}
+
 	for _, c := range cases {
-		result, _ := ValidateSeedSpec(absSpecPath, c.image)
+		seedManifest, err := GetSeedManifest(c.image)
+		if err != nil {
+			t.Errorf("Error getting manifest: %v", err)
+		}
+		result := ValidateSeedSpec(absSpecPath, seedManifest)
 		isValid := result.Valid()
 		if (isValid != c.expected ) {
 			t.Errorf("ValidateSeedSpec(%q) == %v, expected %v", c.image, isValid, c.expected)
@@ -43,22 +48,51 @@ func TestValidateSeedSpec(t *testing.T) {
 func TestValidImageName(t *testing.T) {
 	cases := []struct {
 		image string
-		expected string
+		valid bool
+		expectedErrorMsg string
 	}{
-		{"image-watermark-0.1.0-seed:0.1.0", "image-watermark-0.1.0-seed:0.1.0"},
-		{"my-algorithm-0.1.0-seed:0.1.0", "my-algorithm-0.1.0-seed:0.1.0"},
-		{"seed-test/invalid-missing-job", "--seed:"},
-		{"seed-test/watermark", "image-watermark-0.1.0-seed:0.1.0" },
+		{"image-watermark-0.1.0-seed:0.1.0", true, ""},
+		{"my-algorithm-0.1.0-seed:0.1.0", true, ""},
+		{"seed-test/invalid-missing-job", false, "Expected --seed:, given seed-test/invalid-missing-job"},
+		{"seed-test/watermark", false, "Expected image-watermark-0.1.0-seed:0.1.0, given seed-test/watermark" },
 	}
 	for _, c := range cases {
-		out, err := DockerInspect(c.image)
-		seedManifest := ParseLabel(out, "com.ngageoint.seed.manifest")
-		result := ValidImageName(string(seedManifest))
+		seedManifest, err := GetSeedManifest(c.image)
+		valid, errorMsg := ValidImageName(c.image, seedManifest)
 		if err != nil {
 			continue
 		}
-		if (result != c.expected ) {
-			t.Errorf("ValidImageName(%q) == %v, expected %v", c.image, result, c.expected)
+		if (valid != c.valid ) {
+			t.Errorf("ValidImageName(%q) == %v, expected %v", c.image, valid, c.valid)
+		}
+		if (len(errorMsg) > 0) && (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
+			t.Errorf("Error message contained `%s`, expected `%s`", errorMsg, c.expectedErrorMsg)
+		}
+	}
+}
+
+func TestRunImage(t *testing.T) {
+	cases := []struct {
+		image string
+		valid bool
+		expectedErrorMsg string
+	}{
+		{"extractor-0.1.0-seed:0.1.0", true, ""},
+	}
+	for _, c := range cases {
+		seedManifest, err := GetSeedManifest(c.image)
+		if err != nil {
+			continue
+		}
+		result := RunImage(c.image, seedManifest)
+		if (result.Valid != c.valid ) {
+			t.Errorf("RunImage(%q) == %v, expected %v", c.image, result.Valid, c.valid)
+		}
+		if (len(result.RunErrors) > 0) {
+			errorMsg := result.RunErrors[0]
+			if (!strings.Contains(errorMsg, c.expectedErrorMsg)) {
+				t.Errorf("Error message contained `%s`, expected `%s`", errorMsg, c.expectedErrorMsg)
+			}
 		}
 	}
 }
