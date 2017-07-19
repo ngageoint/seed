@@ -1,6 +1,6 @@
 package objects
 
-type Seed_0_0_3 struct {
+type Seed_0_0_4 struct {
 	SeedVersion string
-	Job SeedJob_1_4
+	Job SeedJob
 }

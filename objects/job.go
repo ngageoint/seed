@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-type SeedJob_1_4 struct {
+type SeedJob struct {
 	Name string
 	Version string
 	AlgorithmVersion string
@@ -24,13 +24,13 @@ type SeedJob_1_4 struct {
 	ErrorMapping []ErrorMap
 }
 
-func (o *SeedJob_1_4) UnmarshalJSON(b []byte) error {
-	type xjob SeedJob_1_4
+func (o *SeedJob) UnmarshalJSON(b []byte) error {
+	type xjob SeedJob
 	xo := &xjob{SharedMem: 0.0, Storage: 0.0}
 	if err := json.Unmarshal(b, xo); err != nil {
 		return err
 	}
-	*o = SeedJob_1_4(*xo)
+	*o = SeedJob(*xo)
 	return nil
 }
 
