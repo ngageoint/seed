@@ -203,6 +203,7 @@ func DockerBuild(seed *objects.Seed, imageName string) {
 	if string(slurperr) != "" {
 		fmt.Fprintf(os.Stderr, "ERROR: Error building image '%s':\n%s\n",
 			imageName, string(slurperr))
+		os.Exit(2)
 	}
 }
 
@@ -228,7 +229,8 @@ func DockerRun(seed *objects.Seed) {
 
 	if runCmd.Lookup(constants.RmFlag).Value.String() == "true" {
 		dockerArgs = append(dockerArgs, "--rm")
-	} //, imageName}
+	}
+
 	var mountsArgs []string
 
 	// expand INPUT_FILEs to specified inputData files
@@ -311,14 +313,8 @@ func DockerRun(seed *objects.Seed) {
 	if string(slurperr) != "" {
 		fmt.Fprintf(os.Stderr, "ERROR: Error running image '%s':\n%s\n",
 			imageName, string(slurperr))
+		os.Exit(2)
 	}
-
-	// runOutput, err := exec.Command("docker", dockerArgs...).Output()
-	// if err != nil {
-	// 	fmt.Fprintf(os.Stderr, "ERROR: Error running docker command. %s\n", err.Error())
-	// } else {
-	// 	fmt.Fprintf(os.Stdout, "%s", string(runOutput))
-	// }
 
 	// Validate output against pattern
 	if seed.Job.Interface.OutputData.Files != nil ||
@@ -415,11 +411,14 @@ func DefineFlags() {
 	switch os.Args[1] {
 	case constants.BuildCommand:
 		buildCmd.Parse(os.Args[2:])
-		if len(os.Args) > 2 && (os.Args[2] != "-d" && os.Args[2] != "-directory") {
-			directory = os.Args[2]
+		if len(buildCmd.Args()) == 1 {
+			directory = buildCmd.Args()[0]
 		}
 	case constants.RunCommand:
 		runCmd.Parse(os.Args[2:])
+		if len(runCmd.Args()) == 1 {
+			directory = runCmd.Args()[0]
+		}
 	case constants.SearchCommand:
 		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
 		PrintSearchUsage()
@@ -431,8 +430,8 @@ func DefineFlags() {
 		PrintPublishUsage()
 	case constants.ValidateCommand:
 		validateCmd.Parse(os.Args[2:])
-		if len(os.Args) > 2 && (os.Args[2] != "-d" && os.Args[2] != "-directory") {
-			directory = os.Args[2]
+		if len(validateCmd.Args()) == 1 {
+			directory = validateCmd.Args()[0]
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
@@ -480,7 +479,7 @@ func PrintBuildUsage() {
 	fmt.Fprintf(os.Stderr, "Usage:\tseed build [-d JOB_DIRECTORY]\n")
 	fmt.Fprintf(os.Stderr, "Options:\n")
 	fmt.Fprintf(os.Stderr,
-		"  -%s,  -%s\tDirectory containing Seed spec and Dockerfile (default is current directory)\n",
+		"  -%s  -%s\tDirectory containing Seed spec and Dockerfile (default is current directory)\n",
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
 	os.Exit(1)
 }
@@ -491,13 +490,13 @@ func PrintRunUsage() {
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
-		"  -%s,  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
+		"  -%s  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
-	fmt.Fprintf(os.Stderr, "  -%s,  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
+	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
 		constants.ShortInputDataFlag, constants.InputDataFlag)
-	fmt.Fprintf(os.Stderr, "  -%s, -%s\tDocker image name to run\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tDocker image name to run\n",
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
-	fmt.Fprintf(os.Stderr, "  -%s,  -%s   \tJob Output Directory Location\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
 		constants.ShortJobOutputDirFlag, constants.JobOutputDirFlag)
 	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n",
 		constants.RmFlag)
@@ -517,7 +516,7 @@ func PrintSearchUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed search [OPTIONS] \n")
 	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr, "  -r, -repo Specifies a specific registry to search (default is docker.io)\n")
+	fmt.Fprintf(os.Stderr, "  -r -repo Specifies a specific registry to search (default is docker.io)\n")
 	os.Exit(1)
 }
 
@@ -535,9 +534,9 @@ func PrintValidateUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed validate [OPTIONS] \n")
 	fmt.Fprintf(os.Stderr, "\nValidates the given %s is compliant with the Seed spec.\n", constants.SeedFileName)
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr, "  -%s, -%s\tSpecifies directory in which Seed is located (default is current directory)\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies directory in which Seed is located (default is current directory)\n",
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
-	fmt.Fprintf(os.Stderr, "  -%s, -%s   \tExternal Seed schema file; Overrides built in schema to validate Seed spec against\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s   \tExternal Seed schema file; Overrides built in schema to validate Seed spec against\n",
 		constants.ShortSchemaFlag, constants.SchemaFlag)
 	os.Exit(1)
 }
@@ -612,30 +611,29 @@ func SetOutputDir(seed *objects.Seed) string {
 	outputDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 	outdir := GetFullPath(outputDir)
 
-	// Check if outputDir is empty. Create alternate directory if not
+	// Check if outputDir exists. Create if not
+	if _, err := os.Stat(outdir); os.IsNotExist(err) {
+		// Create the directory
+		// Didn't find the specified directory
+		fmt.Fprintf(os.Stderr, "INFO: %s not found; creating directory...\n",
+			outdir)
+		os.Mkdir(outdir, os.ModePerm)
+	}
+
+	// Check if outdir is empty. Create time-stamped subdir if not
 	f, err := os.Open(outdir)
 	if err != nil {
-		if os.IsNotExist(err) {
-			// Didn't find the specified directory
-			fmt.Fprintf(os.Stderr, "INFO: %s not found; creating directory...\n",
-				outdir)
-		} else {
-			// complain
-			fmt.Fprintf(os.Stderr, "ERROR: Error with %s. %s\n", outdir, err.Error())
-		}
+		// complain
+		fmt.Fprintf(os.Stderr, "ERROR: Error with %s. %s\n", outdir, err.Error())
 	}
 	defer f.Close()
 	_, err = f.Readdirnames(1)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-	}
 	if err != io.EOF {
 		// Directory is not empty
-		fmt.Fprintf(os.Stderr,
-			"INFO: Output directory %s is not empty. Creating sub-directory for Job Output Directory: ",
-			outdir)
 		t := time.Now().Format("20060102_150405")
-		fmt.Println(t)
+		fmt.Fprintf(os.Stderr,
+			"INFO: Output directory %s is not empty. Creating sub-directory %s for Job Output Directory.\n",
+			outdir, t)
 		outdir = filepath.Join(outdir, t)
 		os.Mkdir(outdir, os.ModePerm)
 	}
@@ -748,7 +746,8 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 	// and then validate any keys identified in OutputData exist
 	if seed.Job.Interface.OutputData.JSON != nil {
 
-		fmt.Fprintf(os.Stderr, "INFO: Validating %s...\n", constants.ResultsFileManifestName)
+		fmt.Fprintf(os.Stderr, "INFO: Validating %s...\n",
+			filepath.Join(outDir, constants.ResultsFileManifestName))
 		// look for results manifest
 		outDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 		manfile := filepath.Join(outDir, constants.ResultsFileManifestName)
@@ -801,12 +800,16 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 	var result *gojsonschema.Result
 	var err error
+
+	// Load supplied schema file
 	if schemaFile != "" {
 		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema file %s...\n",
 			seedFileName, schemaFile)
 		schemaLoader := gojsonschema.NewReferenceLoader(schemaFile)
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)
+
+		// Load baked-in schema file
 	} else {
 		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n", seedFileName)
 		schemaBytes, _ := constants.Asset("data/seed.manifest.schema.json")
@@ -814,11 +817,14 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)
 	}
+
+	// Error occurred loading the schema or seed.manifest.json
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\nERROR: Error validating seed file against schema. Error is: %s\n", err.Error())
 		return false
 	}
 
+	// Validation failed. Print results
 	if !result.Valid() {
 		fmt.Fprintf(os.Stderr, "\nERROR: %s is not valid. See errors:\n", seedFileName)
 		for _, e := range result.Errors() {
@@ -830,6 +836,7 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 		return false
 	}
 
+	// Validation succeeded
 	fmt.Fprintf(os.Stderr, "\nSUCCESS: %s is valid.\n\n", seedFileName)
 	return true
 }
@@ -837,9 +844,8 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 //GetFullPath returns the full path of the given file. This expands relative file
 // paths and verifes non-relative paths
 // Validate path for file existance??
-func GetFullPath(file string) string {
+func GetFullPath(rFile string) string {
 
-	rFile := file
 	// Normalize
 	rFile = filepath.Clean(filepath.ToSlash(rFile))
 
