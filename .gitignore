@@ -6,8 +6,8 @@ cli/*
 # Exclude project files
 .idea
 *.iml
-
 # scratch files during development
 output/
 validator/Output*
 examples/addition-algorithm/outputs
+examples/addition-algorithm/outputs/*
