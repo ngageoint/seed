@@ -16,13 +16,14 @@ before_install:
 
 install:
   - go get github.com/xeipuuv/gojsonschema
+  - go get -u github.com/jteeuwen/go-bindata/...
 
 script:
   - ./spec/add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc seed.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output seed.adoc
-  - sudo cp ./spec/schema/* ./spec/output/
-  - go test -v ./...
+  - ./cli/build-cli.sh
+  - #go test -v ./...
 
 after_failure:
   - docker logs asciidoc-to-html
