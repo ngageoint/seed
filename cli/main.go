@@ -54,10 +54,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"./constants"
-	"./objects"
 	"github.com/xeipuuv/gojsonschema"
+	"github.com/ngageoint/seed/cli/constants"
+	"github.com/ngageoint/seed/cli/objects"
 )
 
 var seedFileName string

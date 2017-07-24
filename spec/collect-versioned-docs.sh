@@ -17,7 +17,8 @@ fi
 if [[ "${TRAVIS_TAG}x" == "x" ]]
 then
     # Place snapshot schemas
-    sudo cp ../schema/* $OUTPUT_DIR
+    sudo mkdir -p $OUTPUT_DIR/schema
+    sudo cp ../schema/* $OUTPUT_DIR/schema
 
     # Place versioned spec and schemas
     for VERSION in $(cat ../../.versions)
