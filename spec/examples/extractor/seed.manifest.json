@@ -1,5 +1,5 @@
 {
-    "seedVersion": "0.0.5",
+    "seedVersion": "SEED_VERSION",
     "job": {
         "name": "extractor",
         "algorithmVersion": "0.1.0",
