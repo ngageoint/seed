@@ -60,6 +60,7 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
+var seedFileName string
 var buildCmd *flag.FlagSet
 var listCmd *flag.FlagSet
 var publishCmd *flag.FlagSet
@@ -90,7 +91,7 @@ func main() {
 	// set path to seed file -
 	// 	Either relative to current directory or located in given directory (-d option)
 	//  	-d directory might be a relative path to current directory
-	seedFileName := constants.SeedFileName
+	seedFileName = constants.SeedFileName
 	if directory == "." {
 		directory = curDirectory
 		seedFileName = filepath.Join(curDirectory, seedFileName)
@@ -169,11 +170,14 @@ func DockerBuild(seed *objects.Seed, imageName string) {
 		imageName = BuildImageName(seed)
 	}
 
+	// Set the seed.manifest.json contents as an image label
+	label := "com.ngageoint.seed.manifest=" + GetManifestLabel()
+
 	jobDirectory := buildCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 
 	// Build Docker image
 	fmt.Fprintf(os.Stderr, "INFO: Building %s\n", imageName)
-	buildCmd := exec.Command("docker", "build", "-t", imageName, jobDirectory)
+	buildCmd := exec.Command("docker", "build", "-t", imageName, jobDirectory, "--label", label)
 
 	// attach stderr pipe
 	errPipe, err := buildCmd.StderrPipe()
@@ -205,6 +209,29 @@ func DockerBuild(seed *objects.Seed, imageName string) {
 			imageName, string(slurperr))
 		os.Exit(2)
 	}
+}
+
+//GetManifestLabel returns the seed.manifest.json as LABEL com.ngageoint.seed.manifest contents
+func GetManifestLabel() string {
+	// read the seed.manifest.json into a string
+	seedbytes, err := ioutil.ReadFile(seedFileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Eror reading %s. %s\n", seedFileName, err.Error())
+		os.Exit(2)
+	}
+	var seedbuff bytes.Buffer
+	json.Compact(&seedbuff, seedbytes)
+	seedbytes, err = json.Marshal(seedbuff.String())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Error marshalling seed manifest. %s\n", err.Error())
+	}
+
+	// Escape forward slashes and dollar signes
+	seed := string(seedbytes)
+	seed = strings.Replace(seed, "$", "\\$", -1)
+	seed = strings.Replace(seed, "/", "\\/", -1)
+
+	return seed
 }
 
 //DockerRun Runs image described by Seed spec
