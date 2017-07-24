@@ -33,4 +33,8 @@ then
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.metadata.schema.json
     done
 fi
+
+# Chown the entire output directory recursively
+sudo chown -R travis:travis $OUTPUT_DIR
+
 popd > /dev/null
