@@ -14,10 +14,6 @@ before_install:
   - docker pull asciidoctor/docker-asciidoctor
   - ./validator/test-images/docker-build-test-images.sh
 
-install:
-  - go get github.com/xeipuuv/gojsonschema
-  - go get -u github.com/jteeuwen/go-bindata/...
-
 script:
   - ./spec/add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc seed.adoc
