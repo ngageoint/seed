@@ -14,7 +14,7 @@ import (
 	"strings"
 	"strconv"
 	// TODO: Consider removal of Go struct in favor of generic interface for JSON unmarshalling.
-	"github.com/ngageoint/seed/objects"
+	"./objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -185,6 +185,7 @@ func ValidImageName(dockerImage, seedManifest string) (bool, string) {
 func Validate(schemaUri string, seedManifest string) gojsonschema.Result {
 	schemaLoader := gojsonschema.NewReferenceLoader(schemaUri)
 	documentLoader := gojsonschema.NewStringLoader(seedManifest)
+	println(seedManifest)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	if err != nil {
 		panic(err.Error())
@@ -287,7 +288,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 	args = append(args, envVars...)
 	args = append(args, "-u", currentUser.Uid, dockerImage)
 
-	imageArgs := os.ExpandEnv(seed.Job.Interface.Args)
+	imageArgs := os.ExpandEnv(seed.Job.Interface.Cmd)
 	seedArgs := strings.Split(imageArgs, " ")
 	args = append(args, seedArgs...)
 

@@ -35,7 +35,7 @@ func (o *SeedJob) UnmarshalJSON(b []byte) error {
 }
 
 type JobInterface struct {
-	Args string
+	Cmd string
 	InputData InputData
 	OutputData OutputData
 	EnvVars []JobEnvVar
