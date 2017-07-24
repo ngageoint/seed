@@ -14,7 +14,6 @@ import (
 	"strings"
 	"strconv"
 	// TODO: Consider removal of Go struct in favor of generic interface for JSON unmarshalling.
-	"./objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -161,7 +160,7 @@ func GetSeedManifest(dockerImage string) (string, error) {
 
 // Returns if the given docker image has a valid name that matches this format: <name>-<algorithmVersion>-seed:<packageVersion>
 func ValidImageName(dockerImage, seedManifest string) (bool, string) {
-	var seed objects.Seed_0_0_4
+	var seed Seed_0_0_5
 	err := json.Unmarshal([]byte(seedManifest), &seed)
 	if err != nil {
 		panic(err.Error())
@@ -197,7 +196,7 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 	var result RunResult
 	result.Valid = true
 	
-	var seed objects.Seed_0_0_4
+	var seed Seed_0_0_5
 	err := json.Unmarshal([]byte(seedManifest), &seed)
 	checkError(err)
 	
