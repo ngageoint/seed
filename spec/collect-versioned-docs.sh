@@ -10,11 +10,16 @@ then
     sudo mkdir ${TRAVIS_TAG}
     sudo cp -R seed.* $TRAVIS_TAG/
     sudo cp -R ../schema/*.json $TRAVIS_TAG/
+    sudo cp ../../cli/output/* $TRAVIS_TAG/
 fi
 
 # Grab all available versions to place in gh-pages
 if [[ "${TRAVIS_TAG}x" == "x" ]]
 then
+    # Place snapshot schemas
+    sudo cp ../schema/* $OUTPUT_DIR
+
+    # Place versioned spec and schemas
     for VERSION in $(cat ../../.versions)
     do
         cd $OUTPUT_DIR

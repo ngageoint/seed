@@ -880,7 +880,7 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 		// Load baked-in schema file
 	} else {
 		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n", seedFileName)
-		schemaBytes, _ := constants.Asset("data/seed.manifest.schema.json")
+		schemaBytes, _ := constants.Asset("../spec/schema/seed.manifest.schema.json")
 		schemaLoader := gojsonschema.NewStringLoader(string(schemaBytes))
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)

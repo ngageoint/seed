@@ -1,6 +1,6 @@
 = Seed CLI
 
-The Seed team provides a fully featured Command-Line Interface (CLI) for algorithm developers looking to provide Seed
+The Seed team provides a fully featured Command-Line Interface (CLI) for algorithm developers looking to offer Seed
 compliant packaging of their jobs. Using the CLI will enable you to quickly iterate without getting bogged down
 learning how to interface directly with the underlying container technologies (Docker). It also simplifies the process
 of attaching Seed metadata to your algorithm prior to publish.
