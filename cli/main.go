@@ -56,9 +56,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/xeipuuv/gojsonschema"
+
 	"github.com/ngageoint/seed/cli/constants"
 	"github.com/ngageoint/seed/cli/objects"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 var seedFileName string
@@ -339,12 +340,12 @@ func DockerRun(seed *objects.Seed) {
 	//		-rm if specified
 	// 		all mounts
 	//		image name
-	//		Job.Interface.Args
+	//		Job.Interface.Cmd
 	dockerArgs = append(dockerArgs, mountsArgs...)
 	dockerArgs = append(dockerArgs, imageName)
 
-	// Parse out command arguments from seed.Job.Interface.Args
-	args := strings.Split(seed.Job.Interface.Args, " ")
+	// Parse out command arguments from seed.Job.Interface.Cmd
+	args := strings.Split(seed.Job.Interface.Cmd, " ")
 	dockerArgs = append(dockerArgs, args...)
 
 	// Run
@@ -682,9 +683,9 @@ func DefineInputs(seed *objects.Seed) []string {
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
-		seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args, "${"+key+"}", val, -1)
-		seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args, "$"+key, val, -1)
-		seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args, key, val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "${"+key+"}", val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "$"+key, val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, val, -1)
 
 		for _, k := range seed.Job.Interface.InputData.Files {
 			if k.Name == key {
@@ -730,9 +731,9 @@ func SetOutputDir(seed *objects.Seed) string {
 		os.Mkdir(outdir, os.ModePerm)
 	}
 
-	seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args,
+	seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
 		"$JOB_OUTPUT_DIR", outdir, -1)
-	seed.Job.Interface.Args = strings.Replace(seed.Job.Interface.Args,
+	seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
 		"${JOB_OUTPUT_DIR}", outdir, -1)
 	return outdir
 }

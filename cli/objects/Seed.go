@@ -8,7 +8,7 @@ type Seed struct {
 		AlgorithmVersion string `json:"algorithmVersion"`
 		PackageVersion   string `json:"packageVersion"`
 		Interface        struct {
-			Args      string `json:"args"`
+			Cmd       string `json:"cmd"`
 			InputData struct {
 				Files []struct {
 					Name      string   `json:"name"`
