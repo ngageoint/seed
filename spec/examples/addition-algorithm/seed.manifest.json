@@ -48,12 +48,6 @@
           }
         ]
       },
-      "envVars": [
-        {
-          "name": "MAGIC_ADD",
-          "value": "7"
-        }
-      ],
       "mounts": [
         {
           "name": "MOUNT1",
