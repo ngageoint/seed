@@ -3,6 +3,8 @@
 # Ensure script directory is CWD
 OUTPUT_DIR="${0%/*}"/output
 pushd $OUTPUT_DIR
+OUTPUT_DIR=`pwd`
+
 
 # Collect files for GitHub Releases
 if [[ "${TRAVIS_TAG}x" != "x" ]]
