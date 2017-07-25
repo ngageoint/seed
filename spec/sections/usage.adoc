@@ -17,10 +17,11 @@ MUST follow Bash expansion conventions.
 The following minimum variables MUST be provided:
 
 * JOB_OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
-* ALLOCATED_CPUS: Value of `cpus` member.
-* ALLOCATED_MEM: Value of `mem` member.
-* ALLOCATED_SHARED_MEM: Value of `sharedMem` member.
-* ALLOCATED_STORAGE: Value of `storage` member.
+* All `name` member values of `resources.scalar` elements MUST map to environment variables. This SHALL be done by
+normalizing all `name` values to uppercase, stripping all non-alphabetic characters and prefixing with `ALLOCATED_`.
+For a `my-demo-resource5` with a value of `5.0`, an environment variable `ALLOCATED_MYDEMORESOURCE` SHALL be set to
+`5.0` at run time. For a resource with an `inputMultiplier` value the environment variable must include the final
+computed resource allocation as defined in the `scalar` element under <<resources-section,Resources object>>.
 * All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Case MUST map
 exactly from `name` value. Processing framework's MUST ensure data is mounted and provide a container resolvable
 absolute path. _Injection behavior is dependent on the boolean value of `multiple` member._ When `multiple` is `true`

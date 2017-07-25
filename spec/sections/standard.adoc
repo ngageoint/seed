@@ -78,12 +78,9 @@ The following annotated snippet provides quick reference to the use of Job objec
     "authorEmail": "jdoe@example.com", <7>
     "authorUrl": "http://www.example.com", // <8>
     "timeout": 3600,// <9>
-    "cpus": 10.0, // <10>
-    "mem": 10240.0, // <11>
-    "sharedMem": 0.0, // <12>
-    "storage": 0.0, // <13>
-    "interface": { ... }, // <14>
-    "errorMapping": [ ... ] // <15>
+    "resources": { ... }, // <10>
+    "interface": { ... }, // <11>
+    "errorMapping": [ ... ] // <12>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `[a-z0-9_-]+`. `name` and `algorithmVersion` members
@@ -98,12 +95,61 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 <7> Optional string containing job author email.
 <8> Optional string containing URL to job website.
 <9> Required integer containing job timeout value in seconds.
-<10> Required number containing CPU needs of job. Whole or fractional values allowed.
-<11> Required number containing memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<12> Optional number containing shared memory needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<13> Optional number containing storage needs of job in Mebibytes (MiB). Whole or fractional values allowed.
-<14> Required <<interface-section>>.
-<15> Optional array of <<errormapping-section>>.
+<10> Required <<resources-section>>.
+<11> Required <<interface-section>>.
+<12> Optional array of <<errormapping-section>>.
+
+[[resources-section, Resources Object]]
+===== Resources Object
+The Resources object is the member that identifies all resource requirements for a job. This is most commonly CPU,
+memory and disk scalar resources, but MAY in the future accommodate more complex types such as ranges and sets. The
+final computed resources allocated for all `scalar` elements MUST be injected as environment variables to the job at run
+time. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide.
+
+* The Interface object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
+objects and MAY contain any number of elements. There is no other standard restriction on the array size.
+
+.Scalar Elements
+The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `mem`, and
+`disk` that have special meaning and SHOULD be populated by all Seed compliant images.
+
+* The Scalar object MUST have a member `name`. The member's value MUST be a string indicating the resource required by
+the job.
+* The Scalar object MUST have a member `value`. The member's value MUST be a float indicating the quantity of the
+resource required by the job. When dealing with `mem` and `disk` reserved
+* The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a float indicating the factor by
+which input data size (in MiBs) is multiplied and added to the constant value for resource.
+
+Use of `inputMultiplier` for `mem` or `disk` resource types is useful when the volume of input data correlatates to the
+memory or disk consumption of a job. The following basic formula computes the resource requirement when an
+`inputMultiplier` is defined.
+
+----
+resourceRequirement = inputVolume * inputMultiplier + constantValue`
+----
+
+For example, when input data volume is 2.0MiB and an `inputMultiplier` of `4.0` and `value` of `0.1` is specified for
+`disk`, the following computes the resource requirement:
+
+----
+diskRequirement = 2.0MiB * 4.0 + 0.1MiB
+----
+
+[source,javascript]
+----
+[
+    { "name": "cpus", "value": 1.0 }, // <1>
+    { "name": "disk", "value": 4.0, "inputMultiplier": 4.0 }, // <2>
+    { "name": "mem", "value": 64.0, "inputMultiplier": 4.0 }, // <3>
+    ... // <4>
+]
+----
+<1> Recommended Scalar element demonstrating single constant scalar value for specify CPU requirement of job.
+<2> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on input volume
+size for scaling disk requirement of job.
+<3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on input volume
+size for scaling memory requirement of job.
+<4> Optional additional Scalar elements for any custom resources needed by job.
 
 [[interface-section, Interface Object]]
 ===== Interface Object
