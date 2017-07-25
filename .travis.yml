@@ -11,13 +11,13 @@ env:
 before_install:
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh $(tail -1 .versions)-snapshot; ./spec/examples/inject-manifests.sh; fi
   - mkdir -p output
-  - docker pull asciidoctor/docker-asciidoctor
+  - docker pull rochdev/alpine-asciidoctor:mini
   - ./validator/test-images/docker-build-test-images.sh
 
 script:
   - ./spec/add-version-links.sh
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html asciidoctor/docker-asciidoctor asciidoctor -D /documents/output index.adoc seed.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf asciidoctor/docker-asciidoctor asciidoctor-pdf -D /documents/output seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc
   - ./cli/build-cli.sh
   - #go test -v ./...
 
