@@ -311,8 +311,6 @@
         "description",
         "authorName",
         "timeout",
-        "cpus",
-        "mem",
         "interface"
       ]
     }
