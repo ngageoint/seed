@@ -138,11 +138,11 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
     ... // <4>
 ]
 ----
-<1> Recommended Scalar element demonstrating single constant scalar value for specify CPU requirement of job.
-<2> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on input volume
-size for scaling disk requirement of job.
-<3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on input volume
-size for scaling memory requirement of job.
+<1> Recommended Scalar element demonstrating single constant scalar value for specifying CPU requirement of job.
+<2> Optional Scalar element demonstrating single constant scalar value in addition to a multiplier based on total input
+file size for scaling disk requirement of job.
+<3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on total input
+file size for scaling memory requirement of job.
 <4> Optional additional Scalar elements for any custom resources needed by job.
 
 [[interface-section, Interface Object]]
