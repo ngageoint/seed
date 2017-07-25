@@ -50,15 +50,8 @@ the authoring email address.
 publicly accessible URL with further job detail.
 * The Job object MUST have a member with the name `timeout`. This member's values MUST be a integer indicating a timeout
 period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
-* The Job object MUST have a member with the name `cpus`. This member's value MUST be a number indicating the whole or
-fractional CPUs allocated for the job.
-* The Job object MUST have a member with the name `mem`. This member's value MUST be a number indicating the memory
-requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate allocations below 1 MiB.
-* The Job object MAY have a member with the name `sharedMem`. This member's value MUST be a number indicating the
-shared memory (/dev/shm) requirement in Mebibytes (MiB) for the job. Fractional MiB values MAY be used to indicate
-allocations below 1 MiB. If omitted, the default of 0.0 may be assumed.
-* The Job object MAY have a member with the name `storage`. This member's value MUST be a number indicating the runtime
-ephemeral storage requirements in Mebibytes (MiB) of the job. If omitted, the default of 0.0 may be assumed.
+* The Job object MUST have a member with the name `resources`. This member's value MUST be an object as defined in
+<<resources-section>>.
 * The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
 <<interface-section>>.
 * The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
@@ -110,15 +103,16 @@ time. Reference <<environment-variables>> for clarification on what the implemen
 objects and MAY contain any number of elements. There is no other standard restriction on the array size.
 
 .Scalar Elements
-The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `mem`, and
-`disk` that have special meaning and SHOULD be populated by all Seed compliant images.
+The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk` and `mem`
+that have special meaning and SHOULD be populated by all Seed compliant images.
 
 * The Scalar object MUST have a member `name`. The member's value MUST be a string indicating the resource required by
 the job.
-* The Scalar object MUST have a member `value`. The member's value MUST be a float indicating the quantity of the
-resource required by the job. When dealing with `mem` and `disk` reserved
-* The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a float indicating the factor by
-which input data size (in MiBs) is multiplied and added to the constant value for resource.
+* The Scalar object MUST have a member `value`. The member's value MUST be a number indicating the quantity of the
+resource required by the job. When dealing with storage resources such as `mem` or `disk` units of 
+Mebibytes (MiB) MUST be used.
+* The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a number indicating the factor by
+which input file size is multiplied and added to the constant value for resource.
 
 Use of `inputMultiplier` for `mem` or `disk` resource types is useful when the volume of input data correlatates to the
 memory or disk consumption of a job. The following basic formula computes the resource requirement when an
@@ -128,8 +122,8 @@ memory or disk consumption of a job. The following basic formula computes the re
 resourceRequirement = inputVolume * inputMultiplier + constantValue`
 ----
 
-For example, when input data volume is 2.0MiB and an `inputMultiplier` of `4.0` and `value` of `0.1` is specified for
-`disk`, the following computes the resource requirement:
+For example, when total input file size is 2.0MiB and an `inputMultiplier` of `4.0` and `value` of `0.1` is 
+specified for `disk`, the following computes the resource requirement:
 
 ----
 diskRequirement = 2.0MiB * 4.0 + 0.1MiB

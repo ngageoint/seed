@@ -16,7 +16,7 @@ MUST follow Bash expansion conventions.
 
 The following minimum variables MUST be provided:
 
-* JOB_OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
+* OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
 * All `name` member values of `resources.scalar` elements MUST map to environment variables. This SHALL be done by
 normalizing all `name` values to uppercase, stripping all non-alphabetic characters and prefixing with `ALLOCATED_`.
 For a `my-demo-resource5` with a value of `5.0`, an environment variable `ALLOCATED_MYDEMORESOURCE` SHALL be set to
