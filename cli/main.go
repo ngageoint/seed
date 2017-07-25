@@ -70,7 +70,6 @@ var searchCmd *flag.FlagSet
 var validateCmd *flag.FlagSet
 var versionCmd *flag.FlagSet
 var directory string
-var curDirectory string
 var version string
 
 /* Run command defaults:
