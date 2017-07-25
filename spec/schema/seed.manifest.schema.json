@@ -243,11 +243,11 @@
                       "name",
                       "value"
                     ]
-                  }
-                },
-                "required": [
-                  "scalar"
-                ]
+                  },
+                  "required": [
+                    "scalar"
+                  ]
+                }
               }
             },
             "settings": {
