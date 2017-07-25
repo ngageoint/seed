@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.5",
   "job": {
     "name": "my-algorithm",
     "algorithmVersion": "0.1.0",
@@ -16,10 +16,10 @@
     "authorEmail": "jdoe@example.com",
     "authorUrl": "http://www.example.com",
     "timeout": 3600,
-    "cpus": 10.0,
-    "mem": 10240.0,
-    "sharedMem": 0.0,
-    "storage": 0.0,
+    "cpus": 10,
+    "mem": 10240,
+    "sharedMem": 0,
+    "storage": 0,
     "interface": {
       "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
       "inputData": {

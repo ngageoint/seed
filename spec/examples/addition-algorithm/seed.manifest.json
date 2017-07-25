@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.5",
   "job": {
     "name": "addition-algorithm",
     "algorithmVersion": "0.0.1",
@@ -9,7 +9,7 @@
     "authorName": "Emily Smith",
     "timeout": 10,
     "cpus": 0.1,
-    "mem": 1.0,
+    "mem": 1,
     "interface": {
       "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
       "inputData": {

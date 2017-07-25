@@ -5,7 +5,7 @@
   "properties": {
     "seedVersion": {
       "type": "string",
-      "pattern": "SEED_VERSION"
+      "pattern": "0.0.5"
     },
     "job": {
       "type": "object",
@@ -55,11 +55,11 @@
         },
         "sharedMem": {
           "type": "number",
-          "default": 0.0
+          "default": 0
         },
         "storage": {
           "type": "number",
-          "default": 0.0
+          "default": 0
         },
         "interface": {
           "type": "object",
@@ -94,10 +94,6 @@
                         "items": {
                           "type": "string"
                         }
-                      },
-                      "multiple": {
-                        "type": "boolean",
-                        "default": false
                       }
                     },
                     "required": [

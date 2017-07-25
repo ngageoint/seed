@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.5",
   "job": {
     "name": "random-number-gen",
     "algorithmVersion": "0.1.0",
@@ -9,8 +9,7 @@
     "authorName": "John Doe",
     "timeout": 10,
     "cpus": 0.1,
-    "mem": 1.0,
-    "interface": {
-    }
+    "mem": 1,
+    "interface": {}
   }
 }

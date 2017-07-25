@@ -1,6 +1,6 @@
 = Seed Standard Definition
 Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>
-vSEED_VERSION
+v0.0.5
 :toc: left
 :toclevels: 5
 :sectlinks:

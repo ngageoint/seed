@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.5",
   "job": {
     "name": "image-watermark",
     "algorithmVersion": "0.1.0",
@@ -8,8 +8,8 @@
     "description": "Processes an input PNG and outputs watermarked PNG.",
     "authorName": "John Doe",
     "timeout": 30,
-    "cpus": 1.0,
-    "mem": 64.0,
+    "cpus": 1,
+    "mem": 64,
     "interface": {
       "cmd": "${INPUT_IMAGE} ${JOB_OUTPUT_DIR}",
       "inputData": {
