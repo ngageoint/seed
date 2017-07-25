@@ -7,7 +7,7 @@ pushd "${0%/*}" > /dev/null
 
 VERSION=$1
 
-go-bindata -pkg constants -o constants/jsonschema.go ../spec/schema/seed.manifest.schema.json
+vendor/bin/go-bindata -pkg constants -o constants/jsonschema.go ../spec/schema/seed.manifest.schema.json
 echo Building cross platform Seed CLI.
 echo Building for Linux...
 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=$VERSION" -o output/seed-linux-amd64
