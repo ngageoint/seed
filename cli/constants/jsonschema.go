@@ -83,7 +83,7 @@ func SpecSchemaSeedManifestSchemaJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "../spec/schema/seed.manifest.schema.json", size: 8886, mode: os.FileMode(420), modTime: time.Unix(1500920638, 0)}
+	info := bindataFileInfo{name: "../spec/schema/seed.manifest.schema.json", size: 8886, mode: os.FileMode(420), modTime: time.Unix(1500948441, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

@@ -18,6 +18,9 @@ const PublishCommand = "publish"
 //ValidateCommand seed validate subcommand
 const ValidateCommand = "validate"
 
+//ValidateCommand seed version subcommand
+const VersionCommand = "version"
+
 //JobDirectoryFlag defines the location of the seed spec and Dockerfile
 const JobDirectoryFlag = "directory"
 

@@ -36,6 +36,8 @@ usage is as folllows:
 											(default is current directory)
 			-s, -schema			Seed Schema file; Overrides built in schema to validate
 											spec against.
+
+	seed version
 */
 package main
 
@@ -66,8 +68,10 @@ var publishCmd *flag.FlagSet
 var runCmd *flag.FlagSet
 var searchCmd *flag.FlagSet
 var validateCmd *flag.FlagSet
+var versionCmd *flag.FlagSet
 var directory string
 var curDirectory string
+var version string
 
 /* Run command defaults:
    image name and tag: if not specified, attempt to guess from CWD if a
@@ -472,6 +476,12 @@ func DefineFlags() {
 		PrintValidateUsage()
 	}
 
+	// Version command
+	versionCmd = flag.NewFlagSet(constants.VersionCommand, flag.ExitOnError)
+	versionCmd.Usage = func() {
+		PrintVersionUsage()
+	}
+
 	if len(os.Args) == 1 {
 		PrintUsage()
 	}
@@ -500,6 +510,8 @@ func DefineFlags() {
 		if len(validateCmd.Args()) == 1 {
 			directory = validateCmd.Args()[0]
 		}
+	case constants.VersionCommand:
+		PrintVersion()
 	default:
 		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
 		PrintUsage()
@@ -536,7 +548,8 @@ func PrintUsage() {
 	fmt.Fprintf(os.Stderr, "  publish\tAllows for publish of Seed compliant images to remote Docker registry\n")
 	fmt.Fprintf(os.Stderr, "  run   \tExecutes Seed compliant Docker docker image\n")
 	fmt.Fprintf(os.Stderr, "  search\tAllows for discovery of Seed compliant images hosted within a Docker registry (default is docker.io)\n")
-	fmt.Fprintf(os.Stderr, "  validate\tValidates a Seed spec")
+	fmt.Fprintf(os.Stderr, "  validate\tValidates a Seed spec\n")
+	fmt.Fprintf(os.Stderr, "  version\tPrints the version of Seed spec\n")
 	fmt.Fprintf(os.Stderr, "\nRun 'seed COMMAND --help' for more information on a command.\n")
 	os.Exit(1)
 }
@@ -605,6 +618,18 @@ func PrintValidateUsage() {
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s   \tExternal Seed schema file; Overrides built in schema to validate Seed spec against\n",
 		constants.ShortSchemaFlag, constants.SchemaFlag)
+	os.Exit(1)
+}
+
+//PrintVersionUsage prints the seed version usage, then exits the program
+func PrintVersionUsage() {
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed version \n")
+	fmt.Fprintf(os.Stderr, "\nOutputs the version of the Seed CLI and specification.\n")
+	os.Exit(1)
+}
+
+func PrintVersion() {
+	fmt.Fprintf(os.Stderr, "Seed v%s\n", version)
 	os.Exit(1)
 }
 
