@@ -2,8 +2,8 @@ package objects
 
 //Seed represents a seed.manifest.json object.
 type Seed struct {
-	ManifestVersion string `json:"manifest_version"`
-	Job             struct {
+	SeedVersion string `json:"seedVersion"`
+	Job         struct {
 		Name             string `json:"name"`
 		AlgorithmVersion string `json:"algorithmVersion"`
 		PackageVersion   string `json:"packageVersion"`
@@ -22,7 +22,7 @@ type Seed struct {
 					MediaType string `json:"mediaType"`
 					Pattern   string `json:"pattern"`
 					Count     string `json:"count"`
-					Required  bool   `json:"required"`
+					Required  bool   `json:"required,string"`
 				}
 				JSON []struct {
 					Name     string `json:"name"`
@@ -30,10 +30,6 @@ type Seed struct {
 					Key      string `json:"key"`
 					Required bool   `json:"required"`
 				}
-			}
-			EnvVars []struct {
-				Name  string `json:"name"`
-				Value string `json:"value"`
 			}
 			Mounts []struct {
 				Name string `json:"name"`
@@ -45,7 +41,7 @@ type Seed struct {
 				Secret string `json:"secret"`
 			}
 			ErrorMapping []struct {
-				Code        int    `json:"code"`
+				Code        int    `json:"code,string"`
 				Title       string `json:"title"`
 				Description string `json:"description"`
 				Category    string `json:"category"`
