@@ -11,28 +11,40 @@ defined interface of a Seed job. These environment variables MAY be consumed by 
 expansion MAY be leveraged in the `interface.cmd` member. Implementing frameworks MAY perform variable expansion, but it
 MUST follow Bash expansion conventions.
 
+[[variable-normalization, Normalization]]
+===== Normalization
+All environment variables injected MUST be normalized to remove any special characters. The majority of environment
+variable injection is dynamic and tied to `name` member values. These values MUST be sanitized based on the following
+rules:
+
+* Only upper-case alphabetic and underscore characters are permitted unaltered.
+* All lower-case alphabetic characters MUST be capitalized.
+* All numeric and special characters MUST be removed.
+
+===== Injection
 *NOTE*: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
 `interface.settings` `name` member values MUST NOT occur.
 
-The following minimum variables MUST be provided:
+The following variables MUST be provided:
 
 * OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
 * All `name` member values of `resources.scalar` elements MUST map to environment variables. This SHALL be done by
-normalizing all `name` values to uppercase, stripping all non-alphabetic characters and prefixing with `ALLOCATED_`.
-For a `my-demo-resource5` with a value of `5.0`, an environment variable `ALLOCATED_MYDEMORESOURCE` SHALL be set to
-`5.0` at run time. For a resource with an `inputMultiplier` value the environment variable must include the final
-computed resource allocation as defined in the `scalar` element under <<resources-section,Resources object>>.
-* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Case MUST map
-exactly from `name` value. Processing framework's MUST ensure data is mounted and provide a container resolvable
-absolute path. _Injection behavior is dependent on the boolean value of `multiple` member._ When `multiple` is `true`
-the injected environment variable MUST be an absolute path to a _directory_ with all files immediately beneath it. When
-`multiple` is `false` it MUST be an absolute path to the single _file_ provided. This environment variable MUST be left
-unset if member `required` is false and the input is not present.
-* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Case MUST map
-exactly from `name` value and `array`, `object` and `string` JSON types MUST be injected string encoded. This
-environment variable MUST be left unset if `required` is false and the input is not present.
-* All `name` member values of `interface.settings` elements MUST map to environment variables. Case MUST map
-exactly from `name` value.
+<<variable-normalization,normalizing>> all `name` values and prefixing with `ALLOCATED_`. For a `my-demo-resourceNew1`
+with a value of `5.0`, an environment variable `ALLOCATED_MYDEMORESOURCENEW` SHALL be set to `5.0` at run time. For a
+resource with an `inputMultiplier` value the environment variable must include the final computed resource allocation as
+defined in the `scalar` element under <<resources-section,Resources object>>.
+* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Variable names
+must follow <<variable-normalization,normalization rules>>. Processing framework's MUST ensure data is mounted and
+provide a container resolvable absolute path. _Injection behavior is dependent on the boolean value of `multiple`
+member._ When `multiple` is `true` the injected environment variable MUST be an absolute path to a _directory_ with all
+files immediately beneath it. When `multiple` is `false` it MUST be an absolute path to the single _file_ provided. This
+environment variable MUST be left unset if member `required` is false and the input is not present.
+* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Variable names
+must follow <<variable-normalization,normalization rules>> and `array`, `object` and `string` JSON types MUST be
+injected string encoded. This environment variable MUST be left unset if `required` is false and the input is not
+present.
+* All `name` member values of `interface.settings` elements MUST map to environment variables. Variable names
+must follow <<variable-normalization,normalization rules>>.
 
 Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
 use of Bash. Taking the example of an optional `inputData.files` element, the following `cmd` value will expand with
