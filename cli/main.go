@@ -72,28 +72,18 @@ var versionCmd *flag.FlagSet
 var directory string
 var version string
 
-/* Run command defaults:
-   image name and tag: if not specified, attempt to guess from CWD if a
-      seed.json exists. Otherwise error.
-   input: no default; args should match file InputData as described in
-      seed.json. You'll need to search / replace this with container
-      resolvable paths. It's the algorithm developers responsibility to
-      create parameter expansion
-   output: no default; single directory where output files are placed. Glob
-      capture expressions are described in seed.json
-*/
 func main() {
 
 	// Parse input flags
 	DefineFlags()
 
-	// Lists all seed compliant images on (default) local machine
+	// seed list: Lists all seed compliant images on (default) local machine
 	if listCmd.Parsed() {
 		DockerList()
 		os.Exit(1)
 	}
 
-	// Validate seed.json. Exit if invalid
+	// seed validate: Validate seed.manifest.json.
 	if validateCmd.Parsed() {
 		seedFileName := SeedFileName()
 		schemaFile := validateCmd.Lookup(constants.SchemaFlag).Value.String()
@@ -106,13 +96,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Build Docker image
+	// seed build: Build Docker image
 	if buildCmd.Parsed() {
 		DockerBuild("")
 		os.Exit(1)
 	}
 
-	// Docker run - reads seed from label unless -d given
+	// seed run: Runs docker image provided or found in seed manifest
 	if runCmd.Parsed() {
 		DockerRun()
 		os.Exit(1)
@@ -128,12 +118,14 @@ func DockerList() {
 	dCmd.Stderr = &dErr
 	dOut, err := dCmd.StdoutPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error attaching to std output pipe. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error attaching to std output pipe. %s\n",
+			err.Error())
 	}
 
 	dCmd.Start()
 	if string(dErr.Bytes()) != "" {
-		fmt.Fprintf(os.Stderr, "ERROR: Error reading stderr %s\n", string(dErr.Bytes()))
+		fmt.Fprintf(os.Stderr, "ERROR: Error reading stderr %s\n",
+			string(dErr.Bytes()))
 	}
 
 	gCmd.Stdin = dOut
@@ -173,23 +165,27 @@ func DockerBuild(imageName string) {
 
 	// Build Docker image
 	fmt.Fprintf(os.Stderr, "INFO: Building %s\n", imageName)
-	buildCmd := exec.Command("docker", "build", "-t", imageName, jobDirectory, "--label", label)
+	buildCmd := exec.Command("docker", "build", "-t", imageName, jobDirectory,
+		"--label", label)
 
 	// attach stderr pipe
 	errPipe, err := buildCmd.StderrPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to build command stderr. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr,
+			"ERROR: Error attaching to build command stderr. %s\n", err.Error())
 	}
 
 	// Attach stdout pipe
 	outPipe, err := buildCmd.StdoutPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to build command stdout. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr,
+			"ERROR: Error attaching to build command stdout. %s\n", err.Error())
 	}
 
 	// Run docker build
 	if err := buildCmd.Start(); err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error executing docker build. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker build. %s\n",
+			err.Error())
 	}
 
 	// Print out any std out
@@ -207,19 +203,22 @@ func DockerBuild(imageName string) {
 	}
 }
 
-//GetManifestLabel returns the seed.manifest.json as LABEL com.ngageoint.seed.manifest contents
+//GetManifestLabel returns the seed.manifest.json as LABEL
+//  com.ngageoint.seed.manifest contents
 func GetManifestLabel(seedFileName string) string {
 	// read the seed.manifest.json into a string
 	seedbytes, err := ioutil.ReadFile(seedFileName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Eror reading %s. %s\n", seedFileName, err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Eror reading %s. %s\n", seedFileName,
+			err.Error())
 		os.Exit(2)
 	}
 	var seedbuff bytes.Buffer
 	json.Compact(&seedbuff, seedbytes)
 	seedbytes, err = json.Marshal(seedbuff.String())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error marshalling seed manifest. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error marshalling seed manifest. %s\n",
+			err.Error())
 	}
 
 	// Escape forward slashes and dollar signes
@@ -236,29 +235,35 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	fmt.Fprintf(os.Stderr, "\nINFO: Retrieving seed manifest from %s LABEL=com.ngageoint.seed.manifest. Executing command:\n%s\n",
 		imageName, cmdStr)
 
-	cmdArgs := []string{"inspect", "-f", "'{{index .Config.Labels \"com.ngageoint.seed.manifest\"}}'", imageName}
-	inspctCmd := exec.Command("docker", cmdArgs...)
+	inspctCmd := exec.Command("docker", "inspect", "-f",
+		"'{{index .Config.Labels \"com.ngageoint.seed.manifest\"}}'", imageName)
 
 	errPipe, errr := inspctCmd.StderrPipe()
 	if errr != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to docker inspect command stderr. %s\n", errr.Error())
+		fmt.Fprintf(os.Stderr,
+			"ERROR: error attaching to docker inspect command stderr. %s\n",
+			errr.Error())
 	}
 
 	// Attach stdout pipe
 	outPipe, errr := inspctCmd.StdoutPipe()
 	if errr != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to docker inspect command stdout. %s\n", errr.Error())
+		fmt.Fprintf(os.Stderr,
+			"ERROR: error attaching to docker inspect command stdout. %s\n",
+			errr.Error())
 	}
 
 	// Run docker build
 	if err := inspctCmd.Start(); err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error executing docker %s. %s\n", cmdStr, err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: error executing docker %s. %s\n", cmdStr,
+			err.Error())
 	}
 
 	// Print out any std out
 	seedBytes, err := ioutil.ReadAll(outPipe)
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "ERROR: Error retrieving docker %s stdout.\n%s\n", cmdStr, err.Error())
+		fmt.Fprintf(os.Stdout, "ERROR: Error retrieving docker %s stdout.\n%s\n",
+			cmdStr, err.Error())
 	}
 
 	// check for errors on stderr
@@ -269,6 +274,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 		os.Exit(2)
 	}
 
+	// un-escape special characters
 	seedStr := string(seedBytes)
 	seedStr = strings.Replace(seedStr, "\\\"", "\"", -1)
 	seedStr = strings.Replace(seedStr, "\\$", "$", -1)
@@ -276,21 +282,20 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	seedStr = strings.TrimSpace(seedStr)
 	seedStr = strings.TrimSuffix(strings.TrimPrefix(seedStr, "'\""), "\"'")
 
-	seedBytes = []byte(seedStr)
-
 	seed := &objects.Seed{}
 
-	err = json.Unmarshal(seedBytes, &seed)
+	err = json.Unmarshal([]byte(seedStr), &seed)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error unamrshalling seed: %s\n", err.Error())
 	}
 	return *seed
 }
 
-//SeedFileName Finds the full filepath to the seed filename
+//SeedFileName Finds and returns the full filepath to the seed.manifest.json
 func SeedFileName() string {
 	var dir string
 
+	// Get the proper job directory flag
 	if runCmd.Parsed() {
 		dir = runCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 	} else if buildCmd.Parsed() {
@@ -303,7 +308,7 @@ func SeedFileName() string {
 	curDirectory, _ := os.Getwd()
 
 	// set path to seed file -
-	// 	Either relative to current directory or located in given directory (-d option)
+	// 	Either relative to current directory or located in given directory
 	//  	-d directory might be a relative path to current directory
 	seedFileName := constants.SeedFileName
 	if dir == "." {
@@ -348,7 +353,8 @@ func SeedFromManifestFile() (objects.Seed, string) {
 	// Open and parse seed file into struct
 	seedFile, err := os.Open(seedFileName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error opening %s. Error received is: %s\n", seedFileName, err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error opening %s. Error received is: %s\n",
+			seedFileName, err.Error())
 		os.Exit(1)
 	}
 	jsonParser := json.NewDecoder(seedFile)
@@ -373,7 +379,8 @@ func ImageExists(imageName string) (bool, error) {
 		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 		return false, err
 	} else if string(imgOut) == "" {
-		fmt.Fprintf(os.Stderr, "INFO: No docker image found for image name %s. Building image now...\n", imageName)
+		fmt.Fprintf(os.Stderr, "INFO: No docker image found for image name %s. Building image now...\n",
+			imageName)
 		return false, nil
 	}
 	return true, nil
@@ -408,6 +415,9 @@ func DockerRun() {
 	} else {
 		seed, _ = SeedFromManifestFile()
 		imageName = BuildImageName(&seed)
+		if exists, _ := ImageExists(imageName); !exists {
+			DockerBuild(imageName)
+		}
 	}
 
 	// build docker run command
@@ -428,13 +438,10 @@ func DockerRun() {
 	}
 
 	// mount the JOB_OUTPUT_DIR (outDir flag)
-	var outDir string
-	if runCmd.Lookup(constants.JobOutputDirFlag).Value.String() != "" {
-		outDir = SetOutputDir(&seed)
-		if outDir != "" {
-			mountsArgs = append(mountsArgs, "-v")
-			mountsArgs = append(mountsArgs, outDir+":"+outDir)
-		}
+	outDir := SetOutputDir(imageName, &seed)
+	if outDir != "" {
+		mountsArgs = append(mountsArgs, "-v")
+		mountsArgs = append(mountsArgs, outDir+":"+outDir)
 	}
 	// Settings
 	settings := DefineSettings(&seed)
@@ -463,31 +470,28 @@ func DockerRun() {
 	for _, s := range dockerArgs {
 		cmd.WriteString(s + " ")
 	}
-	fmt.Fprintf(os.Stderr, "\nINFO: Running Docker command:\n%s\n", cmd.String())
+	fmt.Fprintf(os.Stderr, "INFO: Running Docker command:\n%s\n", cmd.String())
 
 	// Run Docker command and capture output
 	runCmd := exec.Command("docker", dockerArgs...)
 	// attach stderr pipe
 	errPipe, err := runCmd.StderrPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stderr. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stderr. %s\n",
+			err.Error())
 	}
 
 	// Attach stdout pipe
 	outPipe, err := runCmd.StdoutPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stdout. %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stdout. %s\n",
+			err.Error())
 	}
 
 	// Run docker build
 	if err := runCmd.Start(); err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error executing docker run. %s\n", err.Error())
-	}
-
-	// Print out any std out
-	slurp, _ := ioutil.ReadAll(outPipe)
-	if string(slurp) != "" {
-		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
+		fmt.Fprintf(os.Stderr, "ERROR: error executing docker run. %s\n",
+			err.Error())
 	}
 
 	// check for errors on stderr
@@ -496,6 +500,12 @@ func DockerRun() {
 		fmt.Fprintf(os.Stderr, "ERROR: Error running image '%s':\n%s\n",
 			imageName, string(slurperr))
 		os.Exit(2)
+	}
+
+	// Print out any std out
+	slurp, _ := ioutil.ReadAll(outPipe)
+	if string(slurp) != "" {
+		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
 	}
 
 	// Validate output against pattern
@@ -579,8 +589,10 @@ func DefineFlags() {
 	validateCmd.StringVar(&directory, constants.ShortJobDirectoryFlag, ".",
 		"Location of the seed.manifest.json spec to validate")
 	var schema string
-	validateCmd.StringVar(&schema, constants.SchemaFlag, "", "JSON schema file to validate seed against.")
-	validateCmd.StringVar(&schema, constants.ShortSchemaFlag, "", "JSON schema file to validate seed against.")
+	validateCmd.StringVar(&schema, constants.SchemaFlag, "",
+		"JSON schema file to validate seed against.")
+	validateCmd.StringVar(&schema, constants.ShortSchemaFlag, "",
+		"JSON schema file to validate seed against.")
 
 	validateCmd.Usage = func() {
 		PrintValidateUsage()
@@ -629,7 +641,8 @@ func DefineFlags() {
 	}
 }
 
-//PrintCommandUsage prints usage of parsed command, or seed usage if no command parsed
+//PrintCommandUsage prints usage of parsed command, or seed usage if no command
+// parsed
 func PrintCommandUsage() {
 	if buildCmd.Parsed() {
 		PrintBuildUsage()
@@ -715,14 +728,14 @@ func PrintPublishUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [OPTIONS] \n")
 	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
 	// fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	// fmt.Fprintf(os.Stderr, "  -r, -repo Specifies a specific registry to search (default is docker.io)\n")
 	os.Exit(1)
 }
 
 //PrintValidateUsage prints the seed validate usage, then exits the program
 func PrintValidateUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed validate [OPTIONS] \n")
-	fmt.Fprintf(os.Stderr, "\nValidates the given %s is compliant with the Seed spec.\n", constants.SeedFileName)
+	fmt.Fprintf(os.Stderr, "\nValidates the given %s is compliant with the Seed spec.\n",
+		constants.SeedFileName)
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies directory in which Seed is located (default is current directory)\n",
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
@@ -781,7 +794,8 @@ func DefineInputs(seed *objects.Seed) []string {
 		x := strings.Split(f, "=")
 		if len(x) != 2 {
 			fmt.Fprintf(os.Stderr, "ERROR: Input files should be specified in KEY=VALUE format.\n")
-			fmt.Fprintf(os.Stderr, "ERROR: Unknown key for input %v encountered.\n", inputs)
+			fmt.Fprintf(os.Stderr, "ERROR: Unknown key for input %v encountered.\n",
+				inputs)
 			continue
 		}
 
@@ -793,9 +807,12 @@ func DefineInputs(seed *objects.Seed) []string {
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
-		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "${"+key+"}", val, -1)
-		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "$"+key, val, -1)
-		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
+			"${"+key+"}", val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "$"+key,
+			val, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, val,
+			-1)
 
 		for _, k := range seed.Job.Interface.InputData.Files {
 			if k.Name == key {
@@ -810,8 +827,22 @@ func DefineInputs(seed *objects.Seed) []string {
 
 //SetOutputDir replaces the JOB_OUTPUT_DIR argument with the given output directory.
 // Returns output directory string
-func SetOutputDir(seed *objects.Seed) string {
+func SetOutputDir(imageName string, seed *objects.Seed) string {
+
+	if !strings.Contains(seed.Job.Interface.Cmd, "JOB_OUTPUT_DIR") {
+		return ""
+	}
+
 	outputDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
+
+	// #37: if -o is not specified, and JOB_OUTPUT_DIR is in the command args,
+	//	auto create a time-stamped subdirectory with the name of the form:
+	//		imagename-iso8601timestamp
+	if outputDir == "" {
+		outputDir = imageName + "-" + time.Now().Format(time.RFC3339)
+		outputDir = strings.Replace(outputDir, ":", "_", -1)
+	}
+
 	outdir := GetFullPath(outputDir)
 
 	// Check if outputDir exists. Create if not
@@ -934,11 +965,9 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 	// Look for ResultsFileManifestName.json in the root of the JOB_OUTPUT_DIR
 	// and then validate any keys identified in OutputData exist
 	if seed.Job.Interface.OutputData.JSON != nil {
-
 		fmt.Fprintf(os.Stderr, "INFO: Validating %s...\n",
 			filepath.Join(outDir, constants.ResultsFileManifestName))
 		// look for results manifest
-		outDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 		manfile := filepath.Join(outDir, constants.ResultsFileManifestName)
 		if _, err := os.Stat(manfile); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "ERROR: %s specified but cannot be found. %s\n Exiting testrunner.\n",
@@ -946,7 +975,8 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 			return
 		}
 
-		bites, err := ioutil.ReadFile(filepath.Join(outDir, constants.ResultsFileManifestName))
+		bites, err := ioutil.ReadFile(filepath.Join(outDir,
+			constants.ResultsFileManifestName))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Error reading %s.%s\n",
 				constants.ResultsFileManifestName, err.Error())
@@ -967,14 +997,18 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 
 			if key != "" {
 				if mf[key] != nil {
-					fmt.Fprintf(os.Stderr, "SUCCESS: Key/Value found: %s=%v\n", key, mf[key])
+					fmt.Fprintf(os.Stderr, "SUCCESS: Key/Value found: %s=%v\n", key,
+						mf[key])
 					// error if not found
 				} else {
-					fmt.Fprintf(os.Stderr, "ERROR: No output value found for key %s in results_manifest.json\n", key)
+					fmt.Fprintf(os.Stderr,
+						"ERROR: No output value found for key %s in results_manifest.json\n",
+						key)
 				}
 			} else {
 				if mf[name] != nil {
-					fmt.Fprintf(os.Stderr, "SUCCESS: Name/Value found: %s=%v\n", name, mf[name])
+					fmt.Fprintf(os.Stderr, "SUCCESS: Name/Value found: %s=%v\n", name,
+						mf[name])
 
 					// error if not found
 				} else {
@@ -1000,7 +1034,8 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 
 		// Load baked-in schema file
 	} else {
-		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n", seedFileName)
+		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n",
+			seedFileName)
 		schemaBytes, _ := constants.Asset("../spec/schema/seed.manifest.schema.json")
 		schemaLoader := gojsonschema.NewStringLoader(string(schemaBytes))
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
@@ -1009,13 +1044,16 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 
 	// Error occurred loading the schema or seed.manifest.json
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\nERROR: Error validating seed file against schema. Error is: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr,
+			"\nERROR: Error validating seed file against schema. Error is: %s\n",
+			err.Error())
 		return false
 	}
 
 	// Validation failed. Print results
 	if !result.Valid() {
-		fmt.Fprintf(os.Stderr, "\nERROR: %s is not valid. See errors:\n", seedFileName)
+		fmt.Fprintf(os.Stderr, "\nERROR: %s is not valid. See errors:\n",
+			seedFileName)
 		for _, e := range result.Errors() {
 			fmt.Fprintf(os.Stderr, "-ERROR %v\n", e.Description())
 			fmt.Fprintf(os.Stderr, "\tField: %s\n", e.Field())
@@ -1024,6 +1062,11 @@ func ValidateSeedFile(schemaFile string, seedFileName string) bool {
 		fmt.Fprintf(os.Stderr, "\n")
 		return false
 	}
+
+	// TODO Identify any name collisions
+	// searches through the job.interface.inputData.Files/JSON and interface.settings
+	// for the follwing reserved variables:
+	//		JOB_OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
 
 	// Validation succeeded
 	fmt.Fprintf(os.Stderr, "\nSUCCESS: %s is valid.\n\n", seedFileName)
