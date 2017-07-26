@@ -114,8 +114,8 @@ Mebibytes (MiB) MUST be used.
 * The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a number indicating the factor by
 which input file size is multiplied and added to the constant value for resource.
 
-Use of `inputMultiplier` for `mem` or `disk` resource types is useful when the volume of input data correlatates to the
-memory or disk consumption of a job. The following basic formula computes the resource requirement when an
+Use of `inputMultiplier` for `mem` or `disk` resource types is useful when memory or output disk requirements of a job
+are a function of input file size. The following basic formula computes the resource requirement when an
 `inputMultiplier` is defined.
 
 ----
@@ -140,9 +140,10 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 ----
 <1> Recommended Scalar element demonstrating single constant scalar value for specifying CPU requirement of job.
 <2> Optional Scalar element demonstrating single constant scalar value in addition to a multiplier based on total input
-file size for scaling disk requirement of job.
-<3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on total input
-file size for scaling memory requirement of job.
+file size for scaling disk requirement of job. This multiplier allows for scaling the output disk space required as a
+function of input file size.
+<3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on total
+input file size for scaling memory requirement of job.
 <4> Optional additional Scalar elements for any custom resources needed by job.
 
 [[interface-section, Interface Object]]
