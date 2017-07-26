@@ -228,13 +228,13 @@ func RunImage(dockerImage, seedManifest string) RunResult {
 	dockerOutDir := ""
 	outAbsPath := ""
 	if len(outFiles) > 0 {
-		dockerOutDir = os.ExpandEnv("${JOB_OUTPUT_DIR}")
+		dockerOutDir = os.ExpandEnv("${OUTPUT_DIR}")
 		if dockerOutDir == "" {
 			outdir, _ := ioutil.TempDir("", "Output")
 			dockerOutDir = filepath.Base(outdir)
 			defer os.RemoveAll(outdir) // clean up
 			os.Mkdir(dockerOutDir, 0777)
-			os.Setenv("JOB_OUTPUT_DIR", dockerOutDir)
+			os.Setenv("OUTPUT_DIR", dockerOutDir)
 		}
 		outAbsPath, _ = filepath.Abs(dockerOutDir)
 		outVolume := outAbsPath + ":/" + dockerOutDir

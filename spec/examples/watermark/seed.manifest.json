@@ -9,7 +9,7 @@
     "authorName": "John Doe",
     "timeout": 30,
     "interface": {
-      "cmd": "${INPUT_IMAGE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
       "resources": {
         "scalar": [
           { "name": "cpu", "value": 1.0 },

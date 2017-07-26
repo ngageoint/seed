@@ -14,7 +14,7 @@
         "authorUrl": "http://www.example.com",
         "timeout": 3600,
         "interface": {
-            "cmd": "${ZIP} -d ${JOB_OUTPUT_DIR}",
+            "cmd": "${ZIP} -d ${OUTPUT_DIR}",
             "resources": {
             "scalar": [
                   { "name": "cpu", "value": 10.0 },
