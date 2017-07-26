@@ -17,7 +17,7 @@
     "authorUrl": "http://www.example.com",
     "timeout": 3600,
     "interface": {
-      "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
       "resources": {
         "scalar": [
           { "name": "cpu", "value": 10.0 },

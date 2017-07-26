@@ -170,7 +170,7 @@ The following annotated snippet provides quick reference to the use of Interface
 [source,javascript]
 ----
 {
-    "cmd": "/app/job.sh ${INPUT_FILE} ${JOB_OUTPUT_DIR}", // <1>
+    "cmd": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
     "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
     "outputData": { ... }, // <3>
     "mounts": [ ... ], // <4>
@@ -258,7 +258,7 @@ following the execution of a Seed image. Data can be captured in two different f
 extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
 output directory as `results_manifest.json`. The absolute path to the job output directory is REQUIRED to be passed into
-the container at job execution time in the `JOB_OUTPUT_DIR` environment variable. Special attention should be given to
+the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
 <<output-data-permissions,output file permissions>> and support is provided for defining
 <<extended-file-metadata,extended metadata>>.
 
@@ -332,7 +332,7 @@ The following annotated snippets provides quick reference to the use of OutputDa
 <2> Required string containing output identifier.
 <3> Required string containing IANA Media type of file.
 <4> Required string containing glob expression for file capture. Processing system is expected to
-capture output relative to JOB_OUTPUT_DIR.
+capture output relative to OUTPUT_DIR.
 <5> Optional string containing either a numeric count or `*` for unbounded output. Default value
 is `1`.
 <6> Optional boolean indicating whether processing system should assume failure if output data is missing. Default value
