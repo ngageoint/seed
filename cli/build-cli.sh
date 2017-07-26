@@ -6,8 +6,16 @@ set -e
 pushd "${0%/*}" > /dev/null
 
 VERSION=$1
+if [[ "${VERSION}x" == "x" ]]
+then
+    echo Missing version parameter!
+    echo Usage:
+    echo $0 1.0.0
+    exit 1
+fi
 
-vendor/bin/go-bindata -pkg constants -o constants/jsonschema.go ../spec/schema/seed.manifest.schema.json
+
+vendor/go-bindata -pkg constants -o constants/jsonschema.go ../spec/schema/seed.manifest.schema.json
 echo Building cross platform Seed CLI.
 echo Building for Linux...
 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=$VERSION" -o output/seed-linux-amd64
