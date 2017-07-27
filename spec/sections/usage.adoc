@@ -19,7 +19,7 @@ rules:
 
 * Only upper-case alphabetic and underscore characters are permitted unaltered.
 * All lower-case alphabetic characters MUST be capitalized.
-* All numeric and special characters MUST be removed.
+* All dash characters MUST be replaced with underscores.
 
 ===== Injection
 *NOTE*: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
