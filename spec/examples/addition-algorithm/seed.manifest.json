@@ -8,10 +8,15 @@
     "description": "Adds numbers together",
     "authorName": "Emily Smith",
     "timeout": 10,
-    "cpus": 0.1,
-    "mem": 1.0,
     "interface": {
-      "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
+      "resources": {
+        "scalar": [
+          { "name": "cpu", "value": 0.1 },
+          { "name": "mem", "value": 1.0 },
+          { "name": "disk", "value": 1.0, "inputMultiplier": 1.0 }
+        ]
+      },
       "inputData": {
         "files": [
           {

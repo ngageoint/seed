@@ -450,7 +450,7 @@ func DockerRun() {
 		}
 	}
 
-	// mount the JOB_OUTPUT_DIR (outDir flag)
+	// mount the OUTPUT_DIR (outDir flag)
 	outDir := SetOutputDir(imageName, &seed)
 	if outDir != "" {
 		mountsArgs = append(mountsArgs, "-v")
@@ -704,7 +704,7 @@ func PrintBuildUsage() {
 
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] -o JOB_OUTPUT_DIRECTORY [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] -o OUTPUT_DIRECTORY [OPTIONS]\n")
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
@@ -874,17 +874,17 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 	return mountArgs, nil
 }
 
-//SetOutputDir replaces the JOB_OUTPUT_DIR argument with the given output directory.
+//SetOutputDir replaces the OUTPUT_DIR argument with the given output directory.
 // Returns output directory string
 func SetOutputDir(imageName string, seed *objects.Seed) string {
 
-	if !strings.Contains(seed.Job.Interface.Cmd, "JOB_OUTPUT_DIR") {
+	if !strings.Contains(seed.Job.Interface.Cmd, "OUTPUT_DIR") {
 		return ""
 	}
 
 	outputDir := runCmd.Lookup(constants.JobOutputDirFlag).Value.String()
 
-	// #37: if -o is not specified, and JOB_OUTPUT_DIR is in the command args,
+	// #37: if -o is not specified, and OUTPUT_DIR is in the command args,
 	//	auto create a time-stamped subdirectory with the name of the form:
 	//		imagename-iso8601timestamp
 	if outputDir == "" {
@@ -922,9 +922,9 @@ func SetOutputDir(imageName string, seed *objects.Seed) string {
 	}
 
 	seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
-		"$JOB_OUTPUT_DIR", outdir, -1)
+		"$OUTPUT_DIR", outdir, -1)
 	seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
-		"${JOB_OUTPUT_DIR}", outdir, -1)
+		"${OUTPUT_DIR}", outdir, -1)
 	return outdir
 }
 
@@ -972,7 +972,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 		//  #3 Check number of files (if defined)
 		for _, f := range seed.Job.Interface.OutputData.Files {
 
-			// find all pattern matches in JOB_OUTPUT_DIR
+			// find all pattern matches in OUTPUT_DIR
 			matches, _ := filepath.Glob(path.Join(outDir, f.Pattern))
 
 			// Check media type of matches
@@ -1011,7 +1011,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 	}
 
 	// Validate any defined OutputData.Json
-	// Look for ResultsFileManifestName.json in the root of the JOB_OUTPUT_DIR
+	// Look for ResultsFileManifestName.json in the root of the OUTPUT_DIR
 	// and then validate any keys identified in OutputData exist
 	if seed.Job.Interface.OutputData.JSON != nil {
 		fmt.Fprintf(os.Stderr, "INFO: Validating %s...\n",
@@ -1114,7 +1114,7 @@ func ValidateSeedFile(schemaFile string, seedFileName string) error {
 	// TODO Identify any name collisions
 	// searches through the job.interface.inputData.Files/JSON and interface.settings
 	// for the follwing reserved variables:
-	//		JOB_OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
+	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
 
 	// Validation succeeded
 	fmt.Fprintf(os.Stderr, "SUCCESS: %s is valid.\n\n", seedFileName)
