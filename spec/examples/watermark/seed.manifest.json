@@ -8,10 +8,14 @@
     "description": "Processes an input PNG and outputs watermarked PNG.",
     "authorName": "John Doe",
     "timeout": 30,
-    "cpus": 1.0,
-    "mem": 64.0,
     "interface": {
-      "cmd": "${INPUT_IMAGE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
+      "resources": {
+        "scalar": [
+          { "name": "cpu", "value": 1.0 },
+          { "name": "mem", "value": 64.0 }
+        ]
+      },
       "inputData": {
         "files": [
           {

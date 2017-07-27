@@ -47,20 +47,6 @@
         "timeout": {
           "type": "integer"
         },
-        "cpus": {
-          "type": "number"
-        },
-        "mem": {
-          "type": "number"
-        },
-        "sharedMem": {
-          "type": "number",
-          "default": 0.0
-        },
-        "storage": {
-          "type": "number",
-          "default": 0.0
-        },
         "interface": {
           "type": "object",
           "additionalProperties": false,
@@ -84,10 +70,6 @@
                       "required": {
                         "type": "boolean",
                         "default": true
-                      },
-                      "multiple": {
-                        "type": "boolean",
-                        "default": false
                       },
                       "mediaType": {
                         "type": "array",
@@ -237,6 +219,37 @@
                 ]
               }
             },
+            "resources": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "scalar": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "inputMultiplier": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "value"
+                    ]
+                  },
+                  "required": [
+                    "scalar"
+                  ]
+                }
+              }
+            },
             "settings": {
               "type": "array",
               "items": {
@@ -298,8 +311,6 @@
         "description",
         "authorName",
         "timeout",
-        "cpus",
-        "mem",
         "interface"
       ]
     }

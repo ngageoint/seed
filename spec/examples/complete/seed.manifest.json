@@ -16,12 +16,16 @@
     "authorEmail": "jdoe@example.com",
     "authorUrl": "http://www.example.com",
     "timeout": 3600,
-    "cpus": 10.0,
-    "mem": 10240.0,
-    "sharedMem": 0.0,
-    "storage": 0.0,
     "interface": {
-      "cmd": "${INPUT_FILE} ${JOB_OUTPUT_DIR}",
+      "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
+      "resources": {
+        "scalar": [
+          { "name": "cpu", "value": 10.0 },
+          { "name": "mem", "value": 10240.0 },
+          { "name": "sharedMem", "value": 0.0 },
+          { "name": "disk", "value": 10.0, "inputMultiplier": 4.0 }
+        ]
+      },
       "inputData": {
         "files": [
           {

@@ -8,8 +8,6 @@
     "description": "Generates a random number and outputs on stdout",
     "authorName": "John Doe",
     "timeout": 10,
-    "cpus": 0.1,
-    "mem": 1.0,
     "interface": {
     }
   }
