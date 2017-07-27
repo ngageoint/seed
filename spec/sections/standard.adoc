@@ -106,8 +106,8 @@ objects and MAY contain any number of elements. There is no other standard restr
 The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk` and `mem`
 that have special meaning and SHOULD be populated by all Seed compliant images.
 
-* The Scalar object MUST have a member `name`. The member's value MUST be a string indicating the resource required by
-the job.
+* The Scalar object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the resource required by the job.
 * The Scalar object MUST have a member `value`. The member's value MUST be a number indicating the quantity of the
 resource required by the job. When dealing with storage resources such as `mem` or `disk` units of 
 Mebibytes (MiB) MUST be used.
@@ -200,8 +200,9 @@ sub-section.
 Critical implementation details related to `multiple` member should be referenced in
 <<environment-variables,environment variables>>.
 
-* The Files object MUST have a member `name`. The member's value MUST be a string indicating the environment
-variable name that will be injected by the processing platform for job consumption.
+* The Files object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the environment variable name that will be
+injected by the processing platform for job consumption.
 * The Files object MUST have a member `mediaType`. The member's value is an array of strings that MUST indicate the IANA
 Media types that the job accepts.
 * The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
@@ -212,8 +213,9 @@ placeholder will be replaced with an absolute path to a single file.
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
 .JSON Elements
-* The JSON object MUST have a member `name`. The member's value MUST be a string indicating the environment
-variable name that will be injected by the processing platform for job consumption.
+* The JSON object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the environment variable name that will be
+injected by the processing platform for job consumption.
 * The JSON object MUST have a member `type`. The member's value MUST be a string and indicate a valid JSON schema type.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
@@ -269,9 +271,9 @@ sub-section.
 sub-section.
 
 .Files Elements
-* The Files object MUST have a member `name`. The member's value MUST be a string indicating the key the processing
-system will place the file name captured for downstream processing.
-variable name that will be injected by the processing platform for job consumption.
+* The Files object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or underscore
+characters (defined by the regex `[a-zA-Z_-]+`) indicating the key the processing system will place the file name
+captured for downstream processing.
 * The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
 the file being captured by OutputData.
 * The Files object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the
@@ -283,9 +285,10 @@ matching with no upper bound.
 value SHOULD always be expected. If omitted, the default value is `true`.
 
 .JSON Elements
-* The JSON object MUST have a member `name`. The member's value MUST be a string indicating the key the processing
-system will place the JSON member value in for downstream use. When `key` member is omitted, it must be a case-sensitive
-match of the member key in result manifest.
+* The JSON object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the key the processing system will place the JSON
+member value in for downstream use. When `key` member is omitted, it must be a case-sensitive match of the member key in
+result manifest.
 * The JSON object MUST have a member `type`. The member's value MUST be a string and indicate the JSON schema type of
 the member being captured from the result manifest.
 * The JSON object MAY have a member `key`. The member's value MUST be a string and indicate the case-sensitive result
@@ -351,8 +354,9 @@ The Mounts object is the member responsible for indicating any additional direct
 container for the Job to run. A mount directory is typically a shared file system directory that contains some set of
 reference data that the Job requires.
 
-* The Mounts object MUST have a member `name`. The member's value is a string that correlates mount references
- elsewhere in the Interface to an external mount configuration that specifies how the mount is provided.
+* The Mounts object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) that correlates mount references elsewhere in the Interface
+to an external mount configuration that specifies how the mount is provided.
 * The Mounts object MUST have a member `path`. The member's value is an absolute file system path specifying where in
  the container the Job expects the shared directory to be mounted.
 * The Settings object MAY have a member `mode`. The member's value is a string that either specifies "ro" for read-only
@@ -385,8 +389,9 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 `outputData`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
-* The Settings object MUST have a member `name`. The member's value is a string that indicates the case-sensitive
-environment variable to be injected at run time.
+* The Settings object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
+underscore characters (defined by the regex `[a-zA-Z_-]+`) that indicates the environment variable to be injected at run
+time.
 * The Settings object MAY have a member `secret`. The member's value is a boolean that indicates whether the value
  associated with the named setting is secret and stored as a secure string.
 
