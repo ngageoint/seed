@@ -65,7 +65,8 @@
                     "additionalProperties": false,
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                       },
                       "required": {
                         "type": "boolean",
@@ -95,7 +96,8 @@
                     "additionalProperties": false,
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                       },
                       "required": {
                         "type": "boolean",
@@ -132,7 +134,8 @@
                     "additionalProperties": false,
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                       },
                       "mediaType": {
                         "type": "string"
@@ -164,7 +167,8 @@
                     "additionalProperties": false,
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                       },
                       "key": {
                         "type": "string"
@@ -200,7 +204,8 @@
                 "additionalProperties": false,
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                   },
                   "path": {
                     "type": "string"
@@ -230,7 +235,8 @@
                     "additionalProperties": false,
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "[a-zA-Z_-]+"
                       },
                       "value": {
                         "type": "number"
@@ -257,7 +263,8 @@
                 "additionalProperties": false,
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "[a-zA-Z_-]+"
                   },
                   "secret": {
                     "type": "boolean",
