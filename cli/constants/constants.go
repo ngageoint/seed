@@ -27,6 +27,12 @@ const JobDirectoryFlag = "directory"
 //ShortJobDirectoryFlag defines the shorthand location of the seed spec and Dockerfile
 const ShortJobDirectoryFlag = "d"
 
+//SettingFlag defines the SettingFlag
+const SettingFlag = "setting"
+
+//ShortSettingFlag defines the shorthand SettingFlag
+const ShortSettingFlag = "e"
+
 //InputDataFlag defines the InputDataFlag
 const InputDataFlag = "inputData"
 

@@ -38,7 +38,7 @@ type Seed struct {
 			}
 			Settings []struct {
 				Name   string `json:"name"`
-				Secret string `json:"secret"`
+				Secret bool   `json:"secret"`
 			}
 			ErrorMapping []struct {
 				Code        int    `json:"code,string"`
