@@ -107,7 +107,8 @@ The Scalar objects MAY include any arbitrary custom resource name, but there are
 that have special meaning and SHOULD be populated by all Seed compliant images.
 
 * The Scalar object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the resource required by the job.
+underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the resource required by the job. Refer to
+<<variable-injection>> for details on environment variable available at execution time.
 * The Scalar object MUST have a member `value`. The member's value MUST be a number indicating the quantity of the
 resource required by the job. When dealing with storage resources such as `mem` or `disk` units of 
 Mebibytes (MiB) MUST be used.
@@ -202,7 +203,8 @@ Critical implementation details related to `multiple` member should be reference
 
 * The Files object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
 underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the environment variable name that will be
-injected by the processing platform for job consumption.
+injected by the processing platform for job consumption. Refer to <<variable-injection>> for details on environment
+variable available at execution time.
 * The Files object MUST have a member `mediaType`. The member's value is an array of strings that MUST indicate the IANA
 Media types that the job accepts.
 * The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
@@ -215,7 +217,8 @@ value SHOULD always be expected. If omitted, the default value MUST be treated a
 .JSON Elements
 * The JSON object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
 underscore characters (defined by the regex `[a-zA-Z_-]+`) indicating the environment variable name that will be
-injected by the processing platform for job consumption.
+injected by the processing platform for job consumption. Refer to <<variable-injection>> for details on environment
+variable available at execution time.
 * The JSON object MUST have a member `type`. The member's value MUST be a string and indicate a valid JSON schema type.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
@@ -391,7 +394,7 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 
 * The Settings object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
 underscore characters (defined by the regex `[a-zA-Z_-]+`) that indicates the environment variable to be injected at run
-time.
+time. Refer to <<variable-injection>> for details on environment variable available at execution time.
 * The Settings object MAY have a member `secret`. The member's value is a boolean that indicates whether the value
  associated with the named setting is secret and stored as a secure string.
 
