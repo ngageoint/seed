@@ -21,8 +21,9 @@ rules:
 * All lower-case alphabetic characters MUST be capitalized.
 * All dash characters MUST be replaced with underscores.
 
+[[variable-injection, Injection]]
 ===== Injection
-*NOTE*: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
+WARNING: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
 `interface.settings` `name` member values MUST NOT occur.
 
 The following variables MUST be provided:
