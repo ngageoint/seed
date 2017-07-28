@@ -30,8 +30,8 @@ The following variables MUST be provided:
 
 * OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor capture.
 * All `name` member values of `resources.scalar` elements MUST map to environment variables. This SHALL be done by
-<<variable-normalization,normalizing>> all `name` values and prefixing with `ALLOCATED_`. For a `my-demo-resourceNew1`
-with a value of `5.0`, an environment variable `ALLOCATED_MYDEMORESOURCENEW` SHALL be set to `5.0` at run time. For a
+<<variable-normalization,normalizing>> all `name` values and prefixing with `ALLOCATED_`. For a `my-demo-resourceNew`
+with a value of `5.0`, an environment variable `ALLOCATED_MY_DEMO_RESOURCENEW` SHALL be set to `5.0` at run time. For a
 resource with an `inputMultiplier` value the environment variable must include the final computed _output_ resource
 allocation as defined in the `scalar` element under <<resources-section,Resources object>>. It SHOULD be clarified that
 the allocated value computed using an `inputMultiplier` value MUST NOT include the size of input files - only the
