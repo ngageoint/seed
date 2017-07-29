@@ -33,6 +33,12 @@ const SettingFlag = "setting"
 //ShortSettingFlag defines the shorthand SettingFlag
 const ShortSettingFlag = "e"
 
+//MountFlag defines the MountFlag
+const MountFlag = "mount"
+
+//ShortMountFlag defines the shorthand MountFlag
+const ShortMountFlag = "m"
+
 //InputDataFlag defines the InputDataFlag
 const InputDataFlag = "inputData"
 

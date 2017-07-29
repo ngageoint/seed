@@ -236,9 +236,9 @@ func GetManifestLabel(seedFileName string) string {
 
 //GetNormalizedVariable transforms an input name into the spec required environment variable
 func GetNormalizedVariable(inputName string) string {
-	// Removes all non-alphabetic runes, except dash and underscore
-	// Uppercases all lowercase alphabetic runes
-	// Dashes are transformed into underscores
+	// Remove all non-alphabetic runes, except dash and underscore
+	// Upper-case all lower-case alphabetic runes
+	// Dash runes are transformed into underscore
 	normalizer := func(r rune) rune {
 		switch {
 		case r >= 'A' && r <= 'Z' || r == '_':
@@ -493,8 +493,16 @@ func DockerRun() {
 	}
 
 	// Additional Mounts defined in seed.json
-	mounts := DefineMounts(&seed)
-	_ = mounts
+	if seed.Job.Interface.Mounts != nil {
+		inMounts, err := DefineMounts(&seed)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing mount arguments.\n%s", err.Error())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		} else if inMounts != nil {
+			mountsArgs = append(envArgs, inMounts...)
+		}
+	}
 
 	// Build Docker command arguments:
 	// 		run
@@ -596,6 +604,12 @@ func DefineFlags() {
 		"Defines the value to be applied to setting")
 	runCmd.Var(&settings, constants.ShortSettingFlag,
 		"Defines the value to be applied to setting")
+
+	var mounts objects.ArrayFlags
+	runCmd.Var(&mounts, constants.MountFlag,
+		"Defines the full path to be mapped via mount")
+	runCmd.Var(&mounts, constants.ShortMountFlag,
+		"Defines the full path to be mapped via mount")
 
 	var inputs objects.ArrayFlags
 	runCmd.Var(&inputs, constants.InputDataFlag,
@@ -753,6 +767,8 @@ func PrintRunUsage() {
 		constants.ShortInputDataFlag, constants.InputDataFlag)
 	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value setting values of the seed spec in the format SETTING_KEY=VALUE\n",
 		constants.ShortSettingFlag, constants.SettingFlag)
+	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value mount values of the seed spec in the format MOUNT_KEY=HOST_PATH\n",
+		constants.ShortMountFlag, constants.MountFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s\tDocker image name to run\n",
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
@@ -971,26 +987,61 @@ func SetOutputDir(imageName string, seed *objects.Seed) string {
 }
 
 //DefineMounts defines any seed specified mounts. TODO
-func DefineMounts(seed *objects.Seed) []string {
+func DefineMounts(seed *objects.Seed) ([]string, error) {
+	// Ingest inputs into a map key = inputkey, value=inputpath
+	inputs := strings.Split(runCmd.Lookup(constants.MountFlag).Value.String(), ",")
+	inMap := make(map[string]string)
+	for _, f := range inputs {
+		x := strings.Split(f, "=")
+		if len(x) != 2 {
+			fmt.Fprintf(os.Stderr, "ERROR: Mount should be specified in KEY=VALUE format.\n")
+			fmt.Fprintf(os.Stderr, "ERROR: Unknown key for mount %v encountered.\n",
+				x)
+			continue
+		}
+		inMap[x[0]] = x[1]
+	}
+
+
+	// Valid by default
+	valid := true
+	var keys []string
+	for _, f := range seed.Job.Interface.Mounts {
+		keys = append(keys, f.Name)
+		if _, prs := inMap[f.Name]; !prs {
+			valid = false
+		}
+	}
+
+	if !valid {
+		var buffer bytes.Buffer
+		buffer.WriteString("ERROR: Incorrect mount key/values provided. -m arguments should be in the form:\n")
+		buffer.WriteString("  seed run -m MOUNT=path/to ...\n")
+		buffer.WriteString("The following mount keys are expected:\n")
+		for _, n := range keys {
+			buffer.WriteString("  " + n + "\n")
+		}
+		buffer.WriteString("\n")
+		return nil, errors.New(buffer.String())
+	}
+
+	var mounts []string
 	if seed.Job.Interface.Mounts != nil {
-		/*
-			fmt.Println("Found some mounts....")
-			var mounts []string
 			for _, mount := range seed.Job.Interface.Mounts {
-				fmt.Println(mount.Name)
 				mounts = append(mounts, "-v")
-				mountPath := mount.Path + ":" + mount.Path
+				mountPath := inMap[mount.Name] + ":" + mount.Path
 
 				if mount.Mode != "" {
 					mountPath += ":" + mount.Mode
+				} else {
+					mountPath += ":ro"
 				}
-				dockerArgs = append(dockerArgs,mountPath)
+				mounts = append(mounts, mountPath)
 			}
-		*/
-		return nil
+		return mounts, nil
 	}
 
-	return nil
+	return mounts, nil
 }
 
 //DefineSettings defines any seed specified docker settings. TODO
