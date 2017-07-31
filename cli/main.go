@@ -226,7 +226,7 @@ func GetManifestLabel(seedFileName string) string {
 			err.Error())
 	}
 
-	// Escape forward slashes and dollar signes
+	// Escape forward slashes and dollar signs
 	seed := string(seedbytes)
 	seed = strings.Replace(seed, "$", "\\$", -1)
 	seed = strings.Replace(seed, "/", "\\/", -1)
@@ -281,7 +281,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 			errr.Error())
 	}
 
-	// Run docker build
+	// Run docker inspect
 	if err := inspctCmd.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: error executing docker %s. %s\n", cmdStr,
 			err.Error())
@@ -306,16 +306,17 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	// un-escape special characters
 	seedStr := string(seedBytes)
 	seedStr = strings.Replace(seedStr, "\\\"", "\"", -1)
+	seedStr = strings.Replace(seedStr, "\\\"", "\"", -1) //extra replace to fix extra back slashes added by docker build command
 	seedStr = strings.Replace(seedStr, "\\$", "$", -1)
 	seedStr = strings.Replace(seedStr, "\\/", "/", -1)
 	seedStr = strings.TrimSpace(seedStr)
 	seedStr = strings.TrimSuffix(strings.TrimPrefix(seedStr, "'\""), "\"'")
-
+	
 	seed := &objects.Seed{}
 
 	err = json.Unmarshal([]byte(seedStr), &seed)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error unamrshalling seed: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "ERROR: Error unmarshalling seed: %s\n", err.Error())
 	}
 	return *seed
 }
@@ -500,7 +501,7 @@ func DockerRun() {
 			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 			os.Exit(1)
 		} else if inMounts != nil {
-			mountsArgs = append(envArgs, inMounts...)
+			mountsArgs = append(mountsArgs, inMounts...)
 		}
 	}
 
@@ -1166,39 +1167,56 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 				constants.ResultsFileManifestName, err.Error())
 			return
 		}
-
-		// Read in manifest
-		var mfile interface{}
-		json.Unmarshal(bites, &mfile)
-		mf := mfile.(map[string]interface{})
+		
+		documentLoader := gojsonschema.NewStringLoader(string(bites))
+		_, err = documentLoader.LoadJSON()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error loading results manifest file: %s. %s\n Exiting testrunner.\n",
+				constants.ResultsFileManifestName, err.Error())
+			return
+		}
+		
+		schemaFmt := "{ \"type\": \"object\", \"properties\": { %s }, \"required\": [ %s ] }"
+		schema := ""
+		required := ""
 
 		// Loop through defined name/key values to extract from results_manifest.json
 		for _, jsonStr := range seed.Job.Interface.OutputData.JSON {
-			// name
-			name := jsonStr.Name
-			// key
-			key := jsonStr.Key
-
-			if key != "" {
-				if mf[key] != nil {
-					fmt.Fprintf(os.Stderr, "SUCCESS: Key/Value found: %s=%v\n", key,
-						mf[key])
-					// error if not found
-				} else {
-					fmt.Fprintf(os.Stderr,
-						"ERROR: No output value found for key %s in results_manifest.json\n",
-						key)
-				}
-			} else {
-				if mf[name] != nil {
-					fmt.Fprintf(os.Stderr, "SUCCESS: Name/Value found: %s=%v\n", name,
-						mf[name])
-
-					// error if not found
-				} else {
-					fmt.Fprintf(os.Stderr, "ERROR: No value found for name %s\n", name)
-				}
+			key := jsonStr.Name
+			if jsonStr.Key != "" {
+				key = jsonStr.Key
 			}
+
+			schema += fmt.Sprintf("\"%s\": { \"type\": \"%s\" },", key, jsonStr.Type)
+
+			if jsonStr.Required {
+				required += fmt.Sprintf("\"%s\",", key)
+			}
+		}
+		//remove trailing commas
+		if len(schema) > 0 {
+			schema = schema[:len(schema)-1]
+		}
+		if len(required) > 0 {
+			required = required[:len(required)-1]
+		}
+		
+		schema = fmt.Sprintf(schemaFmt, schema, required)
+		
+		schemaLoader := gojsonschema.NewStringLoader(schema)
+		schemaResult, err := gojsonschema.Validate(schemaLoader, documentLoader)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error running validator: %s\n Exiting testrunner.\n",
+				err.Error())
+			return
+		}
+		
+		if len(schemaResult.Errors()) == 0 {
+			fmt.Fprintf(os.Stderr, "SUCCESS: Results manifest file is valid.\n")
+		}
+
+		for _, desc := range schemaResult.Errors() {
+			fmt.Fprintf(os.Stderr, "ERROR: %s is invalid: - %s\n", constants.ResultsFileManifestName, desc)
 		}
 	}
 }
