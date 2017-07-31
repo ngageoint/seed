@@ -306,6 +306,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	// un-escape special characters
 	seedStr := string(seedBytes)
 	seedStr = strings.Replace(seedStr, "\\\"", "\"", -1)
+	seedStr = strings.Replace(seedStr, "\\\"", "\"", -1)
 	seedStr = strings.Replace(seedStr, "\\$", "$", -1)
 	seedStr = strings.Replace(seedStr, "\\/", "/", -1)
 	seedStr = strings.TrimSpace(seedStr)
@@ -317,6 +318,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error unamrshalling seed: %s\n", err.Error())
 	}
+	fmt.Println(seed.Job.Interface.Resources.Scalar)
 	return *seed
 }
 
@@ -423,33 +425,14 @@ func ImageExists(imageName string) (bool, error) {
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
 	var seed objects.Seed
-	var imageName string
+
+	imageName := runCmd.Lookup(constants.ImgNameFlag).Value.String()
+	if imageName == "" {
+		fmt.Fprintf(os.Stderr, "ERROR: No input image specified\n")
+	}
 
 	// Parse seed information off of the label
-	if runCmd.Lookup(constants.ImgNameFlag).Value.String() != "" {
-		imageName = runCmd.Lookup(constants.ImgNameFlag).Value.String()
-
-		// Check if image exists
-		if exists, _ := ImageExists(imageName); !exists {
-			// try to build from seed file
-			DockerBuild(imageName)
-		}
-
-		if runCmd.Lookup(constants.JobDirectoryFlag).Value.String() != "." {
-			fmt.Fprintf(os.Stderr,
-				"INFO: Image name %s specified. Job directory parameter will be ignored.\n",
-				imageName)
-		}
-		seed = SeedFromImageLabel(imageName)
-
-		// Parse seed from manifest file and build image name
-	} else {
-		seed, _ = SeedFromManifestFile()
-		imageName = BuildImageName(&seed)
-		if exists, _ := ImageExists(imageName); !exists {
-			DockerBuild(imageName)
-		}
-	}
+	seed = SeedFromImageLabel(imageName)
 
 	// build docker run command
 	dockerArgs := []string{"run"}
@@ -500,7 +483,7 @@ func DockerRun() {
 			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 			os.Exit(1)
 		} else if inMounts != nil {
-			mountsArgs = append(envArgs, inMounts...)
+			mountsArgs = append(mountsArgs, inMounts...)
 		}
 	}
 
