@@ -234,6 +234,28 @@ func GetManifestLabel(seedFileName string) string {
 	return seed
 }
 
+//GetNormalizedVariable transforms an input name into the spec required environment variable
+func GetNormalizedVariable(inputName string) string {
+	// Remove all non-alphabetic runes, except dash and underscore
+	// Upper-case all lower-case alphabetic runes
+	// Dash runes are transformed into underscore
+	normalizer := func(r rune) rune {
+		switch {
+		case r >= 'A' && r <= 'Z' || r == '_':
+			return r
+		case r >= 'a' && r <= 'z':
+			return 'A' + (r - 'a')
+		case r == '-':
+			return '_'
+		}
+		return -1
+	}
+
+	result := strings.Map(normalizer, inputName)
+
+	return result
+}
+
 //SeedFromImageLabel returns seed parsed from the docker image LABEL
 func SeedFromImageLabel(imageName string) objects.Seed {
 	cmdStr := "inspect -f '{{index .Config.Labels \"com.ngageoint.seed.manifest\"}}'" + imageName
@@ -437,6 +459,7 @@ func DockerRun() {
 	}
 
 	var mountsArgs []string
+	var envArgs []string
 
 	// expand INPUT_FILEs to specified inputData files
 	if seed.Job.Interface.InputData.Files != nil {
@@ -458,20 +481,38 @@ func DockerRun() {
 	}
 
 	// Settings
-	settings := DefineSettings(&seed)
-	_ = settings
+	if seed.Job.Interface.Settings != nil {
+		inSettings, err := DefineSettings(&seed)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing settings arguments.\n%s", err.Error())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		} else if inSettings != nil {
+			envArgs = append(envArgs, inSettings...)
+		}
+	}
 
 	// Additional Mounts defined in seed.json
-	mounts := DefineMounts(&seed)
-	_ = mounts
+	if seed.Job.Interface.Mounts != nil {
+		inMounts, err := DefineMounts(&seed)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing mount arguments.\n%s", err.Error())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		} else if inMounts != nil {
+			mountsArgs = append(envArgs, inMounts...)
+		}
+	}
 
 	// Build Docker command arguments:
 	// 		run
 	//		-rm if specified
+	//		env injection
 	// 		all mounts
 	//		image name
 	//		Job.Interface.Cmd
 	dockerArgs = append(dockerArgs, mountsArgs...)
+	dockerArgs = append(dockerArgs, envArgs...)
 	dockerArgs = append(dockerArgs, imageName)
 
 	// Parse out command arguments from seed.Job.Interface.Cmd
@@ -557,6 +598,18 @@ func DefineFlags() {
 		"Name of Docker image to run")
 	runCmd.StringVar(&imgNameFlag, constants.ShortImgNameFlag, "",
 		"Name of Docker image to run")
+
+	var settings objects.ArrayFlags
+	runCmd.Var(&settings, constants.SettingFlag,
+		"Defines the value to be applied to setting")
+	runCmd.Var(&settings, constants.ShortSettingFlag,
+		"Defines the value to be applied to setting")
+
+	var mounts objects.ArrayFlags
+	runCmd.Var(&mounts, constants.MountFlag,
+		"Defines the full path to be mapped via mount")
+	runCmd.Var(&mounts, constants.ShortMountFlag,
+		"Defines the full path to be mapped via mount")
 
 	var inputs objects.ArrayFlags
 	runCmd.Var(&inputs, constants.InputDataFlag,
@@ -704,7 +757,7 @@ func PrintBuildUsage() {
 
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] -o OUTPUT_DIRECTORY [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY [OPTIONS]\n")
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
@@ -712,6 +765,10 @@ func PrintRunUsage() {
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
 	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
 		constants.ShortInputDataFlag, constants.InputDataFlag)
+	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value setting values of the seed spec in the format SETTING_KEY=VALUE\n",
+		constants.ShortSettingFlag, constants.SettingFlag)
+	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value mount values of the seed spec in the format MOUNT_KEY=HOST_PATH\n",
+		constants.ShortMountFlag, constants.MountFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s\tDocker image name to run\n",
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
@@ -815,7 +872,8 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 		inMap[x[0]] = x[1]
 	}
 
-	var valid bool
+	// Valid by default
+	valid := true
 	var keys []string
 	for _, f := range seed.Job.Interface.InputData.Files {
 		keys = append(keys, f.Name)
@@ -929,33 +987,110 @@ func SetOutputDir(imageName string, seed *objects.Seed) string {
 }
 
 //DefineMounts defines any seed specified mounts. TODO
-func DefineMounts(seed *objects.Seed) []string {
-	if seed.Job.Interface.Mounts != nil {
-		/*
-			fmt.Println("Found some mounts....")
-			var mounts []string
-			for _, mount := range seed.Job.Interface.Mounts {
-				fmt.Println(mount.Name)
-				mounts = append(mounts, "-v")
-				mountPath := mount.Path + ":" + mount.Path
-
-				if mount.Mode != "" {
-					mountPath += ":" + mount.Mode
-				}
-				dockerArgs = append(dockerArgs,mountPath)
-			}
-		*/
-		return nil
+func DefineMounts(seed *objects.Seed) ([]string, error) {
+	// Ingest inputs into a map key = inputkey, value=inputpath
+	inputs := strings.Split(runCmd.Lookup(constants.MountFlag).Value.String(), ",")
+	inMap := make(map[string]string)
+	for _, f := range inputs {
+		x := strings.Split(f, "=")
+		if len(x) != 2 {
+			fmt.Fprintf(os.Stderr, "ERROR: Mount should be specified in KEY=VALUE format.\n")
+			fmt.Fprintf(os.Stderr, "ERROR: Unknown key for mount %v encountered.\n",
+				x)
+			continue
+		}
+		inMap[x[0]] = x[1]
 	}
 
-	return nil
+	// Valid by default
+	valid := true
+	var keys []string
+	for _, f := range seed.Job.Interface.Mounts {
+		keys = append(keys, f.Name)
+		if _, prs := inMap[f.Name]; !prs {
+			valid = false
+		}
+	}
+
+	if !valid {
+		var buffer bytes.Buffer
+		buffer.WriteString("ERROR: Incorrect mount key/values provided. -m arguments should be in the form:\n")
+		buffer.WriteString("  seed run -m MOUNT=path/to ...\n")
+		buffer.WriteString("The following mount keys are expected:\n")
+		for _, n := range keys {
+			buffer.WriteString("  " + n + "\n")
+		}
+		buffer.WriteString("\n")
+		return nil, errors.New(buffer.String())
+	}
+
+	var mounts []string
+	if seed.Job.Interface.Mounts != nil {
+		for _, mount := range seed.Job.Interface.Mounts {
+			mounts = append(mounts, "-v")
+			mountPath := inMap[mount.Name] + ":" + mount.Path
+
+			if mount.Mode != "" {
+				mountPath += ":" + mount.Mode
+			} else {
+				mountPath += ":ro"
+			}
+			mounts = append(mounts, mountPath)
+		}
+		return mounts, nil
+	}
+
+	return mounts, nil
 }
 
 //DefineSettings defines any seed specified docker settings. TODO
 // Return []string of docker command arguments in form of:
 //	"-?? setting1=val1 -?? setting2=val2 etc"
-func DefineSettings(seed *objects.Seed) []string {
-	return nil
+func DefineSettings(seed *objects.Seed) ([]string, error) {
+	// Ingest inputs into a map key = inputkey, value=inputpath
+	inputs := strings.Split(runCmd.Lookup(constants.SettingFlag).Value.String(), ",")
+	inMap := make(map[string]string)
+	for _, f := range inputs {
+		x := strings.Split(f, "=")
+		if len(x) != 2 {
+			fmt.Fprintf(os.Stderr, "ERROR: Setting should be specified in KEY=VALUE format.\n")
+			fmt.Fprintf(os.Stderr, "ERROR: Unknown key for setting %v encountered.\n",
+				x)
+			continue
+		}
+		inMap[x[0]] = x[1]
+	}
+
+	// Valid by default
+	valid := true
+	var keys []string
+	for _, s := range seed.Job.Interface.Settings {
+		keys = append(keys, s.Name)
+		if _, prs := inMap[s.Name]; !prs {
+			valid = false
+		}
+
+	}
+
+	if !valid {
+		var buffer bytes.Buffer
+		buffer.WriteString("ERROR: Incorrect setting key/values provided. -e arguments should be in the form:\n")
+		buffer.WriteString("  seed run -e SETTING=somevalue ...\n")
+		buffer.WriteString("The following settings are expected:\n")
+		for _, n := range keys {
+			buffer.WriteString("  " + n + "\n")
+		}
+		buffer.WriteString("\n")
+		return nil, errors.New(buffer.String())
+	}
+
+	var settings []string
+	for _, key := range keys {
+		settings = append(settings, "-e")
+		settings = append(settings, GetNormalizedVariable(key)+"="+inMap[key])
+	}
+
+	return settings, nil
 }
 
 //ValidateOutput validates the output of the docker run command. Output data is
