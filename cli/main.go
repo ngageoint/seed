@@ -1002,7 +1002,6 @@ func DefineMounts(seed *objects.Seed) ([]string, error) {
 		inMap[x[0]] = x[1]
 	}
 
-
 	// Valid by default
 	valid := true
 	var keys []string
@@ -1027,17 +1026,17 @@ func DefineMounts(seed *objects.Seed) ([]string, error) {
 
 	var mounts []string
 	if seed.Job.Interface.Mounts != nil {
-			for _, mount := range seed.Job.Interface.Mounts {
-				mounts = append(mounts, "-v")
-				mountPath := inMap[mount.Name] + ":" + mount.Path
+		for _, mount := range seed.Job.Interface.Mounts {
+			mounts = append(mounts, "-v")
+			mountPath := inMap[mount.Name] + ":" + mount.Path
 
-				if mount.Mode != "" {
-					mountPath += ":" + mount.Mode
-				} else {
-					mountPath += ":ro"
-				}
-				mounts = append(mounts, mountPath)
+			if mount.Mode != "" {
+				mountPath += ":" + mount.Mode
+			} else {
+				mountPath += ":ro"
 			}
+			mounts = append(mounts, mountPath)
+		}
 		return mounts, nil
 	}
 
@@ -1088,7 +1087,7 @@ func DefineSettings(seed *objects.Seed) ([]string, error) {
 	var settings []string
 	for _, key := range keys {
 		settings = append(settings, "-e")
-		settings = append(settings, GetNormalizedVariable(key) + "=" + inMap[key])
+		settings = append(settings, GetNormalizedVariable(key)+"="+inMap[key])
 	}
 
 	return settings, nil
