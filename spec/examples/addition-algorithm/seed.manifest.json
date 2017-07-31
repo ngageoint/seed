@@ -8,15 +8,10 @@
     "description": "Adds numbers together",
     "authorName": "Emily Smith",
     "timeout": 10,
+    "cpus": 0.1,
+    "mem": 1.0,
     "interface": {
       "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
-      "resources": {
-        "scalar": [
-          { "name": "cpu", "value": 0.1 },
-          { "name": "mem", "value": 1.0 },
-          { "name": "disk", "value": 1.0, "inputMultiplier": 1.0 }
-        ]
-      },
       "inputData": {
         "files": [
           {
@@ -34,7 +29,8 @@
             "name": "OUTPUT_FILE",
             "mediaType": "text/plain",
             "pattern": "*_output.txt",
-            "count": "4"
+            "count": "4",
+            "required": true
           }
         ],
         "json": [
@@ -63,6 +59,16 @@
           "name": "MOUNT2",
           "path": "/tmp/",
           "mode": "rw"
+        }
+      ],
+      "settings": [
+        {
+          "name": "SETTING1",
+          "secret": false
+        },
+        {
+          "name": "SETTING2",
+          "secret": true
         }
       ]
     },
