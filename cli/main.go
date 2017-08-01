@@ -1128,6 +1128,13 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 					strings.Contains(f.MediaType, mType) {
 					count++
 					matchList = append(matchList, "\t"+match+"\n")
+					metadata := match + ".metadata.json"
+					if _, err := os.Stat(metadata); err == nil {
+						err := ValidateSeedFile("", metadata, constants.SchemaMetadata)
+						if err != nil {
+							fmt.Fprintf(os.Stderr, "ERROR: Side-car metadata file %s validation error: %s", metadata, err.Error())
+						}
+					}
 				}
 			}
 
@@ -1226,33 +1233,30 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 			fmt.Fprintf(os.Stderr, "ERROR: %s is invalid: - %s\n", constants.ResultsFileManifestName, desc)
 		}
 	}
-	
-	matches, _ := filepath.Glob(path.Join(outDir, "*.metadata.json"))
-	for _, match := range matches {
-		err := ValidateSeedFile("", match, constants.SchemaMetadata)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s", err.Error())
-		}
-	}
 }
 
 //ValidateSeedFile Validates the seed.manifest.json file based on the given schema
 func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
+	
+	typeStr := "manifest"
+	if schemaType == constants.SchemaMetadata {
+		typeStr = "metadata"
+	}
 
 	// Load supplied schema file
 	if schemaFile != "" {
-		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema file %s...\n",
-			seedFileName, schemaFile)
+		fmt.Fprintf(os.Stderr, "INFO: Validating seed %s file %s against schema file %s...\n",
+			typeStr, seedFileName, schemaFile)
 		schemaLoader := gojsonschema.NewReferenceLoader(schemaFile)
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)
 
 		// Load baked-in schema file
 	} else {
-		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n",
-			seedFileName)
+		fmt.Fprintf(os.Stderr, "INFO: Validating seed %s file %s against schema...\n",
+			typeStr, seedFileName)
 		schemaBytes, _ := constants.Asset("../spec/schema/seed.manifest.schema.json")
 		if schemaType == constants.SchemaMetadata {
 			schemaBytes, _ = constants.Asset("../spec/schema/seed.metadata.schema.json")
