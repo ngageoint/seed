@@ -61,7 +61,7 @@
       },
       "mounts": [
         {
-          "name": "MOUNT1",
+          "name": "MOUNT_PATH",
           "path": "/the/container/path",
           "mode": "ro"
         }
