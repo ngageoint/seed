@@ -859,6 +859,9 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 	valid := true
 	var keys []string
 	for _, f := range seed.Job.Interface.InputData.Files {
+		if f.Required == false {
+			continue
+		} //TODO: Handle multiple files
 		keys = append(keys, f.Name)
 		if _, prs := inMap[f.Name]; !prs {
 			valid = false
@@ -877,7 +880,6 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 		return nil, errors.New(buffer.String())
 	}
 
-	// TODO: validate number of inputData flags to number of Interface.InputData.Files
 	var mountArgs []string
 
 	for _, f := range inputs {
@@ -1089,6 +1091,9 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 		// 	#2 Check file names match output pattern
 		//  #3 Check number of files (if defined)
 		for _, f := range seed.Job.Interface.OutputData.Files {
+			if !f.Required {
+				continue
+			}
 
 			// find all pattern matches in OUTPUT_DIR
 			matches, _ := filepath.Glob(path.Join(outDir, f.Pattern))
