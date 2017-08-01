@@ -56,23 +56,23 @@
       },
       "mounts": [
         {
-          "name": "MOUNT1",
+          "name": "MOUNT_BIN",
           "path": "/usr/bin/",
           "mode": "ro"
         },
         {
-          "name": "MOUNT2",
+          "name": "MOUNT_TMP",
           "path": "/tmp/",
           "mode": "rw"
         }
       ],
       "settings": [
         {
-          "name": "SETTING1",
+          "name": "SETTING_ONE",
           "secret": false
         },
         {
-          "name": "SETTING2",
+          "name": "SETTING_TWO",
           "secret": true
         }
       ]

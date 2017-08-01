@@ -25,7 +25,10 @@ usage is as folllows:
 										seedfile: Job.Interface.OutputData.Files and
 										Job.Interface.OutputData.Json will be stored relative to
 										this directory.
-		-rm							Automatically remove the container when it exits (same as
+		-s, -schema     The Seed Metadata Schema file; Overrides built in schema to validate
+									side-car metadata files against
+		
+		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
 		Not yet implemented
@@ -87,7 +90,7 @@ func main() {
 			schemaFile = "file://" + GetFullPath(schemaFile)
 		}
 
-		err := ValidateSeedFile(schemaFile, seedFileName)
+		err := ValidateSeedFile(schemaFile, seedFileName, constants.SchemaManifest)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s", err.Error())
 		}
@@ -324,6 +327,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error unmarshalling seed: %s\n", err.Error())
 	}
+
 	return *seed
 }
 
@@ -380,7 +384,7 @@ func SeedFromManifestFile() (objects.Seed, string) {
 	seedFileName := SeedFileName()
 
 	// Validate seed file
-	err := ValidateSeedFile("", seedFileName)
+	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
 		fmt.Fprintf(os.Stderr, "%s", err.Error())
@@ -430,33 +434,14 @@ func ImageExists(imageName string) (bool, error) {
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
 	var seed objects.Seed
-	var imageName string
+
+	imageName := runCmd.Lookup(constants.ImgNameFlag).Value.String()
+	if imageName == "" {
+		fmt.Fprintf(os.Stderr, "ERROR: No input image specified\n")
+	}
 
 	// Parse seed information off of the label
-	if runCmd.Lookup(constants.ImgNameFlag).Value.String() != "" {
-		imageName = runCmd.Lookup(constants.ImgNameFlag).Value.String()
-
-		// Check if image exists
-		if exists, _ := ImageExists(imageName); !exists {
-			// try to build from seed file
-			DockerBuild(imageName)
-		}
-
-		if runCmd.Lookup(constants.JobDirectoryFlag).Value.String() != "." {
-			fmt.Fprintf(os.Stderr,
-				"INFO: Image name %s specified. Job directory parameter will be ignored.\n",
-				imageName)
-		}
-		seed = SeedFromImageLabel(imageName)
-
-		// Parse seed from manifest file and build image name
-	} else {
-		seed, _ = SeedFromManifestFile()
-		imageName = BuildImageName(&seed)
-		if exists, _ := ImageExists(imageName); !exists {
-			DockerBuild(imageName)
-		}
-	}
+	seed = SeedFromImageLabel(imageName)
 
 	// build docker run command
 	dockerArgs := []string{"run"}
@@ -632,6 +617,12 @@ func DefineFlags() {
 		"Full path to the algorithm output directory")
 	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
 		"Full path to the algorithm output directory")
+		
+	var metadataSchema string
+	runCmd.StringVar(&metadataSchema, constants.SchemaFlag, "",
+		"Metadata schema file to override built in schema in validating side-car metadata files")
+	runCmd.StringVar(&metadataSchema, constants.ShortSchemaFlag, "",
+		"Metadata schema file to override built in schema in validating side-car metadata files")
 
 	var rmVar bool
 	runCmd.BoolVar(&rmVar, constants.RmFlag, false,
@@ -783,6 +774,8 @@ func PrintRunUsage() {
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
 		constants.ShortJobOutputDirFlag, constants.JobOutputDirFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s   \tExternal Seed metadata schema file; Overrides built in schema to validate side-car metadata files\n",
+		constants.ShortSchemaFlag, constants.SchemaFlag)
 	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n",
 		constants.RmFlag)
 	os.Exit(0)
@@ -886,6 +879,9 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 	valid := true
 	var keys []string
 	for _, f := range seed.Job.Interface.InputData.Files {
+		if f.Required == false {
+			continue
+		} //TODO: Handle multiple files
 		keys = append(keys, f.Name)
 		if _, prs := inMap[f.Name]; !prs {
 			valid = false
@@ -904,7 +900,6 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 		return nil, errors.New(buffer.String())
 	}
 
-	// TODO: validate number of inputData flags to number of Interface.InputData.Files
 	var mountArgs []string
 
 	for _, f := range inputs {
@@ -1116,7 +1111,6 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 		// 	#2 Check file names match output pattern
 		//  #3 Check number of files (if defined)
 		for _, f := range seed.Job.Interface.OutputData.Files {
-
 			// find all pattern matches in OUTPUT_DIR
 			matches, _ := filepath.Glob(path.Join(outDir, f.Pattern))
 
@@ -1130,11 +1124,18 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 					strings.Contains(f.MediaType, mType) {
 					count++
 					matchList = append(matchList, "\t"+match+"\n")
+					metadata := match + ".metadata.json"
+					if _, err := os.Stat(metadata); err == nil {
+						err := ValidateSeedFile("", metadata, constants.SchemaMetadata)
+						if err != nil {
+							fmt.Fprintf(os.Stderr, "ERROR: Side-car metadata file %s validation error: %s", metadata, err.Error())
+						}
+					}
 				}
 			}
 
 			// Validate number of matches to specified number
-			if f.Count != "" && f.Count != "*" {
+			if f.Count != "" && f.Count != "*" && f.Required {
 				count, _ := strconv.Atoi(f.Count)
 				if count != len(matchList) {
 					fmt.Fprintf(os.Stderr, "ERROR: %v files specified, %v found.\n",
@@ -1231,23 +1232,31 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 }
 
 //ValidateSeedFile Validates the seed.manifest.json file based on the given schema
-func ValidateSeedFile(schemaFile string, seedFileName string) error {
+func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
+	
+	typeStr := "manifest"
+	if schemaType == constants.SchemaMetadata {
+		typeStr = "metadata"
+	}
 
 	// Load supplied schema file
 	if schemaFile != "" {
-		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema file %s...\n",
-			seedFileName, schemaFile)
+		fmt.Fprintf(os.Stderr, "INFO: Validating seed %s file %s against schema file %s...\n",
+			typeStr, seedFileName, schemaFile)
 		schemaLoader := gojsonschema.NewReferenceLoader(schemaFile)
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)
 
 		// Load baked-in schema file
 	} else {
-		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n",
-			seedFileName)
+		fmt.Fprintf(os.Stderr, "INFO: Validating seed %s file %s against schema...\n",
+			typeStr, seedFileName)
 		schemaBytes, _ := constants.Asset("../spec/schema/seed.manifest.schema.json")
+		if schemaType == constants.SchemaMetadata {
+			schemaBytes, _ = constants.Asset("../spec/schema/seed.metadata.schema.json")
+		}
 		schemaLoader := gojsonschema.NewStringLoader(string(schemaBytes))
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)
