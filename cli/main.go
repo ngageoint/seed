@@ -327,7 +327,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error unmarshalling seed: %s\n", err.Error())
 	}
-	fmt.Println(seed.Job.Interface.Resources.Scalar)
+
 	return *seed
 }
 
