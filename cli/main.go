@@ -25,7 +25,10 @@ usage is as folllows:
 										seedfile: Job.Interface.OutputData.Files and
 										Job.Interface.OutputData.Json will be stored relative to
 										this directory.
-		-rm							Automatically remove the container when it exits (same as
+		-s, -schema     The Seed Metadata Schema file; Overrides built in schema to validate
+									side-car metadata files against
+		
+		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
 		Not yet implemented
@@ -93,7 +96,7 @@ func main() {
 			schemaFile = "file://" + GetFullPath(schemaFile)
 		}
 
-		err := ValidateSeedFile(schemaFile, seedFileName)
+		err := ValidateSeedFile(schemaFile, seedFileName, constants.SchemaManifest)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s", err.Error())
 		}
@@ -375,7 +378,7 @@ func SeedFromManifestFile() (objects.Seed, string) {
 	seedFileName := SeedFileName()
 
 	// Validate seed file
-	err := ValidateSeedFile("", seedFileName)
+	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
 		fmt.Fprintf(os.Stderr, "%s", err.Error())
@@ -605,6 +608,12 @@ func DefineFlags() {
 		"Full path to the algorithm output directory")
 	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
 		"Full path to the algorithm output directory")
+		
+	var metadataSchema string
+	runCmd.StringVar(&metadataSchema, constants.SchemaFlag, "",
+		"Metadata schema file to override built in schema in validating side-car metadata files")
+	runCmd.StringVar(&metadataSchema, constants.ShortSchemaFlag, "",
+		"Metadata schema file to override built in schema in validating side-car metadata files")
 
 	var rmVar bool
 	runCmd.BoolVar(&rmVar, constants.RmFlag, false,
@@ -756,6 +765,8 @@ func PrintRunUsage() {
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
 	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
 		constants.ShortJobOutputDirFlag, constants.JobOutputDirFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s   \tExternal Seed metadata schema file; Overrides built in schema to validate side-car metadata files\n",
+		constants.ShortSchemaFlag, constants.SchemaFlag)
 	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n",
 		constants.RmFlag)
 	os.Exit(0)
@@ -1206,10 +1217,18 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 			fmt.Fprintf(os.Stderr, "ERROR: %s is invalid: - %s\n", constants.ResultsFileManifestName, desc)
 		}
 	}
+	
+	matches, _ := filepath.Glob(path.Join(outDir, "*.metadata.json"))
+	for _, match := range matches {
+		err := ValidateSeedFile("", match, constants.SchemaMetadata)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s", err.Error())
+		}
+	}
 }
 
 //ValidateSeedFile Validates the seed.manifest.json file based on the given schema
-func ValidateSeedFile(schemaFile string, seedFileName string) error {
+func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
 
@@ -1226,6 +1245,9 @@ func ValidateSeedFile(schemaFile string, seedFileName string) error {
 		fmt.Fprintf(os.Stderr, "INFO: Validating seed file %s against schema...\n",
 			seedFileName)
 		schemaBytes, _ := constants.Asset("../spec/schema/seed.manifest.schema.json")
+		if schemaType == constants.SchemaMetadata {
+			schemaBytes, _ = constants.Asset("../spec/schema/seed.metadata.schema.json")
+		}
 		schemaLoader := gojsonschema.NewStringLoader(string(schemaBytes))
 		docLoader := gojsonschema.NewReferenceLoader("file://" + seedFileName)
 		result, err = gojsonschema.Validate(schemaLoader, docLoader)

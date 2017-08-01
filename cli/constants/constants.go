@@ -71,3 +71,10 @@ const SeedFileName = "seed.manifest.json"
 
 //ResultsFileManifestName defines the filename for the results_manifest file
 const ResultsFileManifestName = "results_manifest.json"
+
+type SchemaType int
+
+const (
+	SchemaManifest SchemaType = iota
+	SchemaMetadata
+)
