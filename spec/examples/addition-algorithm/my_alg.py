@@ -26,9 +26,9 @@ def runAlgorithm(x, y, outputDir):
     # write to seed manifest
     if not outputDir == "":
         target = open(os.path.join(outputDir, "results_manifest.json"), 'a')
-        target.write("\"x\": \"" + str(x) + "\",\n")
-        target.write("\"y\": \"" + str(y) + "\",\n")
-        target.write("\"total\": \"" + str(z) + "\"")
+        target.write("\"x\": " + str(x) + ",\n")
+        target.write("\"y\": " + str(y) + ",\n")
+        target.write("\"total\": " + str(z))
         target.close()
     return z
 
