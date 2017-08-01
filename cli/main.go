@@ -1111,10 +1111,6 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 		// 	#2 Check file names match output pattern
 		//  #3 Check number of files (if defined)
 		for _, f := range seed.Job.Interface.OutputData.Files {
-			if !f.Required {
-				continue
-			}
-
 			// find all pattern matches in OUTPUT_DIR
 			matches, _ := filepath.Glob(path.Join(outDir, f.Pattern))
 
@@ -1139,7 +1135,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 			}
 
 			// Validate number of matches to specified number
-			if f.Count != "" && f.Count != "*" {
+			if f.Count != "" && f.Count != "*" && f.Required {
 				count, _ := strconv.Atoi(f.Count)
 				if count != len(matchList) {
 					fmt.Fprintf(os.Stderr, "ERROR: %v files specified, %v found.\n",
