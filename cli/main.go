@@ -27,7 +27,7 @@ usage is as folllows:
 										this directory.
 		-s, -schema     The Seed Metadata Schema file; Overrides built in schema to validate
 									side-car metadata files against
-		
+
 		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
@@ -61,8 +61,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ngageoint/seed/cli/constants"
-	"github.com/ngageoint/seed/cli/objects"
+	"./constants"
+	"./objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -160,8 +160,19 @@ func DockerList() {
 //DockerBuild Builds the docker image with the given image tag.
 func DockerBuild(imageName string) {
 
+	seedFileName := SeedFileName()
+
+	// Validate seed file
+	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
+
 	// retrieve seed from seed manifest
-	seed, seedFileName := SeedFromManifestFile()
+	seed := SeedFromManifestFile(seedFileName)
 
 	// Retrieve docker image name
 	if imageName == "" {
@@ -380,17 +391,7 @@ func SeedFileName() string {
 }
 
 //SeedFromManifestFile returns seed struct parsed from seed file
-func SeedFromManifestFile() (objects.Seed, string) {
-	seedFileName := SeedFileName()
-
-	// Validate seed file
-	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
-		fmt.Fprintf(os.Stderr, "%s", err.Error())
-		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-		os.Exit(1)
-	}
+func SeedFromManifestFile(seedFileName string) objects.Seed {
 
 	// Open and parse seed file into struct
 	seedFile, err := os.Open(seedFileName)
@@ -410,7 +411,7 @@ func SeedFromManifestFile() (objects.Seed, string) {
 		os.Exit(1)
 	}
 
-	return seed, seedFileName
+	return seed
 }
 
 //ImageExists returns true if a local image already exists, false otherwise
@@ -617,7 +618,7 @@ func DefineFlags() {
 		"Full path to the algorithm output directory")
 	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
 		"Full path to the algorithm output directory")
-		
+
 	var metadataSchema string
 	runCmd.StringVar(&metadataSchema, constants.SchemaFlag, "",
 		"Metadata schema file to override built in schema in validating side-car metadata files")
@@ -1235,7 +1236,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
-	
+
 	typeStr := "manifest"
 	if schemaType == constants.SchemaMetadata {
 		typeStr = "metadata"
@@ -1264,32 +1265,86 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	// Error occurred loading the schema or seed.manifest.json
 	if err != nil {
-		// fmt.Fprintf(os.Stderr,
-		// 	"ERROR: Error validating seed file against schema. Error is: %s\n",
-		// 	err.Error())
 		return errors.New("ERROR: Error validating seed file against schema. Error is:" + err.Error() + "\n")
 	}
 
 	// Validation failed. Print results
+	var buffer bytes.Buffer
 	if !result.Valid() {
-		var buffer bytes.Buffer
 		buffer.WriteString("ERROR:" + seedFileName + " is not valid. See errors:\n")
 		for _, e := range result.Errors() {
 			buffer.WriteString("-ERROR " + e.Description() + "\n")
 			buffer.WriteString("\tField: " + e.Field() + "\n")
 			buffer.WriteString("\tContext: " + e.Context().String() + "\n")
 		}
-		return errors.New(buffer.String())
 	}
 
-	// TODO Identify any name collisions
-	// searches through the job.interface.inputData.Files/JSON and interface.settings
-	// for the follwing reserved variables:
+	//Identify any name collisions for the follwing reserved variables:
 	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
+	fmt.Fprintf(os.Stderr,
+		"INFO: Validating seed.Job.Interface.InputData/OutputData file names...\n")
+	seed := SeedFromManifestFile(seedFileName)
+	if seed.Job.Interface.InputData.Files != nil {
+		for _, f := range seed.Job.Interface.InputData.Files {
+			if IsReserved(f.Name) {
+				buffer.WriteString("ERROR: InputData File Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.OutputData.Files != nil {
+		for _, f := range seed.Job.Interface.OutputData.Files {
+			if IsReserved(f.Name) {
+				buffer.WriteString("ERROR: OutputData File Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Mounts != nil {
+		for _, m := range seed.Job.Interface.Mounts {
+			if IsReserved(m.Name) {
+				buffer.WriteString("ERROR: Mounts Name " + m.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Settings != nil {
+		for _, s := range seed.Job.Interface.Settings {
+			if IsReserved(s.Name) {
+				buffer.WriteString("ERROR: Settings Name " + s.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Resources.Scalar != nil {
+		for _, s := range seed.Job.Interface.Resources.Scalar {
+			if IsReserved(s.Name) {
+				buffer.WriteString("ERROR: Scalar Resource Name " + s.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	// Return error if issues found
+	if buffer.String() != "" {
+		return errors.New(buffer.String())
+	}
 
 	// Validation succeeded
 	fmt.Fprintf(os.Stderr, "SUCCESS: %s is valid.\n\n", seedFileName)
 	return nil
+}
+
+//IsReserved checks if the given string is one of the reserved variable names
+func IsReserved(name string) bool {
+	return name == "OUTPUT_DIR"
+	// || name == "ALLOCATED_CPUS" ||
+	// 	name == "ALLOCATED_MEM" || name == "ALLOCATED_SHARED_MEM" ||
+	// 	name == "ALLOCATED_STORAGE"
 }
 
 //GetFullPath returns the full path of the given file. This expands relative file
