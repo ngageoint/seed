@@ -45,7 +45,7 @@
                 ],
                 "json": [
                     {
-                        "name": "Num Files",
+                        "name": "NumFiles",
                         "key": "Num_Files",
                         "type": "integer"
                     },
