@@ -22,7 +22,7 @@ type Seed struct {
 					MediaType string `json:"mediaType"`
 					Pattern   string `json:"pattern"`
 					Count     string `json:"count"`
-					Required  bool   `json:"required,string"`
+					Required  bool   `json:"required"`
 				}
 				JSON []struct {
 					Name     string `json:"name"`
@@ -41,7 +41,7 @@ type Seed struct {
 				Secret bool   `json:"secret"`
 			}
 			ErrorMapping []struct {
-				Code        int    `json:"code,string"`
+				Code        int    `json:"code"`
 				Title       string `json:"title"`
 				Description string `json:"description"`
 				Category    string `json:"category"`

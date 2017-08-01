@@ -34,7 +34,8 @@
             "name": "OUTPUT_FILE",
             "mediaType": "text/plain",
             "pattern": "*_output.txt",
-            "count": "4"
+            "count": "4",
+            "required": true
           }
         ],
         "json": [
@@ -63,6 +64,16 @@
           "name": "MOUNT2",
           "path": "/tmp/",
           "mode": "rw"
+        }
+      ],
+      "settings": [
+        {
+          "name": "SETTING1",
+          "secret": false
+        },
+        {
+          "name": "SETTING2",
+          "secret": true
         }
       ]
     },
