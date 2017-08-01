@@ -14,6 +14,12 @@ type Job struct {
 	Name             string `json:"name"`
 	AlgorithmVersion string `json:"algorithmVersion"`
 	PackageVersion   string `json:"packageVersion"`
+	Title            string `json:"title"`
+	Description      string `json:"description"`
+	AuthorName       string `json:"authorName"`
+	AuthorEmail      string `json:"authorEmail"`
+	AuthorUrl        string `json:"authorUrl"`
+	Timeout          int    `json:"timeout"`
 	Interface        Interface
 	ErrorMapping     []ErrorMap
 }
@@ -147,7 +153,7 @@ func (o *Setting) UnmarshalJSON(b []byte) error {
 }
 
 type ErrorMap struct {
-	Code        int    `json:"code,string"`
+	Code        int    `json:"code"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Category    string `json:"category"`
