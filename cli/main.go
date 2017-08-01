@@ -317,7 +317,7 @@ func SeedFromImageLabel(imageName string) objects.Seed {
 	seedStr = strings.Replace(seedStr, "\\/", "/", -1)
 	seedStr = strings.TrimSpace(seedStr)
 	seedStr = strings.TrimSuffix(strings.TrimPrefix(seedStr, "'\""), "\"'")
-	
+
 	seed := &objects.Seed{}
 
 	err = json.Unmarshal([]byte(seedStr), &seed)
@@ -1176,7 +1176,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 				constants.ResultsFileManifestName, err.Error())
 			return
 		}
-		
+
 		documentLoader := gojsonschema.NewStringLoader(string(bites))
 		_, err = documentLoader.LoadJSON()
 		if err != nil {
@@ -1184,7 +1184,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 				constants.ResultsFileManifestName, err.Error())
 			return
 		}
-		
+
 		schemaFmt := "{ \"type\": \"object\", \"properties\": { %s }, \"required\": [ %s ] }"
 		schema := ""
 		required := ""
@@ -1209,9 +1209,9 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 		if len(required) > 0 {
 			required = required[:len(required)-1]
 		}
-		
+
 		schema = fmt.Sprintf(schemaFmt, schema, required)
-		
+
 		schemaLoader := gojsonschema.NewStringLoader(schema)
 		schemaResult, err := gojsonschema.Validate(schemaLoader, documentLoader)
 		if err != nil {
@@ -1219,7 +1219,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 				err.Error())
 			return
 		}
-		
+
 		if len(schemaResult.Errors()) == 0 {
 			fmt.Fprintf(os.Stderr, "SUCCESS: Results manifest file is valid.\n")
 		}
@@ -1344,7 +1344,7 @@ func CheckSudo() {
 	er := string(slurperr)
 	if er != "" {
 		if strings.Contains(er, "Cannot connect to the Docker daemon. Is the docker daemon running on this host?") ||
-			strings.Contains(er, "dial unix /var/run/docker.sock: connect: permission deied") {
+			strings.Contains(er, "dial unix /var/run/docker.sock: connect: permission denied") {
 			fmt.Fprintf(os.Stderr, "Elevated permissions are required by seed to run Docker. Try running the seed command again as sudo.\n")
 			os.Exit(1)
 		}
