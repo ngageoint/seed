@@ -1279,6 +1279,7 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	//Identify any name collisions for the follwing reserved variables:
 	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
+	fmt.Fprintf(os.Stderr, "INFO: Checking for reserved variable namem collisions...\n")
 	seed := SeedFromManifestFile(seedFileName)
 
 	// Grab all sclar resource names (verify none are set to OUTPUT_DIR)
@@ -1359,7 +1360,7 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 	}
 
 	// Validation succeeded
-	fmt.Fprintf(os.Stderr, "SUCCESS: %s is valid.\n\n", seedFileName)
+	fmt.Fprintf(os.Stderr, "SUCCESS: No errors found. %s is valid.\n\n", seedFileName)
 	return nil
 }
 
