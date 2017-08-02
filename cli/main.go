@@ -27,7 +27,7 @@ usage is as folllows:
 										this directory.
 		-s, -schema     The Seed Metadata Schema file; Overrides built in schema to validate
 									side-car metadata files against
-		
+
 		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
@@ -61,8 +61,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ngageoint/seed/cli/constants"
-	"github.com/ngageoint/seed/cli/objects"
+	"./constants"
+	"./objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -117,6 +117,12 @@ func main() {
 		DockerRun()
 		os.Exit(0)
 	}
+
+	// seed publish: Publishes a seed compliant image
+	if publishCmd.Parsed() {
+		DockerPublish()
+		os.Exit(0)
+	}
 }
 
 //DockerList lists all seed compliant images (ending with -seed) on the local
@@ -160,8 +166,19 @@ func DockerList() {
 //DockerBuild Builds the docker image with the given image tag.
 func DockerBuild(imageName string) {
 
+	seedFileName := SeedFileName()
+
+	// Validate seed file
+	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
+
 	// retrieve seed from seed manifest
-	seed, seedFileName := SeedFromManifestFile()
+	seed := SeedFromManifestFile(seedFileName)
 
 	// Retrieve docker image name
 	if imageName == "" {
@@ -180,38 +197,20 @@ func DockerBuild(imageName string) {
 		buildArgs = append(buildArgs, "--label", label)
 	}
 	buildCmd := exec.Command("docker", buildArgs...)
-
-	// attach stderr pipe
-	errPipe, err := buildCmd.StderrPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr,
-			"ERROR: Error attaching to build command stderr. %s\n", err.Error())
-	}
-
-	// Attach stdout pipe
-	outPipe, err := buildCmd.StdoutPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr,
-			"ERROR: Error attaching to build command stdout. %s\n", err.Error())
-	}
+	var errs bytes.Buffer
+	buildCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+	buildCmd.Stdout = os.Stderr
 
 	// Run docker build
-	if err := buildCmd.Start(); err != nil {
+	if err := buildCmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker build. %s\n",
 			err.Error())
 	}
 
-	// Print out any std out
-	slurp, _ := ioutil.ReadAll(outPipe)
-	if string(slurp) != "" {
-		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
-	}
-
 	// check for errors on stderr
-	slurperr, _ := ioutil.ReadAll(errPipe)
-	if string(slurperr) != "" {
+	if errs.String() != "" {
 		fmt.Fprintf(os.Stderr, "ERROR: Error building image '%s':\n%s\n",
-			imageName, string(slurperr))
+			imageName, errs.String())
 		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 		os.Exit(1)
 	}
@@ -380,17 +379,7 @@ func SeedFileName() string {
 }
 
 //SeedFromManifestFile returns seed struct parsed from seed file
-func SeedFromManifestFile() (objects.Seed, string) {
-	seedFileName := SeedFileName()
-
-	// Validate seed file
-	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
-		fmt.Fprintf(os.Stderr, "%s", err.Error())
-		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-		os.Exit(1)
-	}
+func SeedFromManifestFile(seedFileName string) objects.Seed {
 
 	// Open and parse seed file into struct
 	seedFile, err := os.Open(seedFileName)
@@ -410,7 +399,7 @@ func SeedFromManifestFile() (objects.Seed, string) {
 		os.Exit(1)
 	}
 
-	return seed, seedFileName
+	return seed
 }
 
 //ImageExists returns true if a local image already exists, false otherwise
@@ -524,45 +513,103 @@ func DockerRun() {
 
 	// Run Docker command and capture output
 	runCmd := exec.Command("docker", dockerArgs...)
-	// attach stderr pipe
-	errPipe, err := runCmd.StderrPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stderr. %s\n",
-			err.Error())
-	}
+	var errs bytes.Buffer
+	runCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+	runCmd.Stdout = os.Stderr
 
-	// Attach stdout pipe
-	outPipe, err := runCmd.StdoutPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: error attaching to run command stdout. %s\n",
-			err.Error())
-	}
-
-	// Run docker build
-	if err := runCmd.Start(); err != nil {
+	// Run docker run
+	if err := runCmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: error executing docker run. %s\n",
 			err.Error())
 	}
 
-	// check for errors on stderr
-	slurperr, _ := ioutil.ReadAll(errPipe)
-	if string(slurperr) != "" {
+	if errs.String() != "" {
 		fmt.Fprintf(os.Stderr, "ERROR: Error running image '%s':\n%s\n",
-			imageName, string(slurperr))
+			imageName, errs.String())
 		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 		os.Exit(1)
-	}
-
-	// Print out any std out
-	slurp, _ := ioutil.ReadAll(outPipe)
-	if string(slurp) != "" {
-		fmt.Fprintf(os.Stdout, "%s\n", string(slurp))
 	}
 
 	// Validate output against pattern
 	if seed.Job.Interface.OutputData.Files != nil ||
 		seed.Job.Interface.OutputData.JSON != nil {
 		ValidateOutput(&seed, outDir)
+	}
+}
+
+//DockerPublish executes the seed publish command
+func DockerPublish() {
+
+	registry := publishCmd.Lookup(constants.RegistryFlag).Value.String()
+	org := publishCmd.Lookup(constants.OrgFlag).Value.String()
+	fmt.Fprintf(os.Stderr, "%v\n", publishCmd.Args())
+	origImg := publishCmd.Arg(0)
+	tagImg := origImg
+	// docker tag if registry and/or org specified
+	if registry != "" || org != "" {
+		if org != "" {
+			tagImg = org + "/" + tagImg
+		}
+		if registry != "" {
+			tagImg = registry + "/" + tagImg
+		}
+
+		fmt.Fprintf(os.Stderr, "INFO: Tagging image %s as %s\n", origImg, tagImg)
+		tagCmd := exec.Command("docker", "tag", origImg, tagImg)
+		var errs bytes.Buffer
+		tagCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+		tagCmd.Stdout = os.Stderr
+
+		// Run docker tag
+		if err := tagCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error executing docker tag. %s\n",
+				err.Error())
+		}
+		if errs.String() != "" {
+			fmt.Fprintf(os.Stderr, "ERROR: Error tagging image '%s':\n%s\n", origImg, errs.String())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		}
+	}
+
+	// docker push
+	fmt.Fprintf(os.Stderr, "INFO: Performing docker push %s\n", tagImg)
+	pushCmd := exec.Command("docker", "push", tagImg)
+	var errs bytes.Buffer
+	pushCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+	pushCmd.Stdout = os.Stdout
+
+	// Run docker build
+	if err := pushCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker push. %s\n",
+			err.Error())
+	}
+
+	// Check for errors. Exit if errored
+	if errs.String() != "" {
+		fmt.Fprintf(os.Stderr, "ERROR: Error pushing image '%s':\n%s\n", tagImg, errs.String())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
+
+	// docker rmi
+	errs.Reset()
+	fmt.Fprintf(os.Stderr, "INFO: Removing local image %s\n", tagImg)
+	rmiCmd := exec.Command("docker", "rmi", tagImg)
+	rmiCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+	rmiCmd.Stdout = os.Stdout
+
+	// Run docker rmi
+	if err := rmiCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker rmi. %s\n",
+			err.Error())
+	}
+
+	// check for errors on stderr
+	if errs.String() != "" {
+		fmt.Fprintf(os.Stderr, "ERROR: Error removing image '%s':\n%s\n", tagImg, errs.String())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
 	}
 }
 
@@ -617,7 +664,7 @@ func DefineFlags() {
 		"Full path to the algorithm output directory")
 	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
 		"Full path to the algorithm output directory")
-		
+
 	var metadataSchema string
 	runCmd.StringVar(&metadataSchema, constants.SchemaFlag, "",
 		"Metadata schema file to override built in schema in validating side-car metadata files")
@@ -647,6 +694,14 @@ func DefineFlags() {
 
 	// Publish command
 	publishCmd = flag.NewFlagSet(constants.PublishCommand, flag.ExitOnError)
+	var registry string
+	publishCmd.StringVar(&registry, constants.RegistryFlag, "", "Specifies registry to publish image to.")
+	publishCmd.StringVar(&registry, constants.ShortRegistryFlag, "", "Specifies registry to publish image to.")
+
+	var org string
+	publishCmd.StringVar(&org, constants.OrgFlag, "", "Specifies organization to publish image to.")
+	publishCmd.StringVar(&org, constants.ShortOrgFlag, "", "Specifies organization to publish image to.")
+
 	publishCmd.Usage = func() {
 		PrintPublishUsage()
 	}
@@ -694,8 +749,7 @@ func DefineFlags() {
 	case constants.ListCommand:
 		listCmd.Parse(os.Args[2:])
 	case constants.PublishCommand:
-		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
-		PrintPublishUsage()
+		publishCmd.Parse(os.Args[2:])
 	case constants.ValidateCommand:
 		validateCmd.Parse(os.Args[2:])
 		if len(validateCmd.Args()) == 1 {
@@ -758,7 +812,7 @@ func PrintBuildUsage() {
 
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-in IMAGE_NAME | -d DIRECTORY] [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY [OPTIONS]\n")
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
@@ -783,7 +837,7 @@ func PrintRunUsage() {
 
 //PrintListUsage prints the seed list usage information, then exits the program
 func PrintListUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed list [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed list\n")
 	fmt.Fprintf(os.Stderr, "\nAllows for listing all Seed compliant images residing on the local system.\n")
 	fmt.Fprintf(os.Stderr, "\nLists all '-seed' docker images on the local machine.\n")
 	os.Exit(0)
@@ -800,9 +854,13 @@ func PrintSearchUsage() {
 
 //PrintPublishUsage prints the seed publish usage information, then exits the program
 func PrintPublishUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [OPTIONS] \n")
-	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
-	// fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [-r REGISTRY_NAME] [-o ORGANIZATION_NAME] JOB_NAME-ALGORITHM_VERSION-seed:PACKAGE_VERSION\n")
+	fmt.Fprintf(os.Stderr, "\nAllows for the publish of seed compliant images.\n")
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific registry to publish the image to.\n",
+		constants.ShortRegistryFlag, constants.RegistryFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s      \tSpecifies a specific registry to publish the image to.\n",
+		constants.ShortOrgFlag, constants.OrgFlag)
 	os.Exit(0)
 }
 
@@ -1235,7 +1293,7 @@ func ValidateOutput(seed *objects.Seed, outDir string) {
 func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
-	
+
 	typeStr := "manifest"
 	if schemaType == constants.SchemaMetadata {
 		typeStr = "metadata"
@@ -1264,32 +1322,86 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	// Error occurred loading the schema or seed.manifest.json
 	if err != nil {
-		// fmt.Fprintf(os.Stderr,
-		// 	"ERROR: Error validating seed file against schema. Error is: %s\n",
-		// 	err.Error())
 		return errors.New("ERROR: Error validating seed file against schema. Error is:" + err.Error() + "\n")
 	}
 
 	// Validation failed. Print results
+	var buffer bytes.Buffer
 	if !result.Valid() {
-		var buffer bytes.Buffer
 		buffer.WriteString("ERROR:" + seedFileName + " is not valid. See errors:\n")
 		for _, e := range result.Errors() {
 			buffer.WriteString("-ERROR " + e.Description() + "\n")
 			buffer.WriteString("\tField: " + e.Field() + "\n")
 			buffer.WriteString("\tContext: " + e.Context().String() + "\n")
 		}
-		return errors.New(buffer.String())
 	}
 
-	// TODO Identify any name collisions
-	// searches through the job.interface.inputData.Files/JSON and interface.settings
-	// for the follwing reserved variables:
+	//Identify any name collisions for the follwing reserved variables:
 	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
+	fmt.Fprintf(os.Stderr,
+		"INFO: Validating seed.Job.Interface.InputData/OutputData file names...\n")
+	seed := SeedFromManifestFile(seedFileName)
+	if seed.Job.Interface.InputData.Files != nil {
+		for _, f := range seed.Job.Interface.InputData.Files {
+			if IsReserved(f.Name) {
+				buffer.WriteString("ERROR: InputData File Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.OutputData.Files != nil {
+		for _, f := range seed.Job.Interface.OutputData.Files {
+			if IsReserved(f.Name) {
+				buffer.WriteString("ERROR: OutputData File Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Mounts != nil {
+		for _, m := range seed.Job.Interface.Mounts {
+			if IsReserved(m.Name) {
+				buffer.WriteString("ERROR: Mounts Name " + m.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Settings != nil {
+		for _, s := range seed.Job.Interface.Settings {
+			if IsReserved(s.Name) {
+				buffer.WriteString("ERROR: Settings Name " + s.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.Resources.Scalar != nil {
+		for _, s := range seed.Job.Interface.Resources.Scalar {
+			if IsReserved(s.Name) {
+				buffer.WriteString("ERROR: Scalar Resource Name " + s.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	// Return error if issues found
+	if buffer.String() != "" {
+		return errors.New(buffer.String())
+	}
 
 	// Validation succeeded
 	fmt.Fprintf(os.Stderr, "SUCCESS: %s is valid.\n\n", seedFileName)
 	return nil
+}
+
+//IsReserved checks if the given string is one of the reserved variable names
+func IsReserved(name string) bool {
+	return name == "OUTPUT_DIR"
+	// || name == "ALLOCATED_CPUS" ||
+	// 	name == "ALLOCATED_MEM" || name == "ALLOCATED_SHARED_MEM" ||
+	// 	name == "ALLOCATED_STORAGE"
 }
 
 //GetFullPath returns the full path of the given file. This expands relative file

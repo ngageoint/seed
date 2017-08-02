@@ -66,6 +66,18 @@ const SchemaFlag = "schema"
 //ShortSchemaFlag shorthand flag that defines schema file to validate seed against
 const ShortSchemaFlag = "s"
 
+//RegistryFlag defines registry
+const RegistryFlag = "registry"
+
+//ShortRegistryFlag shorthand flag that defines registry
+const ShortRegistryFlag = "r"
+
+//OrgFlag defines organization
+const OrgFlag = "org"
+
+//ShortOrgFlag shorthand flag that defines organization
+const ShortOrgFlag = "o"
+
 //SeedFileName defines the filename for the seed file
 const SeedFileName = "seed.manifest.json"
 
