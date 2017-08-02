@@ -14,7 +14,7 @@
         "authorUrl": "http://www.example.com",
         "timeout": 3600,
         "interface": {
-            "cmd": "${ZIP} -d ${OUTPUT_DIR}",
+            "cmd": "${ZIP} -d ${OUTPUT_DIR} ${MULTIPLE}",
             "resources": {
             "scalar": [
                   { "name": "cpu", "value": 10.0 },
@@ -30,6 +30,14 @@
                         "required": true,
                         "mediaType": [
                             "application/zip"
+                        ]
+                    },
+                    {
+                        "name": "MULTIPLE",
+                        "required": false,
+                        "multiple": true,
+                        "mediaType": [
+                            "text"
                         ]
                     }
                 ]
