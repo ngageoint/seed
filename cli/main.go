@@ -1279,8 +1279,6 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	//Identify any name collisions for the follwing reserved variables:
 	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
-	fmt.Fprintf(os.Stderr,
-		"INFO: Validating seed.Job.Interface.InputData/OutputData file names...\n")
 	seed := SeedFromManifestFile(seedFileName)
 
 	// Grab all sclar resource names (verify none are set to OUTPUT_DIR)
@@ -1306,11 +1304,30 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		}
 	}
 
+	if seed.Job.Interface.InputData.Json != nil {
+		for _, f := range seed.Job.Interface.InputData.Json {
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: InputData JSON Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
 	if seed.Job.Interface.OutputData.Files != nil {
 		for _, f := range seed.Job.Interface.OutputData.Files {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(f.Name, allocated) {
 				buffer.WriteString("ERROR: OutputData File Name " + f.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
+	if seed.Job.Interface.OutputData.JSON != nil {
+		for _, f := range seed.Job.Interface.OutputData.JSON {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: OutputData JSON Name " + f.Name +
 					" is a reserved variable.\n")
 			}
 		}
