@@ -1431,10 +1431,6 @@ func DockerVersionHasLabel() bool {
 	// Print out any std out
 	slurp, _ := ioutil.ReadAll(outPipe)
 	if string(slurp) != "" {
-		// Trim extra text
-		/*versionStr := strings.TrimPrefix(string(slurp), "Docker version ")
-		fmt.Println(string(slurp))
-		versionStr = versionStr[0:strings.Index(versionStr, "-")]*/
 		version := strings.Split(string(slurp), ".")
 
 		// check each part of version. Return false if 1st < 1, 2nd < 11, 3rd < 1
