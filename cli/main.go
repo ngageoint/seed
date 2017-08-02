@@ -434,15 +434,13 @@ func ImageExists(imageName string) (bool, error) {
 //DockerRun Runs image described by Seed spec
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
-	var seed objects.Seed
-
 	imageName := runCmd.Lookup(constants.ImgNameFlag).Value.String()
 	if imageName == "" {
 		fmt.Fprintf(os.Stderr, "ERROR: No input image specified\n")
 	}
 
 	// Parse seed information off of the label
-	seed = SeedFromImageLabel(imageName)
+	seed := SeedFromImageLabel(imageName)
 
 	// build docker run command
 	dockerArgs := []string{"run"}
@@ -1284,9 +1282,24 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 	fmt.Fprintf(os.Stderr,
 		"INFO: Validating seed.Job.Interface.InputData/OutputData file names...\n")
 	seed := SeedFromManifestFile(seedFileName)
+
+	// Grab all sclar resource names (verify none are set to OUTPUT_DIR)
+	var allocated []string
+	if seed.Job.Interface.Resources.Scalar != nil {
+		for _, s := range seed.Job.Interface.Resources.Scalar {
+			name := GetNormalizedVariable(s.Name)
+			allocated = append(allocated, "ALLOCATED_"+strings.ToUpper(name))
+			if IsReserved(s.Name, nil) {
+				buffer.WriteString("ERROR: Scalar Resource Name " + s.Name +
+					" is a reserved variable.\n")
+			}
+		}
+	}
+
 	if seed.Job.Interface.InputData.Files != nil {
 		for _, f := range seed.Job.Interface.InputData.Files {
-			if IsReserved(f.Name) {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
 				buffer.WriteString("ERROR: InputData File Name " + f.Name +
 					" is a reserved variable.\n")
 			}
@@ -1295,7 +1308,8 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	if seed.Job.Interface.OutputData.Files != nil {
 		for _, f := range seed.Job.Interface.OutputData.Files {
-			if IsReserved(f.Name) {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
 				buffer.WriteString("ERROR: OutputData File Name " + f.Name +
 					" is a reserved variable.\n")
 			}
@@ -1304,7 +1318,8 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	if seed.Job.Interface.Mounts != nil {
 		for _, m := range seed.Job.Interface.Mounts {
-			if IsReserved(m.Name) {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(m.Name, allocated) {
 				buffer.WriteString("ERROR: Mounts Name " + m.Name +
 					" is a reserved variable.\n")
 			}
@@ -1313,17 +1328,9 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	if seed.Job.Interface.Settings != nil {
 		for _, s := range seed.Job.Interface.Settings {
-			if IsReserved(s.Name) {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(s.Name, allocated) {
 				buffer.WriteString("ERROR: Settings Name " + s.Name +
-					" is a reserved variable.\n")
-			}
-		}
-	}
-
-	if seed.Job.Interface.Resources.Scalar != nil {
-		for _, s := range seed.Job.Interface.Resources.Scalar {
-			if IsReserved(s.Name) {
-				buffer.WriteString("ERROR: Scalar Resource Name " + s.Name +
 					" is a reserved variable.\n")
 			}
 		}
@@ -1340,11 +1347,17 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 }
 
 //IsReserved checks if the given string is one of the reserved variable names
-func IsReserved(name string) bool {
-	return name == "OUTPUT_DIR"
-	// || name == "ALLOCATED_CPUS" ||
-	// 	name == "ALLOCATED_MEM" || name == "ALLOCATED_SHARED_MEM" ||
-	// 	name == "ALLOCATED_STORAGE"
+func IsReserved(name string, allocated []string) bool {
+	reserved := name == "OUTPUT_DIR"
+
+	if allocated != nil {
+		for _, s := range allocated {
+			if s == strings.ToUpper(name) {
+				reserved = true
+			}
+		}
+	}
+	return reserved
 }
 
 //GetFullPath returns the full path of the given file. This expands relative file
