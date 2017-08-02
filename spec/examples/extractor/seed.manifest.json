@@ -18,9 +18,9 @@
             "resources": {
             "scalar": [
                   { "name": "cpu", "value": 10.0 },
-                  { "name": "mem", "value": 10240.0 },
+                  { "name": "mem", "value": 16.0 },
                   { "name": "sharedMem", "value": 0.0 },
-                  { "name": "disk", "value": 10.0, "inputMultiplier": 4.0 }
+                  { "name": "disk", "value": 0.01, "inputMultiplier": 1.0 }
               ]
             },
             "inputData": {

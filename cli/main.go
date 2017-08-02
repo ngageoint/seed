@@ -15,8 +15,6 @@ usage is as folllows:
 
 	seed run [OPTIONS]
 		Options:
-		-d, -directory	The directory containing the seed spec and Dockerfile
-										(default is current directory)
 		-i, -inputData  The input data. May be multiple -id flags defined
 										(seedfile: Job.Interface.InputData.Files)
 		-in, -imageName The name of the Docker image to run (overrides image name
@@ -52,6 +50,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"mime"
 	"os"
 	"os/exec"
@@ -452,16 +451,32 @@ func DockerRun() {
 
 	var mountsArgs []string
 	var envArgs []string
+	var resourceArgs []string
+	var inputSize float64
+	var outputSize float64
 
 	// expand INPUT_FILEs to specified inputData files
 	if seed.Job.Interface.InputData.Files != nil {
-		inMounts, err := DefineInputs(&seed)
+		inMounts, size, err := DefineInputs(&seed)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing inputData arguments.\n%s", err.Error())
 			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 			os.Exit(1)
 		} else if inMounts != nil {
 			mountsArgs = append(mountsArgs, inMounts...)
+			inputSize = size
+		}
+	}
+	
+	if len(seed.Job.Interface.Resources.Scalar) > 0 {
+		inResources, diskSize, err := DefineResources(&seed, inputSize)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing resources\n%s", err.Error())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		} else if inResources != nil {
+			resourceArgs = append(resourceArgs, inResources...)
+			outputSize = diskSize
 		}
 	}
 
@@ -508,6 +523,7 @@ func DockerRun() {
 	//		Job.Interface.Cmd
 	dockerArgs = append(dockerArgs, mountsArgs...)
 	dockerArgs = append(dockerArgs, envArgs...)
+	dockerArgs = append(dockerArgs, resourceArgs...)
 	dockerArgs = append(dockerArgs, imageName)
 
 	// Parse out command arguments from seed.Job.Interface.Cmd
@@ -562,7 +578,7 @@ func DockerRun() {
 	// Validate output against pattern
 	if seed.Job.Interface.OutputData.Files != nil ||
 		seed.Job.Interface.OutputData.JSON != nil {
-		ValidateOutput(&seed, outDir)
+		ValidateOutput(&seed, outDir, outputSize)
 	}
 }
 
@@ -583,10 +599,6 @@ func DefineFlags() {
 
 	// Run command flags
 	runCmd = flag.NewFlagSet(constants.RunCommand, flag.ContinueOnError)
-	runCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
-		"Location of the seed spec and Dockerfile")
-	runCmd.StringVar(&directory, constants.ShortJobDirectoryFlag, ".",
-		"Location of the seed spec and Dockerfile")
 
 	var imgNameFlag string
 	runCmd.StringVar(&imgNameFlag, constants.ImgNameFlag, "",
@@ -761,9 +773,6 @@ func PrintRunUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY [OPTIONS]\n")
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr,
-		"  -%s  -%s\tDirectory containing seed spec and Dockerfile (default is current directory)\n",
-		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
 	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
 		constants.ShortInputDataFlag, constants.InputDataFlag)
 	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value setting values of the seed spec in the format SETTING_KEY=VALUE\n",
@@ -857,7 +866,7 @@ func BuildImageName(seed *objects.Seed) string {
 // flags 'inputData' and sets the path in the json object. Returns:
 // 	[]string: docker command args for input files in the format:
 //	"-v /path/to/file1:/path/to/file1 -v /path/to/file2:/path/to/file2 etc"
-func DefineInputs(seed *objects.Seed) ([]string, error) {
+func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 
 	// Validate inputs given vs. inputs defined in manifest
 
@@ -897,10 +906,11 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 			buffer.WriteString("  " + n + "\n")
 		}
 		buffer.WriteString("\n")
-		return nil, errors.New(buffer.String())
+		return nil, 0.0, errors.New(buffer.String())
 	}
 
 	var mountArgs []string
+	var size float64
 
 	for _, f := range inputs {
 		x := strings.Split(f, "=")
@@ -916,6 +926,11 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 
 		// Expand input VALUE
 		val = GetFullPath(val)
+		info, err := os.Stat(val)
+		if os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "ERROR: Input file %s not found\n", val)
+		}
+		size += (1.0 * float64(info.Size())) / (1024.0 * 1024.0)
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
@@ -934,7 +949,7 @@ func DefineInputs(seed *objects.Seed) ([]string, error) {
 		}
 	}
 
-	return mountArgs, nil
+	return mountArgs, size, nil
 }
 
 //SetOutputDir replaces the OUTPUT_DIR argument with the given output directory.
@@ -1098,13 +1113,49 @@ func DefineSettings(seed *objects.Seed) ([]string, error) {
 	return settings, nil
 }
 
+//DefineResources defines any seed specified docker resource requirements.
+// Return []string of docker command arguments in form of:
+//	"-?? setting1=val1 -?? setting2=val2 etc"
+func DefineResources(seed *objects.Seed, size float64) ([]string, float64, error) {
+	var resources []string
+	var disk float64
+	
+	for _, s := range seed.Job.Interface.Resources.Scalar {
+		if s.Name == "mem" {
+			mem := s.Value + s.InputMultiplier * size
+			intMem := int64(math.Ceil(mem))
+			resources = append(resources, "-m")
+			resources = append(resources, fmt.Sprintf("%dm", intMem))
+		}
+		if s.Name == "disk" {
+			disk = s.Value + s.InputMultiplier * size
+		}
+	}
+	
+	return resources, disk, nil
+}
+
 //ValidateOutput validates the output of the docker run command. Output data is
 // validated as defined in the seed.Job.Interface.OutputData.
-func ValidateOutput(seed *objects.Seed, outDir string) {
+func ValidateOutput(seed *objects.Seed, outDir string, diskLimit float64) {
 	// Validate any OutputData.Files
 	if seed.Job.Interface.OutputData.Files != nil {
 		fmt.Fprintf(os.Stderr, "INFO: Validating output files found under %s...\n",
 			outDir)
+			
+		var dirSize int64
+		readSize := func(path string, file os.FileInfo, err error) error {
+		    if !file.IsDir() {
+		        dirSize += file.Size()
+		    }
+
+		    return nil
+		}
+		filepath.Walk(outDir, readSize)  
+		sizeMB := float64(dirSize) / (1024.0 * 1024.0)
+		if diskLimit > 0 && sizeMB > diskLimit {
+			fmt.Fprintf(os.Stderr, "ERROR: Output directory exceeds disk space limit (%f MiB vs. %f MiB)\n", sizeMB, diskLimit)
+		}
 
 		// For each defined OutputData file:
 		//	#1 Check file media type
@@ -1362,7 +1413,7 @@ func CheckSudo() {
 
 //DockerVersionHasLabel returns if the docker version is greater than 1.11.1
 func DockerVersionHasLabel() bool {
-	cmd := exec.Command("docker", "--version")
+	cmd := exec.Command("docker", "version", "-f", "{{.Client.Version}}")
 
 	// Attach stdout pipe
 	outPipe, err := cmd.StdoutPipe()
@@ -1381,9 +1432,10 @@ func DockerVersionHasLabel() bool {
 	slurp, _ := ioutil.ReadAll(outPipe)
 	if string(slurp) != "" {
 		// Trim extra text
-		versionStr := strings.TrimPrefix(string(slurp), "Docker version ")
-		versionStr = versionStr[0:strings.Index(versionStr, "-")]
-		version := strings.Split(versionStr, ".")
+		/*versionStr := strings.TrimPrefix(string(slurp), "Docker version ")
+		fmt.Println(string(slurp))
+		versionStr = versionStr[0:strings.Index(versionStr, "-")]*/
+		version := strings.Split(string(slurp), ".")
 
 		// check each part of version. Return false if 1st < 1, 2nd < 11, 3rd < 1
 		if len(version) > 1 {
