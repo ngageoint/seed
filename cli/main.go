@@ -910,7 +910,7 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 	}
 
 	var mountArgs []string
-	var size float64
+	var sizeMiB float64
 
 	for _, f := range inputs {
 		x := strings.Split(f, "=")
@@ -926,11 +926,13 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 
 		// Expand input VALUE
 		val = GetFullPath(val)
+		
+		//get total size of input files in MiB
 		info, err := os.Stat(val)
 		if os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "ERROR: Input file %s not found\n", val)
 		}
-		size += (1.0 * float64(info.Size())) / (1024.0 * 1024.0)
+		sizeMiB += (1.0 * float64(info.Size())) / (1024.0 * 1024.0) //fileinfo's Size() returns bytes, convert to MiB
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
@@ -949,7 +951,7 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 		}
 	}
 
-	return mountArgs, size, nil
+	return mountArgs, sizeMiB, nil
 }
 
 //SetOutputDir replaces the OUTPUT_DIR argument with the given output directory.
@@ -1113,22 +1115,25 @@ func DefineSettings(seed *objects.Seed) ([]string, error) {
 	return settings, nil
 }
 
-//DefineResources defines any seed specified docker resource requirements.
-// Return []string of docker command arguments in form of:
-//	"-?? setting1=val1 -?? setting2=val2 etc"
-func DefineResources(seed *objects.Seed, size float64) ([]string, float64, error) {
+//DefineResources defines any seed specified docker resource requirements
+//based on the seed spec and the size of the input in MiB
+// returns array of arguments to pass to docker to restrict/specify the resources required
+// returns the total disk space requirement to be checked when validating output
+func DefineResources(seed *objects.Seed, inputSizeMiB float64) ([]string, float64, error) {
 	var resources []string
 	var disk float64
 	
 	for _, s := range seed.Job.Interface.Resources.Scalar {
 		if s.Name == "mem" {
-			mem := s.Value + s.InputMultiplier * size
-			intMem := int64(math.Ceil(mem))
+			//resourceRequirement = inputVolume * inputMultiplier + constantValue
+			mem := (s.InputMultiplier * inputSizeMiB) + s.Value
+			intMem := int64(math.Ceil(mem)) //docker expects integer, get the ceiling of the specified value and convert
 			resources = append(resources, "-m")
 			resources = append(resources, fmt.Sprintf("%dm", intMem))
 		}
 		if s.Name == "disk" {
-			disk = s.Value + s.InputMultiplier * size
+			//resourceRequirement = inputVolume * inputMultiplier + constantValue
+			disk = (s.InputMultiplier * inputSizeMiB) + s.Value
 		}
 	}
 	
