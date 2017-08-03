@@ -63,6 +63,11 @@ import (
 	"github.com/ngageoint/seed/cli/constants"
 	"github.com/ngageoint/seed/cli/objects"
 	"github.com/xeipuuv/gojsonschema"
+	
+	"github.com/heroku/docker-registry-client/registry"
+	//"github.com/docker/distribution/digest"
+	//"github.com/docker/distribution/manifest"
+	//"github.com/docker/libtrust"
 )
 
 var buildCmd *flag.FlagSet
@@ -591,6 +596,27 @@ func DockerRun() {
 	}
 }
 
+//DockerSearch executes the seed search command
+func DockerSearch() {
+
+	url := searchCmd.Lookup(constants.RegistryFlag).Value.String()
+	//org := searchCmd.Lookup(constants.OrgFlag).Value.String()
+	//filter := searchCmd.Lookup(constants.FilterFlag).Value.String()
+	
+	if url == "" {
+		url = constants.DefaultRegistry
+	}
+	
+	username := "" // anonymous
+	password := "" // anonymous
+	hub, err := registry.New(url, username, password)
+	repositories, err := hub.Repositories()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(repositories)
+}
+
 //DefineFlags defines the flags available for the seed runner.
 func DefineFlags() {
 
@@ -662,6 +688,18 @@ func DefineFlags() {
 
 	// Search command
 	searchCmd = flag.NewFlagSet("search", flag.ExitOnError)
+	var registry string
+	searchCmd.StringVar(&registry, constants.RegistryFlag, "", "Specifies registry to search (default is index.docker.io).")
+	searchCmd.StringVar(&registry, constants.ShortRegistryFlag, "", "Specifies registry to search (default is index.docker.io).")
+
+	var org string
+	searchCmd.StringVar(&org, constants.OrgFlag, "", "Specifies organization to filter (default is no filter, search all orgs).")
+	searchCmd.StringVar(&org, constants.ShortOrgFlag, "", "Specifies organization to filter (default is no filter, search all orgs).")
+	
+	var filter string
+	searchCmd.StringVar(&filter, constants.FilterFlag, "", "Specifies filter to apply (default is no filter).")
+	searchCmd.StringVar(&filter, constants.ShortFilterFlag, "", "Specifies filter to apply (default is no filter).")
+	
 	searchCmd.Usage = func() {
 		PrintSearchUsage()
 	}
@@ -809,10 +847,15 @@ func PrintListUsage() {
 
 //PrintSearchUsage prints the seed search usage information, then exits the program
 func PrintSearchUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed search [OPTIONS] \n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed search [-r REGISTRY_NAME] [-o ORGANIZATION_NAME] [-f FILTER] \n")
 	fmt.Fprintf(os.Stderr, "\nAllows for discovery of seed compliant images hosted within a Docker registry.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr, "  -r -repo Specifies a specific registry to search (default is docker.io)\n")
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific registry to search (default is index.docker.io).\n",
+		constants.ShortRegistryFlag, constants.RegistryFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific organization to filter (default is no filter).\n",
+		constants.ShortOrgFlag, constants.OrgFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a filter to apply (default is no filter).\n",
+		constants.ShortFilterFlag, constants.FilterFlag)
 	os.Exit(0)
 }
 

@@ -66,11 +66,32 @@ const SchemaFlag = "schema"
 //ShortSchemaFlag shorthand flag that defines schema file to validate seed against
 const ShortSchemaFlag = "s"
 
+//RegistryFlag defines registry
+const RegistryFlag = "registry"
+
+//ShortRegistryFlag shorthand flag that defines registry
+const ShortRegistryFlag = "r"
+
+//OrgFlag defines organization
+const OrgFlag = "org"
+
+//ShortOrgFlag shorthand flag that defines organization
+const ShortOrgFlag = "o"
+
+//FilterFlag defines filter
+const FilterFlag = "filter"
+
+//ShortFilterFlag shorthand flag that defines filter
+const ShortFilterFlag= "f"
+
 //SeedFileName defines the filename for the seed file
 const SeedFileName = "seed.manifest.json"
 
 //ResultsFileManifestName defines the filename for the results_manifest file
 const ResultsFileManifestName = "results_manifest.json"
+
+//DefaultRegistry defines the default registry address to use when searching for images
+const DefaultRegistry = "index.docker.io"
 
 type SchemaType int
 
