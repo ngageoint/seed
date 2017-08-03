@@ -1369,8 +1369,8 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 	// Find any name collisions
 	for key, val := range vars {
 		if len(val) > 1 {
-			buffer.WriteString("ERROR: Multiple Name values are assigned the same '" +
-				key + "' Name. Each Name value must be unique.\n")
+			buffer.WriteString("ERROR: Multiple Name values are assigned the same " +
+				key + " Name value. Each Name value must be unique.\n")
 			for _, v := range val {
 				buffer.WriteString("\t" + v + "\n")
 			}
