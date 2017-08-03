@@ -429,6 +429,13 @@ func ImageExists(imageName string) (bool, error) {
 	return true, nil
 }
 
+func RemoveAll(v string) {
+	err := os.RemoveAll(v)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error removing temporary directory: %s\n", err.Error())
+	}
+}
+
 //DockerRun Runs image described by Seed spec
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
@@ -459,7 +466,7 @@ func DockerRun() {
 	if seed.Job.Interface.InputData.Files != nil {
 		inMounts, size, temp, err := DefineInputs(&seed)
 		for _, v := range temp {
-			defer os.Remove(v)
+			defer RemoveAll(v)
 		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing inputData arguments.\n%s", err.Error())
@@ -963,7 +970,6 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, err
 		for _, k := range seed.Job.Interface.InputData.Files {
 			if k.Name == key {
 				if k.Multiple {
-					fmt.Println(filepath.Join(tempDirectories[key], info.Name()))
 					os.Link(val, filepath.Join(tempDirectories[key], info.Name()))
 				} else {
 					mountArgs = append(mountArgs, "-v")
