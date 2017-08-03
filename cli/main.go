@@ -1279,19 +1279,23 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	//Identify any name collisions for the follwing reserved variables:
 	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
-	fmt.Fprintf(os.Stderr, "INFO: Checking for reserved variable namem collisions...\n")
+	fmt.Fprintf(os.Stderr, "INFO: Checking for variable name collisions...\n")
 	seed := SeedFromManifestFile(seedFileName)
 
 	// Grab all sclar resource names (verify none are set to OUTPUT_DIR)
 	var allocated []string
+	// var vars map[string]string
+	vars := make(map[string][]string)
 	if seed.Job.Interface.Resources.Scalar != nil {
 		for _, s := range seed.Job.Interface.Resources.Scalar {
 			name := GetNormalizedVariable(s.Name)
 			allocated = append(allocated, "ALLOCATED_"+strings.ToUpper(name))
 			if IsReserved(s.Name, nil) {
-				buffer.WriteString("ERROR: Scalar Resource Name " + s.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.resources.scalar Name " +
+					s.Name + " is a reserved variable. Please choose a different name value.\n")
 			}
+
+			IsInUse(s.Name, "job.interface.resources.scalar", vars)
 		}
 	}
 
@@ -1299,18 +1303,22 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		for _, f := range seed.Job.Interface.InputData.Files {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(f.Name, allocated) {
-				buffer.WriteString("ERROR: InputData File Name " + f.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.inputData.files Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
 			}
+
+			IsInUse(f.Name, "job.interface.inputData.files", vars)
 		}
 	}
 
 	if seed.Job.Interface.InputData.Json != nil {
 		for _, f := range seed.Job.Interface.InputData.Json {
 			if IsReserved(f.Name, allocated) {
-				buffer.WriteString("ERROR: InputData JSON Name " + f.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.inputData.json Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
 			}
+
+			IsInUse(f.Name, "job.interface.inputData.json", vars)
 		}
 	}
 
@@ -1318,9 +1326,10 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		for _, f := range seed.Job.Interface.OutputData.Files {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(f.Name, allocated) {
-				buffer.WriteString("ERROR: OutputData File Name " + f.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.outputData.files Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
 			}
+			IsInUse(f.Name, "job.interface.outputData.files", vars)
 		}
 	}
 
@@ -1328,9 +1337,10 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		for _, f := range seed.Job.Interface.OutputData.JSON {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(f.Name, allocated) {
-				buffer.WriteString("ERROR: OutputData JSON Name " + f.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.outputData.json Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
 			}
+			IsInUse(f.Name, "job.interface.outputData.json", vars)
 		}
 	}
 
@@ -1338,9 +1348,10 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		for _, m := range seed.Job.Interface.Mounts {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(m.Name, allocated) {
-				buffer.WriteString("ERROR: Mounts Name " + m.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.mounts Name " + m.Name +
+					" is a reserved variable. Please choose a different name value.\n")
 			}
+			IsInUse(m.Name, "job.interface.mounts", vars)
 		}
 	}
 
@@ -1348,8 +1359,20 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 		for _, s := range seed.Job.Interface.Settings {
 			// check against the ALLOCATED_* and OUTPUT_DIR
 			if IsReserved(s.Name, allocated) {
-				buffer.WriteString("ERROR: Settings Name " + s.Name +
-					" is a reserved variable.\n")
+				buffer.WriteString("ERROR: job.interface.settings Name " + s.Name +
+					" is a reserved variable. Please choose a different name value.\n")
+			}
+			IsInUse(s.Name, "job.interface.settings", vars)
+		}
+	}
+
+	// Find any name collisions
+	for key, val := range vars {
+		if len(val) > 1 {
+			buffer.WriteString("ERROR: Multiple Name values are assigned the same '" +
+				key + "' Name. Each Name value must be unique.\n")
+			for _, v := range val {
+				buffer.WriteString("\t" + v + "\n")
 			}
 		}
 	}
@@ -1370,12 +1393,33 @@ func IsReserved(name string, allocated []string) bool {
 
 	if allocated != nil {
 		for _, s := range allocated {
-			if s == strings.ToUpper(name) {
+			if GetNormalizedVariable(s) == strings.ToUpper(name) {
 				reserved = true
 			}
 		}
 	}
 	return reserved
+}
+
+//IsInUse checks if the given string is currently being used by another variable
+// Checks if the normalized name is already in use, and if so, adds the path
+// so it may be printed later
+func IsInUse(name string, path string, vars map[string][]string) bool {
+	normName := GetNormalizedVariable(name)
+
+	// normalized name is found in the map. Check if it's a unique path
+	if paths, exists := vars[normName]; exists {
+		vars[normName] = append(paths, path)
+
+		// if existss, _ := StringArrayContains(path, s); !existss {
+		// 	vars[normName] = append(vars[normName], path)
+		// }
+		return true
+	}
+
+	// Not found (yet) so add to map
+	vars[normName] = []string{path}
+	return false
 }
 
 //GetFullPath returns the full path of the given file. This expands relative file
@@ -1495,4 +1539,14 @@ func DockerVersionHasLabel() bool {
 	}
 
 	return false
+}
+
+//StringArrayContains Helper function since golang doesn't have an array.contains
+func StringArrayContains(s string, a []string) (bool, int) {
+	for index, ss := range a {
+		if ss == s {
+			return true, index
+		}
+	}
+	return false, -1
 }
