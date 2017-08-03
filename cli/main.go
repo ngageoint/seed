@@ -430,6 +430,13 @@ func ImageExists(imageName string) (bool, error) {
 	return true, nil
 }
 
+func RemoveAll(v string) {
+	err := os.RemoveAll(v)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error removing temporary directory: %s\n", err.Error())
+	}
+}
+
 //DockerRun Runs image described by Seed spec
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
@@ -456,7 +463,10 @@ func DockerRun() {
 
 	// expand INPUT_FILEs to specified inputData files
 	if seed.Job.Interface.InputData.Files != nil {
-		inMounts, size, err := DefineInputs(&seed)
+		inMounts, size, temp, err := DefineInputs(&seed)
+		for _, v := range temp {
+			defer RemoveAll(v)
+		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Error occurred processing inputData arguments.\n%s", err.Error())
 			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
@@ -865,9 +875,12 @@ func BuildImageName(seed *objects.Seed) string {
 // flags 'inputData' and sets the path in the json object. Returns:
 // 	[]string: docker command args for input files in the format:
 //	"-v /path/to/file1:/path/to/file1 -v /path/to/file2:/path/to/file2 etc"
-func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
+func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, error) {
 
 	// Validate inputs given vs. inputs defined in manifest
+	
+	var mountArgs []string
+	var sizeMiB float64
 
 	// Ingest inputs into a map key = inputkey, value=inputpath
 	inputs := strings.Split(runCmd.Lookup(constants.InputDataFlag).Value.String(), ",")
@@ -886,10 +899,22 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 	// Valid by default
 	valid := true
 	var keys []string
+	var unrequired []string
+	var tempDirectories map[string]string
+	tempDirectories = make(map[string]string)
 	for _, f := range seed.Job.Interface.InputData.Files {
+		if f.Multiple {
+			tempDir := "temp-" + time.Now().Format(time.RFC3339)
+			tempDir = strings.Replace(tempDir, ":", "_", -1)
+			os.Mkdir(tempDir, os.ModePerm)
+			tempDirectories[f.Name] = tempDir
+			mountArgs = append(mountArgs, "-v")
+			mountArgs = append(mountArgs, GetFullPath(tempDir)+":/"+tempDir)
+		}
 		if f.Required == false {
+			unrequired = append(unrequired, f.Name)
 			continue
-		} //TODO: Handle multiple files
+		}
 		keys = append(keys, f.Name)
 		if _, prs := inMap[f.Name]; !prs {
 			valid = false
@@ -905,11 +930,8 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 			buffer.WriteString("  " + n + "\n")
 		}
 		buffer.WriteString("\n")
-		return nil, 0.0, errors.New(buffer.String())
+		return nil, 0.0, tempDirectories, errors.New(buffer.String())
 	}
-
-	var mountArgs []string
-	var sizeMiB float64
 
 	for _, f := range inputs {
 		x := strings.Split(f, "=")
@@ -935,22 +957,43 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, error) {
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
+		value := val
+		if directory, ok := tempDirectories[key]; ok {
+			value = directory  //replace with the temp directory if multiple files
+		}
 		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
-			"${"+key+"}", val, -1)
+			"${"+key+"}", value, -1)
 		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "$"+key,
-			val, -1)
-		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, val,
+			value, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, value,
 			-1)
 
 		for _, k := range seed.Job.Interface.InputData.Files {
 			if k.Name == key {
-				mountArgs = append(mountArgs, "-v")
-				mountArgs = append(mountArgs, val+":"+val)
+				if k.Multiple {
+					//directory has already been added to mount args, just link file into that directory
+					os.Link(val, filepath.Join(tempDirectories[key], info.Name()))
+				} else {
+					mountArgs = append(mountArgs, "-v")
+					mountArgs = append(mountArgs, val+":"+val)
+				}
 			}
 		}
 	}
+	
+	//remove unspecified unrequired inputs from cmd string
+	for _, k := range unrequired {
+		key := k
+		value := ""
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd,
+			"${"+key+"}", value, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, "$"+key,
+			value, -1)
+		seed.Job.Interface.Cmd = strings.Replace(seed.Job.Interface.Cmd, key, value,
+			-1)
+	}
 
-	return mountArgs, sizeMiB, nil
+	return mountArgs, sizeMiB, tempDirectories, nil
 }
 
 //SetOutputDir replaces the OUTPUT_DIR argument with the given output directory.
