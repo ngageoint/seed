@@ -25,7 +25,7 @@ usage is as folllows:
 										this directory.
 		-s, -schema     The Seed Metadata Schema file; Overrides built in schema to validate
 									side-car metadata files against
-		
+
 		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
@@ -159,8 +159,19 @@ func DockerList() {
 //DockerBuild Builds the docker image with the given image tag.
 func DockerBuild(imageName string) {
 
+	seedFileName := SeedFileName()
+
+	// Validate seed file
+	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
+
 	// retrieve seed from seed manifest
-	seed, seedFileName := SeedFromManifestFile()
+	seed := SeedFromManifestFile(seedFileName)
 
 	// Retrieve docker image name
 	if imageName == "" {
@@ -379,17 +390,7 @@ func SeedFileName() string {
 }
 
 //SeedFromManifestFile returns seed struct parsed from seed file
-func SeedFromManifestFile() (objects.Seed, string) {
-	seedFileName := SeedFileName()
-
-	// Validate seed file
-	err := ValidateSeedFile("", seedFileName, constants.SchemaManifest)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: seed file could not be validated. See errors for details.\n")
-		fmt.Fprintf(os.Stderr, "%s", err.Error())
-		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-		os.Exit(1)
-	}
+func SeedFromManifestFile(seedFileName string) objects.Seed {
 
 	// Open and parse seed file into struct
 	seedFile, err := os.Open(seedFileName)
@@ -409,7 +410,7 @@ func SeedFromManifestFile() (objects.Seed, string) {
 		os.Exit(1)
 	}
 
-	return seed, seedFileName
+	return seed
 }
 
 //ImageExists returns true if a local image already exists, false otherwise
@@ -439,15 +440,13 @@ func RemoveAll(v string) {
 //DockerRun Runs image described by Seed spec
 // func DockerRun(seed *objects.Seed) {
 func DockerRun() {
-	var seed objects.Seed
-
 	imageName := runCmd.Lookup(constants.ImgNameFlag).Value.String()
 	if imageName == "" {
 		fmt.Fprintf(os.Stderr, "ERROR: No input image specified\n")
 	}
 
 	// Parse seed information off of the label
-	seed = SeedFromImageLabel(imageName)
+	seed := SeedFromImageLabel(imageName)
 
 	// build docker run command
 	dockerArgs := []string{"run"}
@@ -639,7 +638,7 @@ func DefineFlags() {
 		"Full path to the algorithm output directory")
 	runCmd.StringVar(&outdir, constants.ShortJobOutputDirFlag, "",
 		"Full path to the algorithm output directory")
-		
+
 	var metadataSchema string
 	runCmd.StringVar(&metadataSchema, constants.SchemaFlag, "",
 		"Metadata schema file to override built in schema in validating side-car metadata files")
@@ -881,7 +880,7 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, err
 	// Validate inputs given vs. inputs defined in manifest
 	
 	var mountArgs []string
-	var size float64
+	var sizeMiB float64
 
 	// Ingest inputs into a map key = inputkey, value=inputpath
 	inputs := strings.Split(runCmd.Lookup(constants.InputDataFlag).Value.String(), ",")
@@ -948,11 +947,13 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, err
 
 		// Expand input VALUE
 		val = GetFullPath(val)
+		
+		//get total size of input files in MiB
 		info, err := os.Stat(val)
 		if os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "ERROR: Input file %s not found\n", val)
 		}
-		size += (1.0 * float64(info.Size())) / (1024.0 * 1024.0)
+		sizeMiB += (1.0 * float64(info.Size())) / (1024.0 * 1024.0) //fileinfo's Size() returns bytes, convert to MiB
 
 		// Replace key if found in args strings
 		// Handle replacing KEY or ${KEY} or $KEY
@@ -991,7 +992,7 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, err
 			-1)
 	}
 
-	return mountArgs, size, tempDirectories, nil
+	return mountArgs, sizeMiB, tempDirectories, nil
 }
 
 //SetOutputDir replaces the OUTPUT_DIR argument with the given output directory.
@@ -1155,22 +1156,25 @@ func DefineSettings(seed *objects.Seed) ([]string, error) {
 	return settings, nil
 }
 
-//DefineResources defines any seed specified docker resource requirements.
-// Return []string of docker command arguments in form of:
-//	"-?? setting1=val1 -?? setting2=val2 etc"
-func DefineResources(seed *objects.Seed, size float64) ([]string, float64, error) {
+//DefineResources defines any seed specified docker resource requirements
+//based on the seed spec and the size of the input in MiB
+// returns array of arguments to pass to docker to restrict/specify the resources required
+// returns the total disk space requirement to be checked when validating output
+func DefineResources(seed *objects.Seed, inputSizeMiB float64) ([]string, float64, error) {
 	var resources []string
 	var disk float64
 	
 	for _, s := range seed.Job.Interface.Resources.Scalar {
 		if s.Name == "mem" {
-			mem := s.Value + s.InputMultiplier * size
-			intMem := int64(math.Ceil(mem))
+			//resourceRequirement = inputVolume * inputMultiplier + constantValue
+			mem := (s.InputMultiplier * inputSizeMiB) + s.Value
+			intMem := int64(math.Ceil(mem)) //docker expects integer, get the ceiling of the specified value and convert
 			resources = append(resources, "-m")
 			resources = append(resources, fmt.Sprintf("%dm", intMem))
 		}
 		if s.Name == "disk" {
-			disk = s.Value + s.InputMultiplier * size
+			//resourceRequirement = inputVolume * inputMultiplier + constantValue
+			disk = (s.InputMultiplier * inputSizeMiB) + s.Value
 		}
 	}
 	
@@ -1328,7 +1332,7 @@ func ValidateOutput(seed *objects.Seed, outDir string, diskLimit float64) {
 func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constants.SchemaType) error {
 	var result *gojsonschema.Result
 	var err error
-	
+
 	typeStr := "manifest"
 	if schemaType == constants.SchemaMetadata {
 		typeStr = "metadata"
@@ -1357,32 +1361,159 @@ func ValidateSeedFile(schemaFile string, seedFileName string, schemaType constan
 
 	// Error occurred loading the schema or seed.manifest.json
 	if err != nil {
-		// fmt.Fprintf(os.Stderr,
-		// 	"ERROR: Error validating seed file against schema. Error is: %s\n",
-		// 	err.Error())
 		return errors.New("ERROR: Error validating seed file against schema. Error is:" + err.Error() + "\n")
 	}
 
 	// Validation failed. Print results
+	var buffer bytes.Buffer
 	if !result.Valid() {
-		var buffer bytes.Buffer
 		buffer.WriteString("ERROR:" + seedFileName + " is not valid. See errors:\n")
 		for _, e := range result.Errors() {
 			buffer.WriteString("-ERROR " + e.Description() + "\n")
 			buffer.WriteString("\tField: " + e.Field() + "\n")
 			buffer.WriteString("\tContext: " + e.Context().String() + "\n")
 		}
+	}
+
+	//Identify any name collisions for the follwing reserved variables:
+	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
+	fmt.Fprintf(os.Stderr, "INFO: Checking for variable name collisions...\n")
+	seed := SeedFromManifestFile(seedFileName)
+
+	// Grab all sclar resource names (verify none are set to OUTPUT_DIR)
+	var allocated []string
+	// var vars map[string]string
+	vars := make(map[string][]string)
+	if seed.Job.Interface.Resources.Scalar != nil {
+		for _, s := range seed.Job.Interface.Resources.Scalar {
+			name := GetNormalizedVariable(s.Name)
+			allocated = append(allocated, "ALLOCATED_"+strings.ToUpper(name))
+			if IsReserved(s.Name, nil) {
+				buffer.WriteString("ERROR: job.interface.resources.scalar Name " +
+					s.Name + " is a reserved variable. Please choose a different name value.\n")
+			}
+
+			IsInUse(s.Name, "job.interface.resources.scalar", vars)
+		}
+	}
+
+	if seed.Job.Interface.InputData.Files != nil {
+		for _, f := range seed.Job.Interface.InputData.Files {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.inputData.files Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
+			}
+
+			IsInUse(f.Name, "job.interface.inputData.files", vars)
+		}
+	}
+
+	if seed.Job.Interface.InputData.Json != nil {
+		for _, f := range seed.Job.Interface.InputData.Json {
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.inputData.json Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
+			}
+
+			IsInUse(f.Name, "job.interface.inputData.json", vars)
+		}
+	}
+
+	if seed.Job.Interface.OutputData.Files != nil {
+		for _, f := range seed.Job.Interface.OutputData.Files {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.outputData.files Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
+			}
+			IsInUse(f.Name, "job.interface.outputData.files", vars)
+		}
+	}
+
+	if seed.Job.Interface.OutputData.JSON != nil {
+		for _, f := range seed.Job.Interface.OutputData.JSON {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(f.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.outputData.json Name " +
+					f.Name + " is a reserved variable. Please choose a different name value.\n")
+			}
+			IsInUse(f.Name, "job.interface.outputData.json", vars)
+		}
+	}
+
+	if seed.Job.Interface.Mounts != nil {
+		for _, m := range seed.Job.Interface.Mounts {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(m.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.mounts Name " + m.Name +
+					" is a reserved variable. Please choose a different name value.\n")
+			}
+			IsInUse(m.Name, "job.interface.mounts", vars)
+		}
+	}
+
+	if seed.Job.Interface.Settings != nil {
+		for _, s := range seed.Job.Interface.Settings {
+			// check against the ALLOCATED_* and OUTPUT_DIR
+			if IsReserved(s.Name, allocated) {
+				buffer.WriteString("ERROR: job.interface.settings Name " + s.Name +
+					" is a reserved variable. Please choose a different name value.\n")
+			}
+			IsInUse(s.Name, "job.interface.settings", vars)
+		}
+	}
+
+	// Find any name collisions
+	for key, val := range vars {
+		if len(val) > 1 {
+			buffer.WriteString("ERROR: Multiple Name values are assigned the same " +
+				key + " Name value. Each Name value must be unique.\n")
+			for _, v := range val {
+				buffer.WriteString("\t" + v + "\n")
+			}
+		}
+	}
+
+	// Return error if issues found
+	if buffer.String() != "" {
 		return errors.New(buffer.String())
 	}
 
-	// TODO Identify any name collisions
-	// searches through the job.interface.inputData.Files/JSON and interface.settings
-	// for the follwing reserved variables:
-	//		OUTPUT_DIR, ALLOCATED_CPUS, ALLOCATED_MEM, ALLOCATED_SHARED_MEM, ALLOCATED_STORAGE
-
 	// Validation succeeded
-	fmt.Fprintf(os.Stderr, "SUCCESS: %s is valid.\n\n", seedFileName)
+	fmt.Fprintf(os.Stderr, "SUCCESS: No errors found. %s is valid.\n\n", seedFileName)
 	return nil
+}
+
+//IsReserved checks if the given string is one of the reserved variable names
+func IsReserved(name string, allocated []string) bool {
+	reserved := name == "OUTPUT_DIR"
+
+	if allocated != nil {
+		for _, s := range allocated {
+			if GetNormalizedVariable(s) == strings.ToUpper(name) {
+				reserved = true
+			}
+		}
+	}
+	return reserved
+}
+
+//IsInUse checks if the given string is currently being used by another variable
+// Checks if the normalized name is already in use, and if so, adds the path
+// so it may be printed later
+func IsInUse(name string, path string, vars map[string][]string) bool {
+	normName := GetNormalizedVariable(name)
+
+	// normalized name is found in the map.
+	if paths, exists := vars[normName]; exists {
+		vars[normName] = append(paths, path)
+		return true
+	}
+
+	// Not found (yet) so add to map
+	vars[normName] = []string{path}
+	return false
 }
 
 //GetFullPath returns the full path of the given file. This expands relative file
