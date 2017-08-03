@@ -60,8 +60,8 @@ import (
 	"strings"
 	"time"
 
-	"./constants"
-	"./objects"
+	"github.com/ngageoint/seed/cli/constants"
+	"github.com/ngageoint/seed/cli/objects"
 	"github.com/xeipuuv/gojsonschema"
 )
 
