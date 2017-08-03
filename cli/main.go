@@ -971,6 +971,7 @@ func DefineInputs(seed *objects.Seed) ([]string, float64, map[string]string, err
 		for _, k := range seed.Job.Interface.InputData.Files {
 			if k.Name == key {
 				if k.Multiple {
+					//directory has already been added to mount args, just link file into that directory
 					os.Link(val, filepath.Join(tempDirectories[key], info.Name()))
 				} else {
 					mountArgs = append(mountArgs, "-v")
