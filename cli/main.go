@@ -1407,13 +1407,9 @@ func IsReserved(name string, allocated []string) bool {
 func IsInUse(name string, path string, vars map[string][]string) bool {
 	normName := GetNormalizedVariable(name)
 
-	// normalized name is found in the map. Check if it's a unique path
+	// normalized name is found in the map.
 	if paths, exists := vars[normName]; exists {
 		vars[normName] = append(paths, path)
-
-		// if existss, _ := StringArrayContains(path, s); !existss {
-		// 	vars[normName] = append(vars[normName], path)
-		// }
 		return true
 	}
 
@@ -1539,14 +1535,4 @@ func DockerVersionHasLabel() bool {
 	}
 
 	return false
-}
-
-//StringArrayContains Helper function since golang doesn't have an array.contains
-func StringArrayContains(s string, a []string) (bool, int) {
-	for index, ss := range a {
-		if ss == s {
-			return true, index
-		}
-	}
-	return false, -1
 }
