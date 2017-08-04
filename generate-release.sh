@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-## Usage: ./generate-release.sh 1.0.0
+## Usage: ./generate-release.sh 1.0.0 [default-branch]
 
 VERSION=$1
+
 if [[ "${VERSION}x" == "x" ]]
 then
     echo Missing version parameter!
@@ -11,6 +12,14 @@ then
     exit 1
 fi
 
+DEFAULT_BRANCH=master
+if [[ "${2}x" == "x" ]]
+then
+    DEFAULT_BRANCH=$2
+    echo Updated default branch to $2
+fi
+
+
 # Ensure script directory is CWD
 cd "${0%/*}"
 
@@ -18,9 +27,9 @@ tput setaf 2
 echo "Building release $VERSION"
 tput sgr0
 
-if [[ $(git rev-parse --abbrev-ref HEAD) != "master" ]]; then
+if [[ $(git rev-parse --abbrev-ref HEAD) != "${DEFAULT_BRANCH}" ]]; then
     tput setaf 1
-    echo "Current branch is not master!"
+    echo "Current branch is not ${DEFAULT_BRANCH}!"
     tput sgr0
     git rev-parse --abbrev-ref HEAD
     exit 1
@@ -62,9 +71,9 @@ tput sgr0
 git push --tags
 
 tput setaf 2
-echo -e "\nCheckout back to master"
+echo -e "\nCheckout back to ${DEFAULT_BRANCH}"
 tput sgr0
-git checkout master
+git checkout ${DEFAULT_BRANCH}
 
 tput setaf 2
 echo -e "\nAdd $VERSION to version history"
