@@ -80,7 +80,7 @@ func main() {
 	// Parse input flags
 	DefineFlags()
 
-	// seed validate: Validate seed.manifest.json.
+	// seed validate: Validate seed.manifest.json. Does not require docker
 	if validateCmd.Parsed() {
 		seedFileName := SeedFileName()
 		schemaFile := validateCmd.Lookup(constants.SchemaFlag).Value.String()
@@ -184,15 +184,14 @@ func DockerBuild(imageName string) {
 		imageName = BuildImageName(&seed)
 	}
 
-	// Set the seed.manifest.json contents as an image label
-	label := "com.ngageoint.seed.manifest=" + GetManifestLabel(seedFileName)
-
 	jobDirectory := buildCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 
 	// Build Docker image
 	fmt.Fprintf(os.Stderr, "INFO: Building %s\n", imageName)
 	buildArgs := []string{"build", "-t", imageName, jobDirectory}
 	if DockerVersionHasLabel() {
+		// Set the seed.manifest.json contents as an image label
+		label := "com.ngageoint.seed.manifest=" + GetManifestLabel(seedFileName)
 		buildArgs = append(buildArgs, "--label", label)
 	}
 	buildCmd := exec.Command("docker", buildArgs...)
@@ -340,6 +339,8 @@ func SeedFileName() string {
 		dir = buildCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 	} else if validateCmd.Parsed() {
 		dir = validateCmd.Lookup(constants.JobDirectoryFlag).Value.String()
+	} else if publishCmd.Parsed() {
+		dir = publishCmd.Lookup(constants.JobDirectoryFlag).Value.String()
 	}
 
 	// Define the current working directory
@@ -419,7 +420,6 @@ func ImageExists(imageName string) (bool, error) {
 }
 
 //DockerRun Runs image described by Seed spec
-// func DockerRun(seed *objects.Seed) {
 func DockerRun() {
 	imageName := runCmd.Lookup(constants.ImgNameFlag).Value.String()
 	if imageName == "" {
@@ -432,7 +432,7 @@ func DockerRun() {
 	// build docker run command
 	dockerArgs := []string{"run"}
 
-	if runCmd.Lookup(constants.RmFlag).Value.String() == "true" {
+	if runCmd.Lookup(constants.RmFlag).Value.String() == constants.TrueString {
 		dockerArgs = append(dockerArgs, "--rm")
 	}
 
@@ -554,22 +554,25 @@ func DockerRun() {
 //DockerPublish executes the seed publish command
 func DockerPublish() {
 
+	//1. Check names and verify it doesn't conflict
 	registry := publishCmd.Lookup(constants.RegistryFlag).Value.String()
 	org := publishCmd.Lookup(constants.OrgFlag).Value.String()
-	fmt.Fprintf(os.Stderr, "%v\n", publishCmd.Args())
 	origImg := publishCmd.Arg(0)
-	tagImg := origImg
+	var tag string
+	img := origImg
+
 	// docker tag if registry and/or org specified
 	if registry != "" || org != "" {
 		if org != "" {
-			tagImg = org + "/" + tagImg
+			tag = org + "/"
 		}
 		if registry != "" {
-			tagImg = registry + "/" + tagImg
+			tag = registry + "/" + tag
 		}
 
-		fmt.Fprintf(os.Stderr, "INFO: Tagging image %s as %s\n", origImg, tagImg)
-		tagCmd := exec.Command("docker", "tag", origImg, tagImg)
+		img = tag + img
+		fmt.Fprintf(os.Stderr, "INFO: Tagging image %s as %s\n", origImg, img)
+		tagCmd := exec.Command("docker", "tag", origImg, tag+origImg)
 		var errs bytes.Buffer
 		tagCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
 		tagCmd.Stdout = os.Stderr
@@ -586,9 +589,120 @@ func DockerPublish() {
 		}
 	}
 
+	// Check for image confliction.
+	//TODO search for existing image name
+	conflict := true
+	deconflict := publishCmd.Lookup(constants.ForcePublishFlag).Value.String() == "false"
+
+	// If it conflicts, bump specified version number
+	if conflict && deconflict {
+		//1. Verify we have a valid manifest (-d option or within the current directory)
+		seedFileName := SeedFileName()
+		ValidateSeedFile("", seedFileName, constants.SchemaManifest)
+		seed := SeedFromManifestFile(seedFileName)
+
+		fmt.Fprintf(os.Stderr, "INFO: An image with the name %s already exists. ", img)
+		// Bump the package minor version
+		if publishCmd.Lookup(constants.PkgVersionMinor).Value.String() ==
+			constants.TrueString {
+			pkgVersion := strings.Split(seed.Job.PackageVersion, ".")
+			minorVersion, _ := strconv.Atoi(pkgVersion[1])
+			pkgVersion[1] = strconv.Itoa(minorVersion + 1)
+			seed.Job.PackageVersion = strings.Join(pkgVersion, ".")
+
+			fmt.Fprintf(os.Stderr, "The package version will be increased to %s.\n",
+				seed.Job.PackageVersion)
+
+			// Bump the package major version
+		} else if publishCmd.Lookup(constants.PkgVersionMajor).Value.String() ==
+			constants.TrueString {
+
+			pkgVersion := strings.Split(seed.Job.PackageVersion, ".")
+			majorVersion, _ := strconv.Atoi(pkgVersion[0])
+			pkgVersion[0] = strconv.Itoa(majorVersion + 1)
+			seed.Job.PackageVersion = strings.Join(pkgVersion, ".")
+
+			fmt.Fprintf(os.Stderr, "The major package version will be increased to %s.\n",
+				seed.Job.PackageVersion)
+
+			// Bump the algorithm minor version
+		} else if publishCmd.Lookup(constants.AlgVersionMinor).Value.String() ==
+			constants.TrueString {
+
+			algVersion := strings.Split(seed.Job.AlgorithmVersion, ".")
+			minorVersion, _ := strconv.Atoi(algVersion[1])
+			algVersion[1] = strconv.Itoa(minorVersion + 1)
+			seed.Job.AlgorithmVersion = strings.Join(algVersion, ".")
+
+			fmt.Fprintf(os.Stderr, "The minor algorithm version will be increased to %s.\n",
+				seed.Job.AlgorithmVersion)
+
+			// Bump the algorithm major verion
+		} else if publishCmd.Lookup(constants.AlgVersionMajor).Value.String() ==
+			constants.TrueString {
+			algVersion := strings.Split(seed.Job.AlgorithmVersion, ".")
+			majorVersion, _ := strconv.Atoi(algVersion[0])
+			algVersion[0] = strconv.Itoa(majorVersion + 1)
+			seed.Job.AlgorithmVersion = strings.Join(algVersion, ".")
+
+			fmt.Fprintf(os.Stderr, "The major algorithm version will be increased to %s.\n",
+				seed.Job.AlgorithmVersion)
+		} else {
+			fmt.Fprintf(os.Stderr, "ERROR: No tag deconfliction method specified. Aborting seed publish.\n")
+			os.Exit(1)
+		}
+
+		img = tag + BuildImageName(&seed)
+		fmt.Fprintf(os.Stderr, "\nNew image name: %s\n", img)
+
+		// write version back to the seed manifest
+		seedJSON, _ := json.Marshal(&seed)
+		err := ioutil.WriteFile(seedFileName, seedJSON, os.ModePerm)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error occurred writing updated seed version to %s.\n%s\n",
+				seedFileName, err.Error())
+		}
+
+		// Rebuild
+		jobDirectory := publishCmd.Lookup(constants.JobDirectoryFlag).Value.String()
+
+		// Build Docker image
+		fmt.Fprintf(os.Stderr, "INFO: Building %s\n", img)
+		buildArgs := []string{"build", "-t", img, jobDirectory}
+		if DockerVersionHasLabel() {
+			// Set the seed.manifest.json contents as an image label
+			label := "com.ngageoint.seed.manifest=" + GetManifestLabel(seedFileName)
+			buildArgs = append(buildArgs, "--label", label)
+		}
+		rebuildCmd := exec.Command("docker", buildArgs...)
+		var errs bytes.Buffer
+		rebuildCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+		rebuildCmd.Stdout = os.Stderr
+
+		// Run docker build
+		rebuildCmd.Run()
+
+		// check for errors on stderr
+		if errs.String() != "" {
+			fmt.Fprintf(os.Stderr, "ERROR: Error re-building image '%s':\n%s\n",
+				img, errs.String())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		}
+
+	} else {
+		// fmt.Println("FORCE PUBLISH")
+		// rmCmd := exec.Command("docker", "rmi", "--force", img)
+		// rmCmd.Stderr = os.Stderr
+		// rmCmd.Stdout = os.Stderr
+		// if err := rmCmd.Run(); err != nil {
+		// 	fmt.Fprintf(os.Stderr, "ERROR: Error removing image %s.\n", tagImg)
+		// }
+	}
+
 	// docker push
-	fmt.Fprintf(os.Stderr, "INFO: Performing docker push %s\n", tagImg)
-	pushCmd := exec.Command("docker", "push", tagImg)
+	fmt.Fprintf(os.Stderr, "INFO: Performing docker push %s\n", img)
+	pushCmd := exec.Command("docker", "push", img)
 	var errs bytes.Buffer
 	pushCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
 	pushCmd.Stdout = os.Stdout
@@ -599,17 +713,18 @@ func DockerPublish() {
 			err.Error())
 	}
 
-	// Check for errors. Exit if errored
+	// Check for errors. Exit if error occurs
 	if errs.String() != "" {
-		fmt.Fprintf(os.Stderr, "ERROR: Error pushing image '%s':\n%s\n", tagImg, errs.String())
+		fmt.Fprintf(os.Stderr, "ERROR: Error pushing image '%s':\n%s\n", img,
+			errs.String())
 		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 		os.Exit(1)
 	}
 
 	// docker rmi
 	errs.Reset()
-	fmt.Fprintf(os.Stderr, "INFO: Removing local image %s\n", tagImg)
-	rmiCmd := exec.Command("docker", "rmi", tagImg)
+	fmt.Fprintf(os.Stderr, "INFO: Removing local image %s\n", img)
+	rmiCmd := exec.Command("docker", "rmi", img)
 	rmiCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
 	rmiCmd.Stdout = os.Stdout
 
@@ -621,7 +736,8 @@ func DockerPublish() {
 
 	// check for errors on stderr
 	if errs.String() != "" {
-		fmt.Fprintf(os.Stderr, "ERROR: Error removing image '%s':\n%s\n", tagImg, errs.String())
+		fmt.Fprintf(os.Stderr, "ERROR: Error removing image '%s':\n%s\n", img,
+			errs.String())
 		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 		os.Exit(1)
 	}
@@ -630,6 +746,92 @@ func DockerPublish() {
 //DefineFlags defines the flags available for the seed runner.
 func DefineFlags() {
 
+	// seed build flags
+	DefineBuildFlags()
+
+	// seed run flags
+	DefineRunFlags()
+
+	// seed list flags
+	listCmd = flag.NewFlagSet("list", flag.ExitOnError)
+	listCmd.Usage = func() {
+		PrintListUsage()
+	}
+
+	// seed search flags
+	searchCmd = flag.NewFlagSet("search", flag.ExitOnError)
+	searchCmd.Usage = func() {
+		PrintSearchUsage()
+	}
+
+	// seed publish flags
+	DefinePublishFlags()
+
+	// seed validate flags
+	DefineValidateFlags()
+
+	// seed version flags
+	versionCmd = flag.NewFlagSet(constants.VersionCommand, flag.ExitOnError)
+	versionCmd.Usage = func() {
+		PrintVersionUsage()
+	}
+
+	// Print usage if no command given
+	if len(os.Args) == 1 {
+		PrintUsage()
+	}
+
+	// Parse commands
+	switch os.Args[1] {
+	case constants.BuildCommand:
+		buildCmd.Parse(os.Args[2:])
+		if len(buildCmd.Args()) == 1 {
+			directory = buildCmd.Args()[0]
+		}
+
+	case constants.RunCommand:
+		runCmd.Parse(os.Args[2:])
+		if len(runCmd.Args()) == 0 {
+			PrintRunUsage()
+		} else if len(runCmd.Args()) == 1 {
+			directory = runCmd.Args()[0]
+		}
+
+	case constants.SearchCommand:
+		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
+		PrintSearchUsage()
+
+	case constants.ListCommand:
+		listCmd.Parse(os.Args[2:])
+
+	case constants.PublishCommand:
+		publishCmd.Parse(os.Args[2:])
+
+		if len(publishCmd.Args()) == 0 {
+			PrintPublishUsage()
+		} else if len(publishCmd.Args()) == 1 {
+			directory = publishCmd.Args()[0]
+		}
+
+	case constants.ValidateCommand:
+		validateCmd.Parse(os.Args[2:])
+		if len(validateCmd.Args()) == 1 {
+			directory = validateCmd.Args()[0]
+		}
+
+	case constants.VersionCommand:
+		versionCmd.Parse(os.Args[2:])
+		PrintVersion()
+
+	default:
+		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
+		PrintUsage()
+		os.Exit(0)
+	}
+}
+
+//DefineBuildFlags defines the flags for the seed build command
+func DefineBuildFlags() {
 	// build command flags
 	buildCmd = flag.NewFlagSet(constants.BuildCommand, flag.ContinueOnError)
 	buildCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
@@ -641,8 +843,10 @@ func DefineFlags() {
 	buildCmd.Usage = func() {
 		PrintBuildUsage()
 	}
+}
 
-	// Run command flags
+//DefineRunFlags defines the flags for the seed run command
+func DefineRunFlags() {
 	runCmd = flag.NewFlagSet(constants.RunCommand, flag.ContinueOnError)
 
 	var imgNameFlag string
@@ -689,20 +893,10 @@ func DefineFlags() {
 	runCmd.Usage = func() {
 		PrintRunUsage()
 	}
+}
 
-	// List command
-	listCmd = flag.NewFlagSet("list", flag.ExitOnError)
-	listCmd.Usage = func() {
-		PrintListUsage()
-	}
-
-	// Search command
-	searchCmd = flag.NewFlagSet("search", flag.ExitOnError)
-	searchCmd.Usage = func() {
-		PrintSearchUsage()
-	}
-
-	// Publish command
+//DefinePublishFlags defines the flags for the seed publish command
+func DefinePublishFlags() {
 	publishCmd = flag.NewFlagSet(constants.PublishCommand, flag.ExitOnError)
 	var registry string
 	publishCmd.StringVar(&registry, constants.RegistryFlag, "", "Specifies registry to publish image to.")
@@ -712,11 +906,35 @@ func DefineFlags() {
 	publishCmd.StringVar(&org, constants.OrgFlag, "", "Specifies organization to publish image to.")
 	publishCmd.StringVar(&org, constants.ShortOrgFlag, "", "Specifies organization to publish image to.")
 
+	var d string
+	publishCmd.StringVar(&d, constants.JobDirectoryFlag, ".",
+		"Directory of seed spec and Dockerfile (default is current directory).")
+	publishCmd.StringVar(&d, constants.ShortJobDirectoryFlag, ".",
+		"Directory of seed spec and Dockerfile (default is current directory).")
+
+	var b bool
+	publishCmd.BoolVar(&b, constants.ForcePublishFlag, false,
+		"Force publish, do not deconflict")
+	var pMin bool
+	publishCmd.BoolVar(&pMin, constants.PkgVersionMinor, false,
+		"Minor version bump of 'packageVersion' in manifest on disk, will auto rebuild and push")
+	var pMaj bool
+	publishCmd.BoolVar(&pMaj, constants.PkgVersionMajor, false,
+		"Major version bump of 'packageVersion' in manifest on disk, will auto rebuild and push")
+	var aMin bool
+	publishCmd.BoolVar(&aMin, constants.AlgVersionMinor, false,
+		"Minor version bump of 'algorithmVersion' in manifest on disk, will auto rebuild and push")
+	var aMaj bool
+	publishCmd.BoolVar(&aMaj, constants.AlgVersionMajor, false,
+		"Major version bump of 'algorithmVersion' in manifest on disk, will auto rebuild and push")
+
 	publishCmd.Usage = func() {
 		PrintPublishUsage()
 	}
+}
 
-	// Validate command
+//DefineValidateFlags defines the flags for the validate command
+func DefineValidateFlags() {
 	validateCmd = flag.NewFlagSet(constants.ValidateCommand, flag.ExitOnError)
 	validateCmd.StringVar(&directory, constants.JobDirectoryFlag, ".",
 		"Location of the seed.manifest.json spec to validate")
@@ -730,47 +948,6 @@ func DefineFlags() {
 
 	validateCmd.Usage = func() {
 		PrintValidateUsage()
-	}
-
-	// Version command
-	versionCmd = flag.NewFlagSet(constants.VersionCommand, flag.ExitOnError)
-	versionCmd.Usage = func() {
-		PrintVersionUsage()
-	}
-
-	if len(os.Args) == 1 {
-		PrintUsage()
-	}
-
-	switch os.Args[1] {
-	case constants.BuildCommand:
-		buildCmd.Parse(os.Args[2:])
-		if len(buildCmd.Args()) == 1 {
-			directory = buildCmd.Args()[0]
-		}
-	case constants.RunCommand:
-		runCmd.Parse(os.Args[2:])
-		if len(runCmd.Args()) == 1 {
-			directory = runCmd.Args()[0]
-		}
-	case constants.SearchCommand:
-		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
-		PrintSearchUsage()
-	case constants.ListCommand:
-		listCmd.Parse(os.Args[2:])
-	case constants.PublishCommand:
-		publishCmd.Parse(os.Args[2:])
-	case constants.ValidateCommand:
-		validateCmd.Parse(os.Args[2:])
-		if len(validateCmd.Args()) == 1 {
-			directory = validateCmd.Args()[0]
-		}
-	case constants.VersionCommand:
-		PrintVersion()
-	default:
-		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
-		PrintUsage()
-		os.Exit(0)
 	}
 }
 
@@ -796,7 +973,7 @@ func PrintCommandUsage() {
 
 //PrintUsage prints the seed usage arguments
 func PrintUsage() {
-	fmt.Fprintf(os.Stderr, "Usage:\tseed COMMAND\n\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed COMMAND\n\n")
 	fmt.Fprintf(os.Stderr, "A test runner for seed spec compliant algorithms\n\n")
 	fmt.Fprintf(os.Stderr, "Commands:\n")
 	fmt.Fprintf(os.Stderr, "  build \tBuilds Seed compliant Docker image\n")
@@ -812,8 +989,8 @@ func PrintUsage() {
 
 //PrintBuildUsage prints the seed build usage arguments, then exits the program
 func PrintBuildUsage() {
-	fmt.Fprintf(os.Stderr, "Usage:\tseed build [-d JOB_DIRECTORY]\n")
-	fmt.Fprintf(os.Stderr, "Options:\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed build [-d JOB_DIRECTORY]\n")
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr,
 		"  -%s  -%s\tDirectory containing Seed spec and Dockerfile (default is current directory)\n",
 		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
@@ -822,31 +999,33 @@ func PrintBuildUsage() {
 
 //PrintRunUsage prints the seed run usage arguments, then exits the program
 func PrintRunUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed run [-in IMAGE_NAME | -d DIRECTORY] [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY [OPTIONS]\n")
+	fmt.Fprintf(os.Stderr,
+		"\nUsage:\tseed run -in IMAGE_NAME [-i INPUT_KEY=INPUT_FILE ...] [-e SETTING_KEY=VALUE] -o OUTPUT_DIRECTORY \n")
+
 	fmt.Fprintf(os.Stderr, "\nRuns Docker image defined by seed spec.\n")
+
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
-		constants.ShortInputDataFlag, constants.InputDataFlag)
-	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value setting values of the seed spec in the format SETTING_KEY=VALUE\n",
+	fmt.Fprintf(os.Stderr, "  -%s  -%s \t Specifies the key/value setting values of the seed spec in the format SETTING_KEY=VALUE\n",
 		constants.ShortSettingFlag, constants.SettingFlag)
-	fmt.Fprintf(os.Stderr, "  -%s  -%s\tSpecifies the key/value mount values of the seed spec in the format MOUNT_KEY=HOST_PATH\n",
-		constants.ShortMountFlag, constants.MountFlag)
-	fmt.Fprintf(os.Stderr, "  -%s -%s\tDocker image name to run\n",
+	fmt.Fprintf(os.Stderr, "  -%s  -%s Specifies the key/value input data values of the seed spec in the format INPUT_FILE_KEY=INPUT_FILE_VALUE\n",
+		constants.ShortInputDataFlag, constants.InputDataFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s Docker image name to run\n",
 		constants.ShortImgNameFlag, constants.ImgNameFlag)
-	fmt.Fprintf(os.Stderr, "  -%s -%s   \tJob Output Directory Location\n",
+	fmt.Fprintf(os.Stderr, "  -%s  -%s \t Specifies the key/value mount values of the seed spec in the format MOUNT_KEY=HOST_PATH\n",
+		constants.ShortMountFlag, constants.MountFlag)
+	fmt.Fprintf(os.Stderr, "  -%s  -%s \t Job Output Directory Location\n",
 		constants.ShortJobOutputDirFlag, constants.JobOutputDirFlag)
-	fmt.Fprintf(os.Stderr, "  -%s -%s   \tExternal Seed metadata schema file; Overrides built in schema to validate side-car metadata files\n",
-		constants.ShortSchemaFlag, constants.SchemaFlag)
-	fmt.Fprintf(os.Stderr, "  -%s            \tAutomatically remove the container when it exits (docker run --rm)\n",
+	fmt.Fprintf(os.Stderr, "  -%s \t\t Automatically remove the container when it exits (docker run --rm)\n",
 		constants.RmFlag)
+	fmt.Fprintf(os.Stderr, "  -%s  -%s \t External Seed metadata schema file; Overrides built in schema to validate side-car metadata files\n",
+		constants.ShortSchemaFlag, constants.SchemaFlag)
 	os.Exit(0)
 }
 
 //PrintListUsage prints the seed list usage information, then exits the program
 func PrintListUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed list\n")
-	fmt.Fprintf(os.Stderr, "\nAllows for listing all Seed compliant images residing on the local system.\n")
-	fmt.Fprintf(os.Stderr, "\nLists all '-seed' docker images on the local machine.\n")
+	fmt.Fprintf(os.Stderr, "\nLists all Seed compliant docker images residing on the local system.\n")
 	os.Exit(0)
 }
 
@@ -861,20 +1040,30 @@ func PrintSearchUsage() {
 
 //PrintPublishUsage prints the seed publish usage information, then exits the program
 func PrintPublishUsage() {
-	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [-r REGISTRY_NAME] [-o ORGANIZATION_NAME] JOB_NAME-ALGORITHM_VERSION-seed:PACKAGE_VERSION\n")
+	fmt.Fprintf(os.Stderr, "\nUsage:\tseed publish [-r REGISTRY_NAME] [-o ORG_NAME] [-f] [-p | -P | -a | -A] -d DIRECTORY IMAGE_NAME\n")
 	fmt.Fprintf(os.Stderr, "\nAllows for the publish of seed compliant images.\n")
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific registry to publish the image to.\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s Specifies the directory containing the seed.manifest.json and dockerfile\n",
+		constants.ShortJobDirectoryFlag, constants.JobDirectoryFlag)
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific registry to which to publish the image\n",
 		constants.ShortRegistryFlag, constants.RegistryFlag)
-	fmt.Fprintf(os.Stderr, "  -%s -%s      \tSpecifies a specific registry to publish the image to.\n",
+	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies a specific registry to which to publish the image\n",
 		constants.ShortOrgFlag, constants.OrgFlag)
+	fmt.Fprintf(os.Stderr, "  -%s\t\tForce Minor version bump of 'packageVersion' in manifest on disk if publish conflict found\n",
+		constants.PkgVersionMinor)
+	fmt.Fprintf(os.Stderr, "  -%s\t\tForce Major version bump of 'packageVersion' in manifest on disk if publish conflict found\n",
+		constants.PkgVersionMajor)
+	fmt.Fprintf(os.Stderr, "  -%s\t\tForce Minor version bump of 'algorithmVersion' in manifest on disk if publish conflict found\n",
+		constants.AlgVersionMinor)
+	fmt.Fprintf(os.Stderr, "  -%s\t\tForce Major version bump of 'algorithmVersion' in manifest on disk if publish conflict found\n",
+		constants.AlgVersionMajor)
 	os.Exit(0)
 }
 
 //PrintValidateUsage prints the seed validate usage, then exits the program
 func PrintValidateUsage() {
 	fmt.Fprintf(os.Stderr, "\nUsage:\tseed validate [OPTIONS] \n")
-	fmt.Fprintf(os.Stderr, "\nValidates the given %s is compliant with the Seed spec.\n",
+	fmt.Fprintf(os.Stderr, "\nValidates the given %s by verifying it is compliant with the Seed spec.\n",
 		constants.SeedFileName)
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	fmt.Fprintf(os.Stderr, "  -%s -%s\tSpecifies directory in which Seed is located (default is current directory)\n",
