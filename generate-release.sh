@@ -13,7 +13,7 @@ then
 fi
 
 DEFAULT_BRANCH=master
-if [[ "${2}x" == "x" ]]
+if [[ "${2}x" != "x" ]]
 then
     DEFAULT_BRANCH=$2
     echo Updated default branch to $2
