@@ -558,7 +558,7 @@ func DockerPublish() {
 	registry := publishCmd.Lookup(constants.RegistryFlag).Value.String()
 	org := publishCmd.Lookup(constants.OrgFlag).Value.String()
 	origImg := publishCmd.Arg(0)
-	var tag string
+	tag := ""
 	img := origImg
 
 	// docker tag if registry and/or org specified
@@ -571,27 +571,10 @@ func DockerPublish() {
 		}
 
 		img = tag + img
-		fmt.Fprintf(os.Stderr, "INFO: Tagging image %s as %s\n", origImg, img)
-		tagCmd := exec.Command("docker", "tag", origImg, tag+origImg)
-		var errs bytes.Buffer
-		tagCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
-		tagCmd.Stdout = os.Stderr
-
-		// Run docker tag
-		if err := tagCmd.Run(); err != nil {
-			fmt.Fprintf(os.Stderr, "ERROR: Error executing docker tag. %s\n",
-				err.Error())
-		}
-		if errs.String() != "" {
-			fmt.Fprintf(os.Stderr, "ERROR: Error tagging image '%s':\n%s\n", origImg, errs.String())
-			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-			os.Exit(1)
-		}
 	}
 
 	// Check for image confliction.
-	//TODO search for existing image name
-	conflict := true
+	conflict := true //TODO
 	deconflict := publishCmd.Lookup(constants.ForcePublishFlag).Value.String() == "false"
 
 	// If it conflicts, bump specified version number
@@ -649,10 +632,11 @@ func DockerPublish() {
 				seed.Job.AlgorithmVersion)
 		} else {
 			fmt.Fprintf(os.Stderr, "ERROR: No tag deconfliction method specified. Aborting seed publish.\n")
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
 			os.Exit(1)
 		}
 
-		img = tag + BuildImageName(&seed)
+		img = BuildImageName(&seed)
 		fmt.Fprintf(os.Stderr, "\nNew image name: %s\n", img)
 
 		// write version back to the seed manifest
@@ -690,24 +674,38 @@ func DockerPublish() {
 			os.Exit(1)
 		}
 
-	} else {
-		// fmt.Println("FORCE PUBLISH")
-		// rmCmd := exec.Command("docker", "rmi", "--force", img)
-		// rmCmd.Stderr = os.Stderr
-		// rmCmd.Stdout = os.Stderr
-		// if err := rmCmd.Run(); err != nil {
-		// 	fmt.Fprintf(os.Stderr, "ERROR: Error removing image %s.\n", tagImg)
-		// }
+		// Set final image name to tag + image
+		img = tag + img
+	}
+
+	var errs bytes.Buffer
+
+	// Run docker tag
+	if img != origImg {
+		fmt.Fprintf(os.Stderr, "INFO: Tagging image %s as %s\n", origImg, img)
+		tagCmd := exec.Command("docker", "tag", origImg, img)
+		tagCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
+		tagCmd.Stdout = os.Stderr
+
+		if err := tagCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Error executing docker tag. %s\n",
+				err.Error())
+		}
+		if errs.String() != "" {
+			fmt.Fprintf(os.Stderr, "ERROR: Error tagging image '%s':\n%s\n", origImg, errs.String())
+			fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+			os.Exit(1)
+		}
 	}
 
 	// docker push
 	fmt.Fprintf(os.Stderr, "INFO: Performing docker push %s\n", img)
+	errs.Reset()
 	pushCmd := exec.Command("docker", "push", img)
-	var errs bytes.Buffer
 	pushCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
 	pushCmd.Stdout = os.Stdout
 
-	// Run docker build
+	// Run docker push
 	if err := pushCmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker push. %s\n",
 			err.Error())
@@ -728,7 +726,6 @@ func DockerPublish() {
 	rmiCmd.Stderr = io.MultiWriter(os.Stderr, &errs)
 	rmiCmd.Stdout = os.Stdout
 
-	// Run docker rmi
 	if err := rmiCmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: Error executing docker rmi. %s\n",
 			err.Error())
