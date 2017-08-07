@@ -64,7 +64,10 @@ import (
 	"github.com/ngageoint/seed/cli/objects"
 	"github.com/xeipuuv/gojsonschema"
 	
-	"github.com/heroku/docker-registry-client/registry"
+	//"github.com/heroku/docker-registry-client/registry"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"golang.org/x/net/context"
 	//"github.com/docker/distribution/digest"
 	//"github.com/docker/distribution/manifest"
 	//"github.com/docker/libtrust"
@@ -119,6 +122,12 @@ func main() {
 	// seed run: Runs docker image provided or found in seed manifest
 	if runCmd.Parsed() {
 		DockerRun()
+		os.Exit(0)
+	}
+	
+	// seed search: Searches registry for seed images
+	if searchCmd.Parsed() {
+		DockerSearch()
 		os.Exit(0)
 	}
 }
@@ -602,19 +611,47 @@ func DockerSearch() {
 	url := searchCmd.Lookup(constants.RegistryFlag).Value.String()
 	//org := searchCmd.Lookup(constants.OrgFlag).Value.String()
 	//filter := searchCmd.Lookup(constants.FilterFlag).Value.String()
+	username := searchCmd.Lookup(constants.UserFlag).Value.String()
+	password := searchCmd.Lookup(constants.PassFlag).Value.String()
 	
 	if url == "" {
 		url = constants.DefaultRegistry
 	}
+
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Error getting docker client:\n%s\n",
+			err.Error())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
 	
-	username := "" // anonymous
-	password := "" // anonymous
-	hub, err := registry.New(url, username, password)
+	results, err := cli.ImageSearch(ctx, "-seed", types.ImageSearchOptions{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Error searching registry '%s':\n%s\n",
+			url, err.Error())
+		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
+		os.Exit(1)
+	}
+	fmt.Println(results)
+	
+	/*hub, err := registry.New(url, username, password)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 	repositories, err := hub.Repositories()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(repositories)
+	
+	tags, err := hub.Tags("heroku/cedar")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(tags)*/
 }
 
 //DefineFlags defines the flags available for the seed runner.
@@ -700,6 +737,14 @@ func DefineFlags() {
 	searchCmd.StringVar(&filter, constants.FilterFlag, "", "Specifies filter to apply (default is no filter).")
 	searchCmd.StringVar(&filter, constants.ShortFilterFlag, "", "Specifies filter to apply (default is no filter).")
 	
+	var user string
+	searchCmd.StringVar(&user, constants.UserFlag, "", "Specifies filter to apply (default is no filter).")
+	searchCmd.StringVar(&user, constants.ShortUserFlag, "", "Specifies filter to apply (default is no filter).")
+	
+	var password string
+	searchCmd.StringVar(&password, constants.PassFlag, "", "Specifies filter to apply (default is no filter).")
+	searchCmd.StringVar(&password, constants.ShortPassFlag, "", "Specifies filter to apply (default is no filter).")
+	
 	searchCmd.Usage = func() {
 		PrintSearchUsage()
 	}
@@ -744,12 +789,8 @@ func DefineFlags() {
 		}
 	case constants.RunCommand:
 		runCmd.Parse(os.Args[2:])
-		if len(runCmd.Args()) == 1 {
-			directory = runCmd.Args()[0]
-		}
 	case constants.SearchCommand:
-		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
-		PrintSearchUsage()
+		searchCmd.Parse(os.Args[2:])
 	case constants.ListCommand:
 		listCmd.Parse(os.Args[2:])
 	case constants.PublishCommand:

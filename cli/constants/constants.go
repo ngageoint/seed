@@ -84,6 +84,12 @@ const FilterFlag = "filter"
 //ShortFilterFlag shorthand flag that defines filter
 const ShortFilterFlag= "f"
 
+const UserFlag = "user"
+const ShortUserFlag = "u"
+
+const PassFlag = "pass"
+const ShortPassFlag = "p"
+
 //SeedFileName defines the filename for the seed file
 const SeedFileName = "seed.manifest.json"
 
@@ -91,7 +97,7 @@ const SeedFileName = "seed.manifest.json"
 const ResultsFileManifestName = "results_manifest.json"
 
 //DefaultRegistry defines the default registry address to use when searching for images
-const DefaultRegistry = "index.docker.io"
+const DefaultRegistry = "https://hub.docker.com/v2"
 
 type SchemaType int
 
