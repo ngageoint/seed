@@ -99,6 +99,9 @@ const ResultsFileManifestName = "results_manifest.json"
 //DefaultRegistry defines the default registry address to use when searching for images
 const DefaultRegistry = "https://hub.docker.com/v2"
 
+//DefaultOrg defines the default organization to use when searching for images
+const DefaultOrg = "geoint"
+
 type SchemaType int
 
 const (

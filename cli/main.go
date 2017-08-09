@@ -64,10 +64,10 @@ import (
 	"github.com/ngageoint/seed/cli/objects"
 	"github.com/xeipuuv/gojsonschema"
 	
-	//"github.com/heroku/docker-registry-client/registry"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
+	"github.com/heroku/docker-registry-client/registry"
+	//"github.com/docker/docker/api/types"
+	//"github.com/docker/docker/client"
+	//"golang.org/x/net/context"
 	//"github.com/docker/distribution/digest"
 	//"github.com/docker/distribution/manifest"
 	//"github.com/docker/libtrust"
@@ -609,7 +609,7 @@ func DockerRun() {
 func DockerSearch() {
 
 	url := searchCmd.Lookup(constants.RegistryFlag).Value.String()
-	//org := searchCmd.Lookup(constants.OrgFlag).Value.String()
+	org := searchCmd.Lookup(constants.OrgFlag).Value.String()
 	//filter := searchCmd.Lookup(constants.FilterFlag).Value.String()
 	username := searchCmd.Lookup(constants.UserFlag).Value.String()
 	password := searchCmd.Lookup(constants.PassFlag).Value.String()
@@ -617,41 +617,37 @@ func DockerSearch() {
 	if url == "" {
 		url = constants.DefaultRegistry
 	}
-
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error getting docker client:\n%s\n",
-			err.Error())
-		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-		os.Exit(1)
+	
+	if org == "" {
+		org = constants.DefaultOrg
 	}
 	
-	results, err := cli.ImageSearch(ctx, "-seed", types.ImageSearchOptions{})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Error searching registry '%s':\n%s\n",
-			url, err.Error())
-		fmt.Fprintf(os.Stderr, "Exiting seed...\n")
-		os.Exit(1)
+	dockerHub := false
+	if strings.Contains(url, "hub.docker.com") || strings.Contains(url, "index.docker.io") || strings.Contains(url, "registry-1.docker.io") {
+		url = "https://hub.docker.com"
+		dockerHub = true
 	}
-	fmt.Println(results)
 	
-	/*hub, err := registry.New(url, username, password)
+	hub, err := registry.New(url, username, password)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	repositories, err := hub.Repositories()
+	if dockerHub { //_catalog is disabled on docker hub, cannot get list of images so get all of the images for the org (if specified)
+		repositories, err = hub.UserRepositories(org)
+	} else {
+		repositories, err = hub.Repositories(org)
+	}
 	if err != nil {
 		fmt.Println(err.Error())
+		os.Exit(1)
 	}
-	fmt.Println(repositories)
 	
-	tags, err := hub.Tags("heroku/cedar")
-	if err != nil {
-		fmt.Println(err.Error())
+	for _, repo := range repositories {
+		if strings.HasSuffix(repo, "-seed") {
+			fmt.Println(repo)
+		}
 	}
-	fmt.Println(tags)*/
 }
 
 //DefineFlags defines the flags available for the seed runner.
