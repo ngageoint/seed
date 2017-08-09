@@ -1,5 +1,8 @@
 package constants
 
+//TrueString string version of true boolean
+const TrueString = "true"
+
 //BuildCommand seed build subcommand
 const BuildCommand = "build"
 
@@ -18,7 +21,7 @@ const PublishCommand = "publish"
 //ValidateCommand seed validate subcommand
 const ValidateCommand = "validate"
 
-//ValidateCommand seed version subcommand
+//VersionCommand seed version subcommand
 const VersionCommand = "version"
 
 //JobDirectoryFlag defines the location of the seed spec and Dockerfile
@@ -84,11 +87,32 @@ const FilterFlag = "filter"
 //ShortFilterFlag shorthand flag that defines filter
 const ShortFilterFlag= "f"
 
+//UserFlag defines user
 const UserFlag = "user"
+
+//ShortUserFlag shorthand flag that defines user
 const ShortUserFlag = "u"
 
-const PassFlag = "pass"
+//PassFlag defines password
+const PassFlag = "password"
+
+//ShortPassFlag shorthand flag that defines password
 const ShortPassFlag = "p"
+
+//ForcePublishFlag forces a publish - don't try to deconflict
+const ForcePublishFlag = "f"
+
+//PkgVersionMinor specifies to bump package minor version
+const PkgVersionMinor = "p"
+
+//PkgVersionMajor specifies to bump package major version
+const PkgVersionMajor = "P"
+
+//AlgVersionMinor specifies to bump algorithm minor version
+const AlgVersionMinor = "a"
+
+//AlgVersionMajor specifies to bump algorithm major version
+const AlgVersionMajor = "A"
 
 //SeedFileName defines the filename for the seed file
 const SeedFileName = "seed.manifest.json"
@@ -102,9 +126,13 @@ const DefaultRegistry = "https://hub.docker.com/v2"
 //DefaultOrg defines the default organization to use when searching for images
 const DefaultOrg = "geoint"
 
+//SchemaType defines manfiest or metadata
 type SchemaType int
 
 const (
+	//SchemaManifest manifest schema
 	SchemaManifest SchemaType = iota
+
+	//SchemaMetadata metadata schema
 	SchemaMetadata
 )
