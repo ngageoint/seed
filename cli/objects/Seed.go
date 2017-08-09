@@ -7,34 +7,34 @@ import (
 //Seed represents a seed.manifest.json object.
 type Seed struct {
 	SeedVersion string `json:"seedVersion"`
-	Job         Job
+	Job         Job    `json:"job"`
 }
-	
+
 type Job struct {
-	Name             string `json:"name"`
-	AlgorithmVersion string `json:"algorithmVersion"`
-	PackageVersion   string `json:"packageVersion"`
-	Title            string `json:"title"`
-	Description      string `json:"description"`
-	AuthorName       string `json:"authorName"`
-	AuthorEmail      string `json:"authorEmail"`
-	AuthorUrl        string `json:"authorUrl"`
-	Timeout          int    `json:"timeout"`
-	Interface        Interface
-	ErrorMapping     []ErrorMap
+	Name             string     `json:"name"`
+	AlgorithmVersion string     `json:"algorithmVersion"`
+	PackageVersion   string     `json:"packageVersion"`
+	Title            string     `json:"title,omitempty"`
+	Description      string     `json:"description,omitempty"`
+	AuthorName       string     `json:"authorName,omitempty"`
+	AuthorEmail      string     `json:"authorEmail,omitempty"`
+	AuthorUrl        string     `json:"authorUrl,omitempty"`
+	Timeout          int        `json:"timeout,omitempty"`
+	Interface        Interface  `json:"interface"`
+	ErrorMapping     []ErrorMap `json:"errorMapping,omitempty"`
 }
 
 type Interface struct {
-	Cmd        string `json:"cmd"`
-	Resources  Resources
-	InputData  InputData
-	OutputData OutputData
-	Mounts     []Mount
-	Settings   []Setting
+	Cmd        string     `json:"cmd"`
+	Resources  Resources  `json:"resources,omitempty"`
+	InputData  InputData  `json:"inputData,omitempty"`
+	OutputData OutputData `json:"outputData,omitempty"`
+	Mounts     []Mount    `json:"mounts,omitempty"`
+	Settings   []Setting  `json:"settings,omitempty"`
 }
 
 type Resources struct {
-	Scalar []Scalar
+	Scalar []Scalar `json:"scalar"`
 }
 
 type Scalar struct {
@@ -44,8 +44,8 @@ type Scalar struct {
 }
 
 type InputData struct {
-	Files []InFile
-	Json  []InJson
+	Files []InFile `json:"files,ommitempty"`
+	Json  []InJson `json:"json,omitempty"`
 }
 
 type InFile struct {
@@ -82,8 +82,8 @@ func (o *InJson) UnmarshalJSON(b []byte) error {
 }
 
 type OutputData struct {
-	Files []OutFile
-	JSON  []OutJson
+	Files []OutFile `json:"files,omitempty"`
+	JSON  []OutJson `json:"json,omitempty"`
 }
 
 type OutFile struct {
