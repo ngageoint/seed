@@ -69,6 +69,7 @@ import (
 
 	"github.com/ngageoint/seed/cli/constants"
 	"github.com/ngageoint/seed/cli/objects"
+	"github.com/ngageoint/seed/cli/dockerHubRegistry"
 	"github.com/xeipuuv/gojsonschema"
 	
 	"github.com/heroku/docker-registry-client/registry"
@@ -599,16 +600,31 @@ func DockerSearch() {
 		dockerHub = true
 	}
 	
-	hub, err := registry.New(url, username, password)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+
 	var repositories []string
+	var err error
 	if dockerHub { //_catalog is disabled on docker hub, cannot get list of images so get all of the images for the org (if specified)
+		hub, err := dockerHubRegistry.New(url)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 		repositories, err = hub.UserRepositories(org)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 	} else {
+		hub, err := registry.New(url, username, password)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 		repositories, err = hub.Repositories()
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 	}
 	if err != nil {
 		fmt.Println(err.Error())
