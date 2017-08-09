@@ -574,7 +574,7 @@ func DockerPublish() {
 	}
 
 	// Check for image confliction.
-	conflict := true //TODO
+	conflict := false //TODO - Need to call seed search when implemented
 	deconflict := publishCmd.Lookup(constants.ForcePublishFlag).Value.String() == "false"
 
 	// If it conflicts, bump specified version number
