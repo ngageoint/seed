@@ -81,6 +81,24 @@ const OrgFlag = "org"
 //ShortOrgFlag shorthand flag that defines organization
 const ShortOrgFlag = "o"
 
+//FilterFlag defines filter
+const FilterFlag = "filter"
+
+//ShortFilterFlag shorthand flag that defines filter
+const ShortFilterFlag= "f"
+
+//UserFlag defines user
+const UserFlag = "user"
+
+//ShortUserFlag shorthand flag that defines user
+const ShortUserFlag = "u"
+
+//PassFlag defines password
+const PassFlag = "password"
+
+//ShortPassFlag shorthand flag that defines password
+const ShortPassFlag = "p"
+
 //ForcePublishFlag forces a publish - don't try to deconflict
 const ForcePublishFlag = "f"
 
@@ -101,6 +119,12 @@ const SeedFileName = "seed.manifest.json"
 
 //ResultsFileManifestName defines the filename for the results_manifest file
 const ResultsFileManifestName = "results_manifest.json"
+
+//DefaultRegistry defines the default registry address to use when searching for images
+const DefaultRegistry = "https://hub.docker.com/v2"
+
+//DefaultOrg defines the default organization to use when searching for images
+const DefaultOrg = "geoint"
 
 //SchemaType defines manfiest or metadata
 type SchemaType int
