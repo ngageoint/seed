@@ -29,7 +29,14 @@ usage is as folllows:
 		-rm				Automatically remove the container when it exits (same as
 										docker run --rm)
 	seed search [OPTIONS]
-		Not yet implemented
+		Options:
+			-r, -registry	The registry to search
+			
+			-o, -org		Limit results to this organization/user (for docker hub, this arg is required as images cannot be listed except by org
+			
+			-u, -user		Optional username to use for authentication
+			
+			-p, -password	Optional password to use for authentication
 
 	seed validate [OPTIONS]
 		Options:
@@ -65,12 +72,6 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 	
 	"github.com/heroku/docker-registry-client/registry"
-	//"github.com/docker/docker/api/types"
-	//"github.com/docker/docker/client"
-	//"golang.org/x/net/context"
-	//"github.com/docker/distribution/digest"
-	//"github.com/docker/distribution/manifest"
-	//"github.com/docker/libtrust"
 )
 
 var buildCmd *flag.FlagSet
@@ -840,6 +841,7 @@ func DefineFlags() {
 		PrintVersionUsage()
 	}
 
+
 	// Print usage if no command given
 	if len(os.Args) == 1 {
 		PrintUsage()
@@ -1041,45 +1043,6 @@ func DefineValidateFlags() {
 	validateCmd.Usage = func() {
 		PrintValidateUsage()
 	}
-
-	// Version command
-	versionCmd = flag.NewFlagSet(constants.VersionCommand, flag.ExitOnError)
-	versionCmd.Usage = func() {
-		PrintVersionUsage()
-	}
-
-	if len(os.Args) == 1 {
-		PrintUsage()
-	}
-
-	switch os.Args[1] {
-	case constants.BuildCommand:
-		buildCmd.Parse(os.Args[2:])
-		if len(buildCmd.Args()) == 1 {
-			directory = buildCmd.Args()[0]
-		}
-	case constants.RunCommand:
-		runCmd.Parse(os.Args[2:])
-	case constants.SearchCommand:
-		searchCmd.Parse(os.Args[2:])
-	case constants.ListCommand:
-		listCmd.Parse(os.Args[2:])
-	case constants.PublishCommand:
-		fmt.Fprintf(os.Stderr, "%q is not yet implemented\n\n", os.Args[1])
-		PrintPublishUsage()
-	case constants.ValidateCommand:
-		validateCmd.Parse(os.Args[2:])
-		if len(validateCmd.Args()) == 1 {
-			directory = validateCmd.Args()[0]
-		}
-	case constants.VersionCommand:
-		PrintVersion()
-	default:
-		fmt.Fprintf(os.Stderr, "%q is not a valid command.\n", os.Args[1])
-		PrintUsage()
-		os.Exit(0)
-	}
-
 }
 
 //PrintCommandUsage prints usage of parsed command, or seed usage if no command
