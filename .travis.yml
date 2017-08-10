@@ -1,6 +1,6 @@
 sudo: required
 
-language: go
+language: bash
 
 services:
   - docker
@@ -12,14 +12,11 @@ before_install:
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh $(tail -1 .versions)-snapshot; ./spec/examples/inject-manifests.sh; fi
   - mkdir -p output
   - docker pull rochdev/alpine-asciidoctor:mini
-  - ./validator/test-images/docker-build-test-images.sh
 
 script:
   - ./spec/add-version-links.sh
-  #- go test -v ./validator
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc seed.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc
-  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./cli/build-cli.sh ${TRAVIS_COMMIT}; else ./cli/build-cli.sh ${TRAVIS_TAG}; fi
 
 after_failure:
   - docker logs asciidoc-to-html
