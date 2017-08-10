@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.6",
   "job": {
     "name": "addition-algorithm",
     "algorithmVersion": "0.0.1",
@@ -12,9 +12,19 @@
       "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
       "resources": {
         "scalar": [
-          { "name": "cpu", "value": 0.1 },
-          { "name": "mem", "value": 1.0 },
-          { "name": "disk", "value": 1.0, "inputMultiplier": 1.0 }
+          {
+            "name": "cpu",
+            "value": 0.1
+          },
+          {
+            "name": "mem",
+            "value": 1
+          },
+          {
+            "name": "disk",
+            "value": 1,
+            "inputMultiplier": 1
+          }
         ]
       },
       "inputData": {

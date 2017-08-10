@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.0.6",
   "job": {
     "name": "image-watermark",
     "algorithmVersion": "0.1.0",
@@ -12,8 +12,14 @@
       "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
       "resources": {
         "scalar": [
-          { "name": "cpu", "value": 1.0 },
-          { "name": "mem", "value": 64.0 }
+          {
+            "name": "cpu",
+            "value": 1
+          },
+          {
+            "name": "mem",
+            "value": 64
+          }
         ]
       },
       "inputData": {
