@@ -13,7 +13,7 @@ jq_in_place() {
 
 
 # Update version placeholders
-FILES=$(grep -r SEED_VERSION spec validator | cut -d ':' -f 1 | sort | uniq)
+FILES=$(grep -r SEED_VERSION spec | cut -d ':' -f 1 | sort | uniq)
 
 for FILE in ${FILES}
 do
