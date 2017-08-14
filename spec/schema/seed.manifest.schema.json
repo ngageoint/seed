@@ -47,6 +47,38 @@
         "timeout": {
           "type": "integer"
         },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scalar": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z_-]+$"
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "inputMultiplier": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ]
+              },
+              "required": [
+                "scalar"
+              ]
+            }
+          }
+        },
         "interface": {
           "type": "object",
           "additionalProperties": false,
@@ -224,38 +256,6 @@
                 ]
               }
             },
-            "resources": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "scalar": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "pattern": "^[a-zA-Z_-]+$"
-                      },
-                      "value": {
-                        "type": "number"
-                      },
-                      "inputMultiplier": {
-                        "type": "number"
-                      }
-                    },
-                    "required": [
-                      "name",
-                      "value"
-                    ]
-                  },
-                  "required": [
-                    "scalar"
-                  ]
-                }
-              }
-            },
             "settings": {
               "type": "array",
               "items": {
@@ -318,6 +318,7 @@
         "description",
         "authorName",
         "timeout",
+        "resources",
         "interface"
       ]
     }
