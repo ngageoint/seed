@@ -1,5 +1,4 @@
 {
-	"derp":"herp",
   "seedVersion": "SEED_VERSION",
   "job": {
     "name": "my-algorithm",
@@ -13,9 +12,13 @@
       "csv",
       "image processing"
     ],
-    "authorName": "John Doe",
-    "authorEmail": "jdoe@example.com",
-    "authorUrl": "http://www.example.com",
+    "maintainer": {
+      "name": "John Doe",
+      "organization": "E-corp",
+      "email": "jdoe@example.com",
+      "url": "http://www.example.com",
+      "phone": "666-555-4321"
+    },
     "timeout": 3600,
     "interface": {
       "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",

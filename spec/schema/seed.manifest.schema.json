@@ -35,14 +35,30 @@
             "type": "string"
           }
         },
-        "authorName": {
-          "type": "string"
-        },
-        "authorEmail": {
-          "type": "string"
-        },
-        "authorUrl": {
-          "type": "string"
+        "maintainer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "organization": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
         },
         "timeout": {
           "type": "integer"
@@ -315,7 +331,7 @@
         "packageVersion",
         "title",
         "description",
-        "authorName",
+        "maintainer",
         "timeout",
         "resources",
         "interface"

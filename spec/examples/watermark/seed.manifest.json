@@ -6,7 +6,10 @@
     "packageVersion": "0.1.0",
     "title": "Image Watermarker",
     "description": "Processes an input PNG and outputs watermarked PNG.",
-    "authorName": "John Doe",
+    "maintainer": {
+      "name": "John Doe",
+      "email": "jdoe@example.com"
+    },
     "timeout": 30,
     "interface": {
       "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",

@@ -42,14 +42,10 @@ short descriptive title of the job.
 a full job abstract.
 * The Job object MAY have a member with the name `tags`. The member's value MUST be an array of strings and MAY contain
 any number of elements.
-* The Job object MUST have a member with the name `authorName`. The member's value MUST be a string and SHOULD contain
-the authoring individual or organization.
-* The Job object MAY have a member with the name `authorEmail`. The member's value MUST be a string and SHOULD contain
-the authoring email address.
-* The Job object MAY have a member with the name `authorUrl`. The member's value MUST be a string and SHOULD contain a
-publicly accessible URL with further job detail.
 * The Job object MUST have a member with the name `timeout`. This member's values MUST be a integer indicating a timeout
 period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
+* The Job object MUST have a member with the name `maintainer`. The member's value MUST be an object as defined in
+<<maintainer-section>>.
 * The Job object MUST have a member with the name `resources`. This member's value MUST be an object as defined in
 <<resources-section>>.
 * The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
@@ -67,13 +63,11 @@ The following annotated snippet provides quick reference to the use of Job objec
     "packageVersion": "1.0.0", // <3>
     "title": "My first algorithm", // <4>
     "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <5>
-    "authorName": "John Doe", // <6>
-    "authorEmail": "jdoe@example.com", <7>
-    "authorUrl": "http://www.example.com", // <8>
-    "timeout": 3600,// <9>
-    "resources": { ... }, // <10>
-    "interface": { ... }, // <11>
-    "errorMapping": [ ... ] // <12>
+    "timeout": 3600,// <6>
+    "maintainer": { ... }, // <7>
+    "resources": { ... }, // <8>
+    "interface": { ... }, // <9>
+    "errorMapping": [ ... ] // <10>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
@@ -84,13 +78,43 @@ combined should be unique system-wide.
 updates to the job interface, it should NEVER be used to indicate changes to the algorithm.
 <4> Required string containing short job title.
 <5> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
-<6> Required string containing job author name or organization.
-<7> Optional string containing job author email.
-<8> Optional string containing URL to job website.
-<9> Required integer containing job timeout value in seconds.
-<10> Required <<resources-section>>.
-<11> Required <<interface-section>>.
-<12> Optional array of <<errormapping-section>>.
+<6> Required integer containing job timeout value in seconds.
+<7> Required <<maintainer-section>>.
+<8> Required <<resources-section>>.
+<9> Required <<interface-section>>.
+<10> Optional array of <<errormapping-section>>.
+
+[[maintainer-section, Maintainer Object]]
+===== Maintainer Object
+The Maintainer object is the member that identifies the individual and organization (optional) acting as a point of
+contact for a Seed job.
+
+* The Maintainer object MUST have a member with the name `name`. The member's value MUST be a string and SHOULD contain
+the full name of maintaining individual.
+* The Maintainer object MUST have a member with the name `email`. The member's value MUST be a string and SHOULD contain
+the best contact email for maintaining individual or organization.
+* The Maintainer object MAY have a member with the name `phone`. The member's value MUST be a string and SHOULD contain
+the best contact phone number for maintaining individual or organization.
+* The Maintainer object MAY have a member with the name `organization`. The member's value MUST be a string and SHOULD
+contain organization responsible for maintaining or sponsoring Seed job.
+* The Maintainer object MAY have a member with the name `url`. The member's value MUST be a string and SHOULD contain a
+publicly accessible URL to complete algorithm design or usage documentation.
+
+[source,javascript]
+----
+{
+    "name": "John Doe", // <1>
+    "email": "jdoe@example.com", // <2>
+    "phone": "666-555-4321", // <3>
+    "organization": "E-corp", // <4>
+    "url": "http://www.example.com" // <5>
+}
+----
+<1> Required string containing full name of maintaining individual.
+<2> Required string containing best contact email for maintaining individual or organization.
+<3> Optional string containing best contact phone number for maintaining individual or organization.
+<4> Optional string containing organization responsible for maintaining or sponsoring Seed job.
+<5> Optional string containing publicly accessible URL to complete algorithm design or usage documentation.
 
 [[resources-section, Resources Object]]
 ===== Resources Object
@@ -99,7 +123,7 @@ memory and disk scalar resources, but MAY in the future accommodate more complex
 final computed resources allocated for all `scalar` elements MUST be injected as environment variables to the job at run
 time. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide.
 
-* The Interface object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
+* The Resources object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
 objects and MAY contain any number of elements. There is no other standard restriction on the array size.
 
 .Scalar Elements
