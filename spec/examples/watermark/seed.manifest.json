@@ -10,17 +10,11 @@
     "timeout": 30,
     "interface": {
       "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
-      "resources": {
-        "scalar": [
-          { "name": "cpu", "value": 1.0 },
-          { "name": "mem", "value": 64.0 }
-        ]
-      },
       "inputData": {
         "files": [
           {
             "name": "INPUT_IMAGE",
-            "mediaType": [
+            "mediaTypes": [
               "image/png"
             ]
           }
@@ -35,6 +29,12 @@
           }
         ]
       }
+    },
+    "resources": {
+      "scalar": [
+        { "name": "cpu", "value": 1.0 },
+        { "name": "mem", "value": 64.0 }
+      ]
     },
     "errorMapping": [
       {

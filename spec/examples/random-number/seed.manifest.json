@@ -8,7 +8,7 @@
     "description": "Generates a random number and outputs on stdout",
     "authorName": "John Doe",
     "timeout": 10,
-    "interface": {
-    }
+    "interface": { },
+    "resources": { }
   }
 }
