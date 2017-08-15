@@ -40,7 +40,7 @@ to the SemVer standard.
 short descriptive title of the job.
 * The Job object MUST have a member with the name `description`. The member's value MUST be a string and SHOULD contain
 a full job abstract.
-* The Job object MAY have a member with the name `tag`. The member's value MUST be an array of strings and MAY contain
+* The Job object MAY have a member with the name `tags`. The member's value MUST be an array of strings and MAY contain
 any number of elements.
 * The Job object MUST have a member with the name `authorName`. The member's value MUST be a string and SHOULD contain
 the authoring individual or organization.
