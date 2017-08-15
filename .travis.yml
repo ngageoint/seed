@@ -1,19 +1,18 @@
 sudo: required
 
-language: bash
+language: python
 
 services:
   - docker
-
-env:
-  - SPEC_PATH="../spec/schema/seed.manifest.schema.json" TESTDATA_PATH="../testdata/" TEMPLATES_PATH="../templates" ZIP="../testdata/seed-scale.zip" MOUNTAIN="../templates" HELLO="Hello World"
 
 before_install:
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh $(tail -1 .versions)-snapshot; ./spec/examples/inject-manifests.sh; fi
   - mkdir -p output
   - docker pull rochdev/alpine-asciidoctor:mini
+  - pip install json-spec
 
 script:
+  - ./spec/examples/validate-examples.sh
   - ./spec/add-version-links.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc seed.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc

@@ -6,9 +6,12 @@
     "packageVersion": "0.1.0",
     "title": "Random Number Generator",
     "description": "Generates a random number and outputs on stdout",
-    "authorName": "John Doe",
+    "maintainer": {
+      "name": "John Doe",
+      "email": "jdoe@example.com"
+    },
     "timeout": 10,
-    "interface": {
-    }
+    "interface": { },
+    "resources": { }
   }
 }

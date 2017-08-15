@@ -6,21 +6,18 @@
     "packageVersion": "0.1.0",
     "title": "Image Watermarker",
     "description": "Processes an input PNG and outputs watermarked PNG.",
-    "authorName": "John Doe",
+    "maintainer": {
+      "name": "John Doe",
+      "email": "jdoe@example.com"
+    },
     "timeout": 30,
     "interface": {
       "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
-      "resources": {
-        "scalar": [
-          { "name": "cpu", "value": 1.0 },
-          { "name": "mem", "value": 64.0 }
-        ]
-      },
       "inputData": {
         "files": [
           {
             "name": "INPUT_IMAGE",
-            "mediaType": [
+            "mediaTypes": [
               "image/png"
             ]
           }
@@ -35,6 +32,12 @@
           }
         ]
       }
+    },
+    "resources": {
+      "scalar": [
+        { "name": "cpu", "value": 1.0 },
+        { "name": "mem", "value": 64.0 }
+      ]
     },
     "errorMapping": [
       {
