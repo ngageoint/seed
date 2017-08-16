@@ -43,3 +43,10 @@ deploy:
       branch: master
       condition: $TRAVIS_PULL_REQUEST == false
 
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/10070a680400c55e3baa
+    on_success: change
+    on_failure: always
+    on_start: never
