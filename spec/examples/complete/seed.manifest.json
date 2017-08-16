@@ -33,7 +33,7 @@
           }
         ]
       },
-      "outputData": {
+      "outputs": {
         "files": [
           {
             "name": "output_file_tiffs",

@@ -183,8 +183,8 @@ MAY be required. If a Docker ENTRYPOINT is defined that launches the executable,
 necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
 * The Interface object MAY have a member with the name `inputs`. This member's value MUST be an object as defined in
 <<inputs-section>>.
-* The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
-<<outputdata-section>>.
+* The Interface object MAY have a member with the name `outputs`. This member's value MUST be an object as defined in
+<<outputs-section>>.
 * The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
 objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
@@ -199,7 +199,7 @@ The following annotated snippet provides quick reference to the use of Interface
 {
     "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
     "inputs": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
-    "outputData": { ... }, // <3>
+    "outputs": { ... }, // <3>
     "mounts": [ ... ], // <4>
     "settings": [ ... ] // <5>
 }
@@ -207,7 +207,7 @@ The following annotated snippet provides quick reference to the use of Interface
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
 <2> Optional <<inputs-section>>. This is the means to inject external data into the job container.
-<3> Optional <<outputdata-section>>. This is the means to capture results from the job container.
+<3> Optional <<outputs-section>>. This is the means to capture results from the job container.
 <4> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
 <5> Optional <<settings-section>>. This defines any environment specific settings needed at run time.
 
@@ -282,9 +282,9 @@ Default is `false`.
 <8> Required string containing a valid JSON schema type for input validation.
 <9> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
 
-[[outputdata-section, OutputData Object]]
-====== OutputData Object
-The OutputData object is the member responsible for indicating all output data and the means to capture that data
+[[outputs-section, Outputs Object]]
+====== Outputs Object
+The Outputs object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
 extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
@@ -293,9 +293,9 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 <<output-data-permissions,output file permissions>> and support is provided for defining
 <<extended-file-metadata,extended metadata>>.
 
-* The OutputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
+* The Outputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
 sub-section.
-* The OutputData object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
+* The Outputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
 sub-section.
 
 .Files Elements
@@ -303,7 +303,7 @@ sub-section.
 characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the key the processing system will place the file name
 captured for downstream processing.
 * The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
-the file being captured by OutputData.
+the file being captured by Outputs.
 * The Files object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the
 capture of files.
 * The Files object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
@@ -325,7 +325,7 @@ defined `name` member.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-The following annotated snippets provides quick reference to the use of OutputData object:
+The following annotated snippets provides quick reference to the use of Outputs object:
 
 [source,javascript]
 .Result Manifest
@@ -337,9 +337,9 @@ The following annotated snippets provides quick reference to the use of OutputDa
 ----
 
 [source,javascript]
-.Seed Manifest - OutputData object
+.Seed Manifest - Outputs object
 ----
-"outputData": {
+"outputs": {
     "files": [ // <1>
         {
             "name": "OUTPUT_TIFFS", // <2>
@@ -414,7 +414,7 @@ Seed job to run. These will be exposed as environment variables at run time. Mos
 environment specific configuration or external credentials.
 
 While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputs` /
-`outputData`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
+`outputs`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
 * The Settings object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or

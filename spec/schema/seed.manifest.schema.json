@@ -170,7 +170,7 @@
                 }
               }
             },
-            "outputData": {
+            "outputs": {
               "type": "object",
               "additionalProperties": false,
               "properties": {

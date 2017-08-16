@@ -23,7 +23,7 @@
           }
         ]
       },
-      "outputData": {
+      "outputs": {
         "files": [
           {
             "name": "OUTPUT_IMAGE",
