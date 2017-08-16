@@ -332,9 +332,7 @@
         "title",
         "description",
         "maintainer",
-        "timeout",
-        "resources",
-        "interface"
+        "timeout"
       ]
     }
   },

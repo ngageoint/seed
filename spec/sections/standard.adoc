@@ -46,9 +46,10 @@ any number of elements.
 period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
 * The Job object MUST have a member with the name `maintainer`. The member's value MUST be an object as defined in
 <<maintainer-section>>.
-* The Job object MUST have a member with the name `resources`. This member's value MUST be an object as defined in
-<<resources-section>>.
-* The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
+* The Job object SHOULD have a member with the name `resources`. This member's value MUST be an object as defined in
+<<resources-section>>. It is highly advised that this member be specified, without it resources provided will be default
+for the implementing framework.
+* The Job object MAY have a member with the name `interface`. This member's value MUST be an object as defined in
 <<interface-section>>.
 * The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
 elements defined in <<errormapping-section>>
@@ -80,8 +81,8 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 <5> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
 <6> Required integer containing job timeout value in seconds.
 <7> Required <<maintainer-section>>.
-<8> Required <<resources-section>>.
-<9> Required <<interface-section>>.
+<8> Optional <<resources-section>>.
+<9> Optional <<interface-section>>.
 <10> Optional array of <<errormapping-section>>.
 
 [[maintainer-section, Maintainer Object]]

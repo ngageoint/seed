@@ -10,8 +10,6 @@
       "name": "John Doe",
       "email": "jdoe@example.com"
     },
-    "timeout": 10,
-    "interface": { },
-    "resources": { }
+    "timeout": 10
   }
 }
