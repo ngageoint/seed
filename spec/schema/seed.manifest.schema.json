@@ -293,7 +293,7 @@
             }
           }
         },
-        "errorMapping": {
+        "errors": {
           "type": "array",
           "items": {
             "type": "object",

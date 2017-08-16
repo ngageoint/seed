@@ -51,8 +51,8 @@ period measured in seconds. Consuming systems MUST honor this value as a hard li
 for the implementing framework.
 * The Job object MAY have a member with the name `interface`. This member's value MUST be an object as defined in
 <<interface-section>>.
-* The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
-elements defined in <<errormapping-section>>
+* The Job object MAY have a member with the name `errors`. This member's value MUST be an array containing
+elements defined in <<errors-section>>
 
 The following annotated snippet provides quick reference to the use of Job object:
 
@@ -68,7 +68,7 @@ The following annotated snippet provides quick reference to the use of Job objec
     "maintainer": { ... }, // <7>
     "resources": { ... }, // <8>
     "interface": { ... }, // <9>
-    "errorMapping": [ ... ] // <10>
+    "errors": [ ... ] // <10>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
@@ -83,7 +83,7 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 <7> Required <<maintainer-section>>.
 <8> Optional <<resources-section>>.
 <9> Optional <<interface-section>>.
-<10> Optional array of <<errormapping-section>>.
+<10> Optional array of <<errors-section>>.
 
 [[maintainer-section, Maintainer Object]]
 ===== Maintainer Object
@@ -438,21 +438,21 @@ The following annotated snippet provides quick reference to the use of the Setti
 <1> Required string containing the environment variable name to be injected at run time.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
 
-[[errormapping-section, ErrorMapping Objects]]
-===== ErrorMapping Objects
-The ErrorMapping objects allow for job developers to map arbitrary exit codes to meaningful textual descriptions. This
+[[errors-section, Errors Objects]]
+===== Errors Object
+The Errors object allows for job developers to map arbitrary exit codes to meaningful textual descriptions. This
 is useful in passing information to the processing system to differentiate between data and algorithm errors.
 
-* The ErrorMapping object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
+* The Errors object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
 the executing job process.
-* The ErrorMapping object MUST have a member `title`. The member's value MUST be a string indicating the short
+* The Errors object MUST have a member `title`. The member's value MUST be a string indicating the short
 descriptive title of the error.
-* The ErrorMapping object MAY have a member `description`. The member's value MUST be a string indicating the complete
+* The Errors object MAY have a member `description`. The member's value MUST be a string indicating the complete
 error description and possible causes.
-* The ErrorMapping object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
+* The Errors object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
 MUST be a string containing one of the following values: `algorithm`, `data` or `system`.
 
-The following annotated snippet provides quick reference to the use of ErrorMapping objects:
+The following annotated snippet provides quick reference to the use of Errors objects:
 
 [source,javascript]
 ----

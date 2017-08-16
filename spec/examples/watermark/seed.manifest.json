@@ -39,7 +39,7 @@
         { "name": "mem", "value": 64.0 }
       ]
     },
-    "errorMapping": [
+    "errors": [
       {
         "code": 1,
         "title": "Image Corrupt",
