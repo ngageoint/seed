@@ -23,7 +23,7 @@ rules:
 
 [[variable-injection, Injection]]
 ===== Injection
-WARNING: Collisions between the reserved variables below and `interface.inputData.files`, `interface.inputData.json` and
+WARNING: Collisions between the reserved variables below and `interface.inputs.files`, `interface.inputs.json` and
 `interface.settings` `name` member values MUST NOT occur.
 
 The following variables MUST be provided:
@@ -36,13 +36,13 @@ resource with an `inputMultiplier` value the environment variable must include t
 allocation as defined in the `scalar` element under <<resources-section,Resources object>>. It SHOULD be clarified that
 the allocated value computed using an `inputMultiplier` value MUST NOT include the size of input files - only the
 additional space needed for output files during execution.
-* All `name` member values of `interface.inputData.files` elements MUST map to environment variables. Variable names
+* All `name` member values of `interface.inputs.files` elements MUST map to environment variables. Variable names
 must follow <<variable-normalization,normalization rules>>. Processing framework's MUST ensure data is mounted and
 provide a container resolvable absolute path. _Injection behavior is dependent on the boolean value of `multiple`
 member._ When `multiple` is `true` the injected environment variable MUST be an absolute path to a _directory_ with all
 files immediately beneath it. When `multiple` is `false` it MUST be an absolute path to the single _file_ provided. This
 environment variable MUST be left unset if member `required` is false and the input is not present.
-* All `name` member values of `interface.inputData.json` elements MUST map to environment variables. Variable names
+* All `name` member values of `interface.inputs.json` elements MUST map to environment variables. Variable names
 must follow <<variable-normalization,normalization rules>> and `array`, `object` and `string` JSON types MUST be
 injected string encoded. This environment variable MUST be left unset if `required` is false and the input is not
 present.
@@ -50,7 +50,7 @@ present.
 must follow <<variable-normalization,normalization rules>>.
 
 Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
-use of Bash. Taking the example of an optional `inputData.files` element, the following `command` value will expand with
+use of Bash. Taking the example of an optional `inputs.files` element, the following `command` value will expand with
 a preceding switch only when the input is available:
 
 `${MY_INPUT/#/-d }`

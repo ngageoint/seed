@@ -181,8 +181,8 @@ mounts, settings, inputs and outputs defined for a job.
 complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters
 MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be
 necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
-* The Interface object MAY have a member with the name `inputData`. This member's value MUST be an object as defined in
-<<inputdata-section>>.
+* The Interface object MAY have a member with the name `inputs`. This member's value MUST be an object as defined in
+<<inputs-section>>.
 * The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
 <<outputdata-section>>.
 * The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
@@ -198,7 +198,7 @@ The following annotated snippet provides quick reference to the use of Interface
 ----
 {
     "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
-    "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
+    "inputs": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
     "outputData": { ... }, // <3>
     "mounts": [ ... ], // <4>
     "settings": [ ... ] // <5>
@@ -206,19 +206,19 @@ The following annotated snippet provides quick reference to the use of Interface
 ----
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
-<2> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
+<2> Optional <<inputs-section>>. This is the means to inject external data into the job container.
 <3> Optional <<outputdata-section>>. This is the means to capture results from the job container.
 <4> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
 <5> Optional <<settings-section>>. This defines any environment specific settings needed at run time.
 
-[[inputdata-section, InputData Object]]
-====== InputData Object
-The InputData object is the member responsible for indicating all mutable content available to the Seed image at
+[[inputs-section, Inputs Object]]
+====== Inputs Object
+The Inputs object is the member responsible for indicating all immutable content available to the Seed image at
 runtime.
 
-* The InputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
+* The Inputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
 sub-section.
-* The InputData object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
+* The Inputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
 sub-section.
 
 .Files Elements
@@ -248,7 +248,7 @@ variable available at execution time.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-The following annotated snippet provides quick reference to the use of InputData object:
+The following annotated snippet provides quick reference to the use of Inputs object:
 
 [source,javascript]
 ----
@@ -413,7 +413,7 @@ The Settings object is the member responsible for indicating all content not rel
 Seed job to run. These will be exposed as environment variables at run time. Most commonly, Settings will be used for
 environment specific configuration or external credentials.
 
-While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputData` /
+While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputs` /
 `outputData`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 

@@ -22,7 +22,7 @@
     "timeout": 3600,
     "interface": {
       "command": "${INPUT_FILE} ${OUTPUT_DIR}",
-      "inputData": {
+      "inputs": {
         "files": [
           {
             "name": "INPUT_FILE",

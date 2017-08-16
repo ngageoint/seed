@@ -102,7 +102,7 @@
             "command": {
               "type": "string"
             },
-            "inputData": {
+            "inputs": {
               "type": "object",
               "additionalProperties": false,
               "properties": {

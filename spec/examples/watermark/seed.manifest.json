@@ -13,7 +13,7 @@
     "timeout": 30,
     "interface": {
       "command": "${INPUT_IMAGE} ${OUTPUT_DIR}",
-      "inputData": {
+      "inputs": {
         "files": [
           {
             "name": "INPUT_IMAGE",
