@@ -99,7 +99,7 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "cmd": {
+            "command": {
               "type": "string"
             },
             "inputData": {

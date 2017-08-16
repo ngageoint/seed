@@ -12,7 +12,7 @@
     },
     "timeout": 30,
     "interface": {
-      "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
+      "command": "${INPUT_IMAGE} ${OUTPUT_DIR}",
       "inputData": {
         "files": [
           {

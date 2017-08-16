@@ -177,10 +177,10 @@ input file size for scaling memory requirement of job.
 The Interface object is the primary member that describes the command arguments, environment variables,
 mounts, settings, inputs and outputs defined for a job.
 
-* The Interface object MAY have a member with the name `cmd`. The member's value MUST be a string specifying the
+* The Interface object MAY have a member with the name `command`. The member's value MUST be a string specifying the
 complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters
 MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be
-necessary in `cmd` string. The Seed `cmd` member can be treated as analogous to the Docker CMD statement.
+necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
 * The Interface object MAY have a member with the name `inputData`. This member's value MUST be an object as defined in
 <<inputdata-section>>.
 * The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
@@ -197,7 +197,7 @@ The following annotated snippet provides quick reference to the use of Interface
 [source,javascript]
 ----
 {
-    "cmd": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
+    "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
     "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
     "outputData": { ... }, // <3>
     "mounts": [ ... ], // <4>
@@ -234,8 +234,8 @@ variable available at execution time.
 Media types that the job accepts.
 * The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
 physical files are processed by this `Files` element. If omitted, the default value MUST be treated as false. If true,
-the `cmd` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the `cmd`
-placeholder will be replaced with an absolute path to a single file.
+the `command` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the
+`command` placeholder will be replaced with an absolute path to a single file.
 * The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 

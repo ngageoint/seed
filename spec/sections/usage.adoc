@@ -8,8 +8,8 @@ algorithm developers to understand what execution context they are provided.
 ==== Environment Variables
 Environment variable injection MUST be performed as it is the primary means of providing the context required by the
 defined interface of a Seed job. These environment variables MAY be consumed by a job directly or shell variable
-expansion MAY be leveraged in the `interface.cmd` member. Implementing frameworks MAY perform variable expansion, but it
-MUST follow Bash expansion conventions.
+expansion MAY be leveraged in the `interface.command` member. Implementing frameworks MAY perform variable expansion,
+but it MUST follow Bash expansion conventions.
 
 [[variable-normalization, Normalization]]
 ===== Normalization
@@ -50,7 +50,7 @@ present.
 must follow <<variable-normalization,normalization rules>>.
 
 Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
-use of Bash. Taking the example of an optional `inputData.files` element, the following `cmd` value will expand with
+use of Bash. Taking the example of an optional `inputData.files` element, the following `command` value will expand with
 a preceding switch only when the input is available:
 
 `${MY_INPUT/#/-d }`
