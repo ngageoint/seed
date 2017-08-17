@@ -122,7 +122,8 @@ publicly accessible URL to complete algorithm design or usage documentation.
 The Resources object is the member that identifies all resource requirements for a job. This is most commonly CPU,
 memory and disk scalar resources, but MAY in the future accommodate more complex types such as ranges and sets. The
 final computed resources allocated for all `scalar` elements MUST be injected as environment variables to the job at run
-time. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide.
+time. Reference <<environment-variables>> and <<resource-defaults>> for clarification on what the implementing framework
+MUST provide.
 
 * The Resources object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
 objects and MAY contain any number of elements. There is no other standard restriction on the array size.
