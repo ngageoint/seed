@@ -129,7 +129,10 @@ objects and MAY contain any number of elements. There is no other standard restr
 
 .Scalar Elements
 The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk`,
-`mem` and `sharedMem` that have special meaning and SHOULD be populated by all Seed compliant images.
+`mem` and `sharedMem` that have special meaning. The reserved resource names `cpu`, `disk` and `mem` SHOULD be
+populated by all Seed compliant images, as the defaults provided at runtime will likely be inadequate to run all but the
+most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
+and will rarely be needed.
 
 * The Scalar object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
 underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the resource required by the job. Refer to
@@ -213,7 +216,7 @@ implementing framework MUST provide. Linux shell escaping MAY be needed in the c
 
 [[inputs-section, Inputs Object]]
 ====== Inputs Object
-The Inputs object is the member responsible for indicating all immutable content available to the Seed image at
+The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
 runtime.
 
 * The Inputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
