@@ -27,7 +27,7 @@ then
         cd $OUTPUT_DIR
         sudo mkdir -p $VERSION/schema
         cd $VERSION
-        sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.html
+        sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/index.html
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.pdf
         cd schema
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.manifest.schema.json
