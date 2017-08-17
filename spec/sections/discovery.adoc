@@ -9,7 +9,7 @@ secondary means to subset image results. The standard presently requires that al
 
 === Docker Hub
 Docker Hub stores Docker image manifest information in a readily accessible format only for Automated Builds. This
-enforces the need for all developers wishing to support simple discovery from Docker Hub to support Hub builds, as
+enforces the need for all _developers_ wishing to support simple discovery from Docker Hub to support Hub builds, as
 opposed to local image builds followed by a docker push. Given this caveat, a service such as ImageLayers can be used
 to quickly identify manifest content after discovering available images.
 

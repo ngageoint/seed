@@ -17,9 +17,18 @@ discovery, it is designed to be readily applied to other systems as well.
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
 Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
-services.
+services. Use of the http://github.com/ngageoint/seed-cli[CLI] developed by the Seed team is highly recommended to speed
+the development and packaging of jobs according to the Seed specification.
 
 === Format
+
+The Docker image created must adhere to a specific naming convention. The standard requires specification of both an
+algorithm and a packaging version, tracking changes individually between the algorithm logic and the packaging of it.
+The following image naming template maps to members defined under the <<job-section>>:
+
+----
+<name>-<algorithmVersion>-seed:<packageVersion>
+----
 
 Dockerfile snippet containing required label for Seed compliance:
 
@@ -27,22 +36,16 @@ Dockerfile snippet containing required label for Seed compliance:
 include::examples/complete/Dockerfile-snippet[]
 ----
 
-The com.seed.manifest label contents must be serialized as a string-escaped JSON object. The following is a complete
-example including required and optional keys:
+The `com.ngageoint.seed.manifest` label contents must be serialized as a string-escaped JSON object. The following is a
+complete example including required and optional keys:
 
 ----
 include::examples/complete/seed.manifest.json[]
 ----
 
-The image created must adhere to a specific naming convention. The standard requires specification of both an algorithm
-and a packaging version, tracking changes individually between the algorithm logic and the packaging of it. The
-following image naming template maps to members defined under the `Job` object:
-
-----
-<name>-<algorithmVersion>-seed:<packageVersion>
-----
-
 === Definitions
+* Seed specific terms defined in the <<glossary>> supersede all following definitions. These terms can be found
+_italicized_ throughout the specification.
 * GeoJSON, and the terms Geometry and Polygon are defined in
 https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
 * Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
@@ -63,6 +66,22 @@ include::sections/usage.adoc[]
 
 == Discovery
 include::sections/discovery.adoc[]
+
+== Glossary
+The following terms are specific to Seed and SHOULD be referenced to clarify their meaning throughout the specification.
+
+|===
+|Term |Description
+
+|developer
+|creator and packager of Seed compliant image
+
+|executor
+|process responsible for injecting all run-time context: inputs, mounts and environment settings
+
+|implementor
+|developer of framework for discovering or running Seed compliant images - must provide executor
+|===
 
 == Schema
 
