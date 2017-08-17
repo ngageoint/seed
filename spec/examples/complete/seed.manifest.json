@@ -21,8 +21,8 @@
     },
     "timeout": 3600,
     "interface": {
-      "cmd": "${INPUT_FILE} ${OUTPUT_DIR}",
-      "inputData": {
+      "command": "${INPUT_FILE} ${OUTPUT_DIR}",
+      "inputs": {
         "files": [
           {
             "name": "INPUT_FILE",
@@ -33,7 +33,7 @@
           }
         ]
       },
-      "outputData": {
+      "outputs": {
         "files": [
           {
             "name": "output_file_tiffs",
@@ -77,7 +77,7 @@
         { "name": "disk", "value": 10.0, "inputMultiplier": 4.0 }
       ]
     },
-    "errorMapping": [
+    "errors": [
       {
         "code": 1,
         "title": "Error Name",

@@ -99,10 +99,10 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "cmd": {
+            "command": {
               "type": "string"
             },
-            "inputData": {
+            "inputs": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
@@ -170,7 +170,7 @@
                 }
               }
             },
-            "outputData": {
+            "outputs": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
@@ -293,7 +293,7 @@
             }
           }
         },
-        "errorMapping": {
+        "errors": {
           "type": "array",
           "items": {
             "type": "object",
@@ -332,9 +332,7 @@
         "title",
         "description",
         "maintainer",
-        "timeout",
-        "resources",
-        "interface"
+        "timeout"
       ]
     }
   },

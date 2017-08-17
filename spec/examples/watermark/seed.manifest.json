@@ -12,8 +12,8 @@
     },
     "timeout": 30,
     "interface": {
-      "cmd": "${INPUT_IMAGE} ${OUTPUT_DIR}",
-      "inputData": {
+      "command": "${INPUT_IMAGE} ${OUTPUT_DIR}",
+      "inputs": {
         "files": [
           {
             "name": "INPUT_IMAGE",
@@ -23,7 +23,7 @@
           }
         ]
       },
-      "outputData": {
+      "outputs": {
         "files": [
           {
             "name": "OUTPUT_IMAGE",
@@ -39,7 +39,7 @@
         { "name": "mem", "value": 64.0 }
       ]
     },
-    "errorMapping": [
+    "errors": [
       {
         "code": 1,
         "title": "Image Corrupt",

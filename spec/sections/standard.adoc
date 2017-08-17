@@ -46,12 +46,13 @@ any number of elements.
 period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
 * The Job object MUST have a member with the name `maintainer`. The member's value MUST be an object as defined in
 <<maintainer-section>>.
-* The Job object MUST have a member with the name `resources`. This member's value MUST be an object as defined in
-<<resources-section>>.
-* The Job object MUST have a member with the name `interface`. This member's value MUST be an object as defined in
+* The Job object SHOULD have a member with the name `resources`. This member's value MUST be an object as defined in
+<<resources-section>>. It is highly advised that this member be specified, without it resources provided will be default
+for the implementing framework.
+* The Job object MAY have a member with the name `interface`. This member's value MUST be an object as defined in
 <<interface-section>>.
-* The Job object MAY have a member with the name `errorMapping`. This member's value MUST be an array containing
-elements defined in <<errormapping-section>>
+* The Job object MAY have a member with the name `errors`. This member's value MUST be an array containing
+elements defined in <<errors-section>>
 
 The following annotated snippet provides quick reference to the use of Job object:
 
@@ -67,7 +68,7 @@ The following annotated snippet provides quick reference to the use of Job objec
     "maintainer": { ... }, // <7>
     "resources": { ... }, // <8>
     "interface": { ... }, // <9>
-    "errorMapping": [ ... ] // <10>
+    "errors": [ ... ] // <10>
 }
 ----
 <1> Required string containing job identifier. Limited to regex `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
@@ -80,9 +81,9 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 <5> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
 <6> Required integer containing job timeout value in seconds.
 <7> Required <<maintainer-section>>.
-<8> Required <<resources-section>>.
-<9> Required <<interface-section>>.
-<10> Optional array of <<errormapping-section>>.
+<8> Optional <<resources-section>>.
+<9> Optional <<interface-section>>.
+<10> Optional array of <<errors-section>>.
 
 [[maintainer-section, Maintainer Object]]
 ===== Maintainer Object
@@ -127,14 +128,17 @@ time. Reference <<environment-variables>> for clarification on what the implemen
 objects and MAY contain any number of elements. There is no other standard restriction on the array size.
 
 .Scalar Elements
-The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk` and
-`mem` that have special meaning and SHOULD be populated by all Seed compliant images.
+The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk`,
+`mem` and `sharedMem` that have special meaning. The reserved resource names `cpu`, `disk` and `mem` SHOULD be
+populated by all Seed compliant images, as the defaults provided at runtime will likely be inadequate to run all but the
+most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
+and will rarely be needed.
 
 * The Scalar object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
 underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the resource required by the job. Refer to
 <<variable-injection>> for details on environment variable available at execution time.
 * The Scalar object MUST have a member `value`. The member's value MUST be a number indicating the quantity of the
-resource required by the job. When dealing with storage resources such as `mem` or `disk` units of 
+resource required by the job. When dealing with storage resources such as `mem` or `disk` units of
 Mebibytes (MiB) MUST be used.
 * The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a number indicating the factor by
 which input file size is multiplied and added to the constant value for resource.
@@ -176,14 +180,14 @@ input file size for scaling memory requirement of job.
 The Interface object is the primary member that describes the command arguments, environment variables,
 mounts, settings, inputs and outputs defined for a job.
 
-* The Interface object MAY have a member with the name `cmd`. The member's value MUST be a string specifying the
+* The Interface object MAY have a member with the name `command`. The member's value MUST be a string specifying the
 complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters
 MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be
-necessary in `cmd` string. The Seed `cmd` member can be treated as analogous to the Docker CMD statement.
-* The Interface object MAY have a member with the name `inputData`. This member's value MUST be an object as defined in
-<<inputdata-section>>.
-* The Interface object MAY have a member with the name `outputData`. This member's value MUST be an object as defined in
-<<outputdata-section>>.
+necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
+* The Interface object MAY have a member with the name `inputs`. This member's value MUST be an object as defined in
+<<inputs-section>>.
+* The Interface object MAY have a member with the name `outputs`. This member's value MUST be an object as defined in
+<<outputs-section>>.
 * The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
 objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on
 the array size.
@@ -196,28 +200,28 @@ The following annotated snippet provides quick reference to the use of Interface
 [source,javascript]
 ----
 {
-    "cmd": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
-    "inputData": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
-    "outputData": { ... }, // <3>
+    "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
+    "inputs": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
+    "outputs": { ... }, // <3>
     "mounts": [ ... ], // <4>
     "settings": [ ... ] // <5>
 }
 ----
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
-<2> Optional <<inputdata-section>>. This is the means to inject external data into the job container.
-<3> Optional <<outputdata-section>>. This is the means to capture results from the job container.
+<2> Optional <<inputs-section>>. This is the means to inject external data into the job container.
+<3> Optional <<outputs-section>>. This is the means to capture results from the job container.
 <4> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
 <5> Optional <<settings-section>>. This defines any environment specific settings needed at run time.
 
-[[inputdata-section, InputData Object]]
-====== InputData Object
-The InputData object is the member responsible for indicating all mutable content available to the Seed image at
+[[inputs-section, Inputs Object]]
+====== Inputs Object
+The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
 runtime.
 
-* The InputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
+* The Inputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
 sub-section.
-* The InputData object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
+* The Inputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
 sub-section.
 
 .Files Elements
@@ -233,8 +237,8 @@ variable available at execution time.
 Media types that the job accepts.
 * The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
 physical files are processed by this `Files` element. If omitted, the default value MUST be treated as false. If true,
-the `cmd` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the `cmd`
-placeholder will be replaced with an absolute path to a single file.
+the `command` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the
+`command` placeholder will be replaced with an absolute path to a single file.
 * The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
@@ -247,7 +251,7 @@ variable available at execution time.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-The following annotated snippet provides quick reference to the use of InputData object:
+The following annotated snippet provides quick reference to the use of Inputs object:
 
 [source,javascript]
 ----
@@ -281,20 +285,20 @@ Default is `false`.
 <8> Required string containing a valid JSON schema type for input validation.
 <9> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
 
-[[outputdata-section, OutputData Object]]
-====== OutputData Object
-The OutputData object is the member responsible for indicating all output data and the means to capture that data
+[[outputs-section, Outputs Object]]
+====== Outputs Object
+The Outputs object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
 extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
-output directory as `results_manifest.json`. The absolute path to the job output directory is REQUIRED to be passed into
-the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
+output directory as `seed.output.manifest.json`. The absolute path to the job output directory is REQUIRED to be passed
+into the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
 <<output-data-permissions,output file permissions>> and support is provided for defining
 <<extended-file-metadata,extended metadata>>.
 
-* The OutputData object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
+* The Outputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
 sub-section.
-* The OutputData object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
+* The Outputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
 sub-section.
 
 .Files Elements
@@ -302,7 +306,7 @@ sub-section.
 characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the key the processing system will place the file name
 captured for downstream processing.
 * The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
-the file being captured by OutputData.
+the file being captured by Outputs.
 * The Files object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the
 capture of files.
 * The Files object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
@@ -324,7 +328,7 @@ defined `name` member.
 * The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
 value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-The following annotated snippets provides quick reference to the use of OutputData object:
+The following annotated snippets provides quick reference to the use of Outputs object:
 
 [source,javascript]
 .Result Manifest
@@ -336,9 +340,9 @@ The following annotated snippets provides quick reference to the use of OutputDa
 ----
 
 [source,javascript]
-.Seed Manifest - OutputData object
+.Seed Manifest - Outputs object
 ----
-"outputData": {
+"outputs": {
     "files": [ // <1>
         {
             "name": "OUTPUT_TIFFS", // <2>
@@ -412,8 +416,8 @@ The Settings object is the member responsible for indicating all content not rel
 Seed job to run. These will be exposed as environment variables at run time. Most commonly, Settings will be used for
 environment specific configuration or external credentials.
 
-While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputData` /
-`outputData`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
+While it is _highly_ advised that Seed jobs SHOULD limit input / output to the provided constructs (`inputs` /
+`outputs`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
 * The Settings object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
@@ -437,21 +441,21 @@ The following annotated snippet provides quick reference to the use of the Setti
 <1> Required string containing the environment variable name to be injected at run time.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
 
-[[errormapping-section, ErrorMapping Objects]]
-===== ErrorMapping Objects
-The ErrorMapping objects allow for job developers to map arbitrary exit codes to meaningful textual descriptions. This
+[[errors-section, Errors Objects]]
+===== Errors Object
+The Errors object allows for job developers to map arbitrary exit codes to meaningful textual descriptions. This
 is useful in passing information to the processing system to differentiate between data and algorithm errors.
 
-* The ErrorMapping object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
+* The Errors object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
 the executing job process.
-* The ErrorMapping object MUST have a member `title`. The member's value MUST be a string indicating the short
+* The Errors object MUST have a member `title`. The member's value MUST be a string indicating the short
 descriptive title of the error.
-* The ErrorMapping object MAY have a member `description`. The member's value MUST be a string indicating the complete
+* The Errors object MAY have a member `description`. The member's value MUST be a string indicating the complete
 error description and possible causes.
-* The ErrorMapping object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
+* The Errors object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
 MUST be a string containing one of the following values: `algorithm`, `data` or `system`.
 
-The following annotated snippet provides quick reference to the use of ErrorMapping objects:
+The following annotated snippet provides quick reference to the use of Errors objects:
 
 [source,javascript]
 ----
