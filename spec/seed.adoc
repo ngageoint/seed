@@ -44,7 +44,7 @@ include::examples/complete/seed.manifest.json[]
 ----
 
 === Definitions
-* Seed specific terms defined in the <<glossary>> supersede all following definitions. These terms can be found
+* Seed specific terms defined in the <<Glossary>> supersede all following definitions. These terms can be found
 _italicized_ throughout the specification.
 * GeoJSON, and the terms Geometry and Polygon are defined in
 https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
@@ -68,7 +68,8 @@ include::sections/usage.adoc[]
 include::sections/discovery.adoc[]
 
 == Glossary
-The following terms are specific to Seed and SHOULD be referenced to clarify their meaning throughout the specification.
+The following terms are specific to Seed and are provided to clarify their meaning. They are _italicized_ 
+throughout the document.
 
 |===
 |Term |Description
