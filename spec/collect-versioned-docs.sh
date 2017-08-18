@@ -10,7 +10,7 @@ OUTPUT_DIR=`pwd`
 if [[ "${TRAVIS_TAG}x" != "x" ]]
 then
     sudo mkdir ${TRAVIS_TAG}
-    sudo cp -R index.html seed.* $TRAVIS_TAG/
+    sudo cp -R seed.* $TRAVIS_TAG/
     sudo cp -R ../schema/*.json $TRAVIS_TAG/
 fi
 
@@ -20,7 +20,7 @@ then
     # Place master contents into master directory
     sudo mkdir -p $OUTPUT_DIR/master/schema
     sudo cp seed.* master/
-    sudo cp master/seed.hml master/index.html
+    sudo cp master/seed.html master/index.html
     sudo cp ../schema/* $OUTPUT_DIR/master/schema
 
     # Create folder structure
@@ -43,9 +43,8 @@ then
         # We are going to place all versions in the root, the last one will win, which satisfies our goal of latest tag
         # being the one seen when hitting the GitHub Pages site.
         cd $OUTPUT_DIR
-        sudo cp -rf $VERSION/* ./
-        sudo rm index.html
-        sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/index.html
+        sudo cp -rf $VERSION/seed* ./
+        sudo cp -rf $VERSION/schema/ schema/
     done
 fi
 

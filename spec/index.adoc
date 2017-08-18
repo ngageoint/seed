@@ -1,6 +1,5 @@
 = Seed
 Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>
-vSEED_VERSION
 
 Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
 image.
