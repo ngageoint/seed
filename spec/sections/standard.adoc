@@ -4,19 +4,19 @@ Completeness is fundamental but the standard accommodates both simple and comple
 REQUIRED properties. The following sections detail every possible REQUIRED and OPTIONAL manifest property in both root
 and child objects.
 
-A complete Seed object contained within a com.ngageoint.seed.manifest label is always a string-escaped serialized
+A complete Seed object contained within a `com.ngageoint.seed.manifest` label is always a string-escaped serialized
 object. In Seed, an object consists of a collection of name/value pairs -- also called members. For each member, the
 name is always a string. Member values are either a string, number, object, array or one of the literals: true, false,
 and null. An array consists of elements where each element is a value as described above.
 
 [[seed-section, Seed Object]]
 === Seed Object
-The Seed object is the root JSON object that MUST be placed within a com.ngageoint.seed.manifest Docker image label.
+The Seed object is the root JSON object that MUST be placed within a `com.ngageoint.seed.manifest` Docker image label.
 At a minimum this object MUST define the `seedVersion` and `job` names.
 
 * The Seed object MUST have a member with the name `seedVersion`. The member's value MUST be a string that
 conforms to the SemVer standard.
-* The Seed object MUST have a member with the name `job`. The member's value is a `Job` object.
+* The Seed object MUST have a member with the name `job`. The member's value is a <<job-section>>.
 
 [source,javascript]
 ----
@@ -122,7 +122,8 @@ publicly accessible URL to complete algorithm design or usage documentation.
 The Resources object is the member that identifies all resource requirements for a job. This is most commonly CPU,
 memory and disk scalar resources, but MAY in the future accommodate more complex types such as ranges and sets. The
 final computed resources allocated for all `scalar` elements MUST be injected as environment variables to the job at run
-time. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide.
+time. Reference <<environment-variables>> and <<resource-defaults>> for clarification on what the implementing framework
+MUST provide.
 
 * The Resources object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
 objects and MAY contain any number of elements. There is no other standard restriction on the array size.
@@ -443,8 +444,8 @@ The following annotated snippet provides quick reference to the use of the Setti
 
 [[errors-section, Errors Objects]]
 ===== Errors Object
-The Errors object allows for job developers to map arbitrary exit codes to meaningful textual descriptions. This
-is useful in passing information to the processing system to differentiate between data and algorithm errors.
+The Errors object allows for _developers_ to map arbitrary exit codes to meaningful textual descriptions. This is useful
+in passing information to the _executor_ to differentiate between data and algorithm errors.
 
 * The Errors object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
 the executing job process.
