@@ -19,11 +19,11 @@ At a minimum this object MUST define the `seedVersion` and `job` names.
 | Name | Requirement 2+| Value
 
 |`seedVersion`
-|Required 
+|Required
 2+|MUST be a string that conforms to the SemVer standard.
 
 |`job`
-|Required 
+|Required
 2+|MUST be a <<job-section>>.
 
 4+a|
@@ -46,7 +46,7 @@ The Job object is the core member for describing a single unit of work and the r
 
 |`name`
 |Required
-2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the 
+2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
 regex† `^[a-z0-9_-]+$`).
 
 |`algorithmVersion`
@@ -71,7 +71,7 @@ regex† `^[a-z0-9_-]+$`).
 
 |`timeout`
 |Required
-2+|MUST be a integer indicating a timeout period measured in seconds. Consuming systems MUST honor this value 
+2+|MUST be a integer indicating a timeout period measured in seconds. Consuming systems MUST honor this value
 as a hard limit on job execution time.
 
 |`maintainer`
@@ -80,7 +80,7 @@ as a hard limit on job execution time.
 
 |`resources`
 |Recommended
-2+|MUST be an object as defined in <<resources-section>>. It is highly advised that this member be specified, 
+2+|MUST be an object as defined in <<resources-section>>. It is highly advised that this member be specified,
 without it resources provided will be default for the implementing framework.
 
 |`interface`
@@ -187,7 +187,7 @@ MUST provide.
 
 |`scalar`
 |Required
-2+|MUST be an array of `Scalar` objects and MAY contain any number of elements. There is no other standard restriction 
+2+|MUST be an array of `Scalar` objects and MAY contain any number of elements. There is no other standard restriction
 on the array size.
 |=====
 
@@ -204,18 +204,18 @@ and will rarely be needed.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating 
-the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at
 execution time.
 
 |`value`
 |Required
-2+|MUST be a number indicating the quantity of the resource required by the job. When dealing with storage resources 
+2+|MUST be a number indicating the quantity of the resource required by the job. When dealing with storage resources
 such as `mem` or `disk` units of Mebibytes (MiB) MUST be used.
 
 |`inputMultiplier`
 |Optional
-2+|MUST be a number indicating the factor by which input file size is multiplied and added to the constant value 
+2+|MUST be a number indicating the factor by which input file size is multiplied and added to the constant value
 for resource.
 |=====
 
@@ -268,9 +268,9 @@ mounts, settings, inputs and outputs defined for a job.
 
 |`command`
 |Optional
-2+|MUST be a string specifying the complete string passed to the container at run time. Based on the Linux shell, shell 
-escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission 
-of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the 
+2+|MUST be a string specifying the complete string passed to the container at run time. Based on the Linux shell, shell
+escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission
+of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the
 Docker CMD statement.
 
 |`inputs`
@@ -283,12 +283,12 @@ Docker CMD statement.
 
 |`mounts`
 |Optional
-2+|MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other 
+2+|MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other
 standard restriction on the array size.
 
 |`settings`
 |Optional
-2+|MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no 
+2+|MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no
 other standard restriction on the array size.
 
 4+| _The following annotated snippet provides quick reference to the use of Interface object:_
@@ -342,7 +342,7 @@ Critical implementation details related to `multiple` member should be reference
 |`name`
 |Required
 2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the environment variable name that will be injected by the processing platform for job consumption. Refer to 
+the environment variable name that will be injected by the processing platform for job consumption. Refer to
 <<variable-injection>> for details on environment variable available at execution time.
 
 |`mediaType`
@@ -351,14 +351,14 @@ the environment variable name that will be injected by the processing platform f
 
 |`multiple`
 |Optional
-2+|MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the 
-default value MUST be treated as false. If true, the `command` placeholder will be replaced with an absolute directory 
-containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single 
+2+|MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the
+default value MUST be treated as false. If true, the `command` placeholder will be replaced with an absolute directory
+containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single
 file.
 
 |`required`
 |Optional
-2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST 
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST
 be treated as true.
 |=====
 
@@ -369,8 +369,8 @@ be treated as true.
 | Name | Requirement 2+| Value
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
-indicating the environment variable name that will be injected by the processing platform for job consumption. 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
+indicating the environment variable name that will be injected by the processing platform for job consumption.
 Refer to <<variable-injection>> for details on environment variable available at execution time.
 
 |`type`
@@ -379,7 +379,7 @@ Refer to <<variable-injection>> for details on environment variable available at
 
 |`required`
 |Optional
-2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value 
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
 MUST be treated as true.
 |=====
 
@@ -452,7 +452,7 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
 indicating the key the processing system will place the file name captured for downstream processing.
 
 |`mediaType`
@@ -465,12 +465,12 @@ indicating the key the processing system will place the file name captured for d
 
 |`count`
 |Optional
-2+|MUST be a string that accepts 2 possibilities: positive numeric values or a `\*`. Numeric values indicate an 
+2+|MUST be a string that accepts 2 possibilities: positive numeric values or a `\*`. Numeric values indicate an
 explicit match expected for `pattern` while `*` indicates matching with no upper bound.
 
 |`required`
 |Optional
-2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value 
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
 is `true`.
 |=====
 
@@ -481,8 +481,8 @@ is `true`.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
-indicating the key the processing system will place the JSON member value in for downstream use. When `key` member 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
+indicating the key the processing system will place the JSON member value in for downstream use. When `key` member
 is omitted, it must be a case-sensitive match of the member key in result manifest.
 
 |`type`
@@ -491,12 +491,12 @@ is omitted, it must be a case-sensitive match of the member key in result manife
 
 |`key`
 |Optional
-2+|MUST be a string and indicate the case-sensitive result manifest member to capture. If omitted, the result member 
+2+|MUST be a string and indicate the case-sensitive result manifest member to capture. If omitted, the result member
 key is assumed to be a case-sensitive match for the above defined `name` member.
 
 |`required`
 |Optional
-2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value 
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
 MUST be treated as true.
 |=====
 
@@ -504,16 +504,8 @@ The following annotated snippets provides quick reference to the use of Outputs 
 
 [cols="2,1,2,5"]
 |=====
-4+a|
-[source,javascript]
-.Result Manifest
-----
-{
-    "cellCount": 256,
-    ...
-}
-----
 3+a|
+Seed `outputs` object snippet:
 [source,javascript]
 ----
 "outputs": {
@@ -537,6 +529,15 @@ The following annotated snippets provides quick reference to the use of Outputs 
     ]
 }
 ----
+seed.output.manifest.json:
+[source,javascript]
+
+----
+{
+    "cellCount": 256, //<11>
+    ...
+}
+----
 a|
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing output identifier.
@@ -553,6 +554,7 @@ result manifest in absence of `key` member.
 <9> Required string containing JSON schema type of member extracted from result manifest.
 <10> Optional string containing key of result manifest member for extraction. This allows mapping from a result manifest
 member key that differs from the value of `name` member.
+<11> Example output manifest containing key defined in (10).
 |=====
 
 [[mounts-section, Mounts Object]]
@@ -567,18 +569,18 @@ reference data that the Job requires.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that 
-correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
+correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the
 mount is provided.
 
 |`path`
 |Required
-2+|MUST be an absolute file system path specifying where in the container the Job expects the shared directory to be 
+2+|MUST be an absolute file system path specifying where in the container the Job expects the shared directory to be
 mounted.
 
 |`mode`
 |Optional
-2+|MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access. 
+2+|MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access.
 Default value is "ro".
 4+| _The following annotated snippet provides quick reference to the use of Mounts object:_
 3+a|
@@ -615,13 +617,13 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that 
-indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on 
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
+indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on
 environment variable available at execution time.
 
 |`secret`
 |Optional
-2+|MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a 
+2+|MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a
 secure string.
 4+| _The following annotated snippet provides quick reference to the use of Settings object:_
 3+a|
@@ -663,7 +665,7 @@ in passing information to the executor† to differentiate between data and algo
 
 |`category`
 |Optional
-2+|MUST be a string containing one of the following values: `algorithm`, `data` or `system`. If omitted, the default 
+2+|MUST be a string containing one of the following values: `algorithm`, `data` or `system`. If omitted, the default
 value is `algorithm`.
 4+| _The following annotated snippet provides quick reference to the use of Errors object:_
 3+a|
