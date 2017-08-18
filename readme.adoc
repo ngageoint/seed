@@ -15,7 +15,7 @@ are provided for Seed usage in both simple and complex algorithm scenarios and t
 algorithm developers interested in getting started quickly.
 
 The Seed team is in the process of developing a fully featured CLI that will minimize the domain expertise
-required for an algorithm developer to get a Seed image ready for distribution. This will handle the Docker
+required for an algorithm developer† to get a Seed image ready for distribution. This will handle the Docker
 image construction and publish, so focus can be given to what really matters - describing your algorithm's
 purpose, requirements and interface.
 
