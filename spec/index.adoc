@@ -18,4 +18,4 @@ push. This requirement will be deprecated as label search support is standardize
 
 See the latest version of the link:seed.html[full specification] for complete detail on manifest format.
 
-Specification permalinks:
+Specification versions:
