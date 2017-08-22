@@ -1,0 +1,11 @@
+<style>
+    /* disable the default striping of rows */
+    table tr.even, table tr.alt, table tr:nth-of-type(even) {
+        background: none
+    }
+    /* stripe even rows only when the "striped" CSS class is used */
+    table.striped tr.even, table.striped tr.alt, table.striped tr:nth-of-type(even) td:nth-child(){
+        background: #f8f8f7;
+    }
+</style>
+

@@ -7,6 +7,7 @@ vSEED_VERSION
 :sectnums:
 :sectnumlevels: 5
 :icons: font
+:docinfo:
 
 == Introduction
 

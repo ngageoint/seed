@@ -1,3 +1,5 @@
+:tabletags-red.bodydata: <td style="background-color:red;">|</td>
+
 The Seed standard is intended to provide a complete definition of the runtime processing, memory and storage
 requirements of a discrete unit of work, in addition to the inputs, outputs and potential errors produced.
 Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
@@ -91,7 +93,8 @@ without it resources provided will be default for the implementing framework.
 |Optional
 2+|MUST be an array containing elements defined in <<errors-section>>
 
-4+| _The following annotated snippet provides quick reference to the use of Job object:_
+4+h| _The following annotated snippet provides quick reference to the use of Job object:_
+
 3+a|
 [source,javascript]
 ----
@@ -153,7 +156,8 @@ contact for a Seed job.
 |Optional
 2+|MUST be a string and SHOULD contain a publicly accessible URL to complete algorithm design or usage documentation.
 
-4+| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+
 3+a|
 [source,javascript]
 ----
@@ -236,7 +240,8 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 
 [cols="2,1,2,5",options=""]
 |=====
-4+| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+
 3+a|
 [source,javascript]
 ----
@@ -291,7 +296,8 @@ standard restriction on the array size.
 2+|MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no
 other standard restriction on the array size.
 
-4+| _The following annotated snippet provides quick reference to the use of Interface object:_
+4+h| _The following annotated snippet provides quick reference to the use of Interface object:_
+
 3+a|
 [source,javascript]
 ----
@@ -363,7 +369,6 @@ be treated as true.
 |=====
 
 .JSON Elements
-
 [cols="2,1,2,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
@@ -385,7 +390,8 @@ MUST be treated as true.
 
 [cols="2,1,2,5"]
 |=====
-4+| _The following annotated snippet provides quick reference to the use of Inputs object:_
+4+h| _The following annotated snippet provides quick reference to the use of Inputs object:_
+
 3+a|
 [source,javascript]
 ----
@@ -475,8 +481,9 @@ is `true`.
 |=====
 
 .JSON Elements
+.title
 [cols="2,1,2,5",options="header"]
-|=====
+|====
 | Name | Requirement 2+| Value
 
 |`name`
@@ -498,7 +505,7 @@ key is assumed to be a case-sensitive match for the above defined `name` member.
 |Optional
 2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
 MUST be treated as true.
-|=====
+|====
 
 The following annotated snippets provides quick reference to the use of Outputs object:
 
@@ -582,7 +589,9 @@ mounted.
 |Optional
 2+|MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access.
 Default value is "ro".
-4+| _The following annotated snippet provides quick reference to the use of Mounts object:_
+
+4+h| _The following annotated snippet provides quick reference to the use of Mounts object:_
+
 3+a|
 [source,javascript]
 ----
@@ -625,7 +634,9 @@ environment variable available at execution time.
 |Optional
 2+|MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a
 secure string.
-4+| _The following annotated snippet provides quick reference to the use of Settings object:_
+
+4+h| _The following annotated snippet provides quick reference to the use of Settings object:_
+
 3+a|
 [source,javascript]
 ----
@@ -667,7 +678,9 @@ in passing information to the executor† to differentiate between data and algo
 |Optional
 2+|MUST be a string containing one of the following values: `algorithm`, `data` or `system`. If omitted, the default
 value is `algorithm`.
-4+| _The following annotated snippet provides quick reference to the use of Errors object:_
+
+4+h| _The following annotated snippet provides quick reference to the use of Errors object:_
+
 3+a|
 [source,javascript]
 ----
