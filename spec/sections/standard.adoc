@@ -542,7 +542,7 @@ Seed `outputs` object snippet:
     ]
 }
 ----
-seed.output.manifest.json:
+seed.outputs.json:
 [source,javascript]
 
 ----
