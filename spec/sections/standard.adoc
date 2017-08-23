@@ -1,3 +1,5 @@
+:tabletags-red.bodydata: <td style="background-color:red;">|</td>
+
 The Seed standard is intended to provide a complete definition of the runtime processing, memory and storage
 requirements of a discrete unit of work, in addition to the inputs, outputs and potential errors produced.
 Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
@@ -14,10 +16,19 @@ and null. An array consists of elements where each element is a value as describ
 The Seed object is the root JSON object that MUST be placed within a `com.ngageoint.seed.manifest` Docker image label.
 At a minimum this object MUST define the `seedVersion` and `job` names.
 
-* The Seed object MUST have a member with the name `seedVersion`. The member's value MUST be a string that
-conforms to the SemVer standard.
-* The Seed object MUST have a member with the name `job`. The member's value is a <<job-section>>.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
+|`seedVersion`
+|Required
+2+|MUST be a string that conforms to the SemVer standard.
+
+|`job`
+|Required
+2+|MUST be a <<job-section>>.
+
+4+a|
 [source,javascript]
 ----
 {
@@ -25,37 +36,66 @@ conforms to the SemVer standard.
   "job": { ... }
 }
 ----
+|=====
 
 [[job-section, Job Objects]]
 ==== Job Object
 The Job object is the core member for describing a single unit of work and the resources it requires.
 
-* The Job object MUST have a member with the name `name`. The member's value MUST be a string of only lowercase
-alpha-numeric, dash or underscore characters (defined by the regex `^[a-z0-9_-]+$`).
-* The Job object MUST have a member with the name `algorithmVersion`. The member's value MUST be a string that conforms
-to the SemVer standard.
-* The Job object MUST have a member with the name `packageVersion`. The member's value MUST be a string that conforms
-to the SemVer standard.
-* The Job object MUST have a member with the name `title`. The member's value MUST be a string and SHOULD contain a
-short descriptive title of the job.
-* The Job object MUST have a member with the name `description`. The member's value MUST be a string and SHOULD contain
-a full job abstract.
-* The Job object MAY have a member with the name `tags`. The member's value MUST be an array of strings and MAY contain
-any number of elements.
-* The Job object MUST have a member with the name `timeout`. This member's values MUST be a integer indicating a timeout
-period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
-* The Job object MUST have a member with the name `maintainer`. The member's value MUST be an object as defined in
-<<maintainer-section>>.
-* The Job object SHOULD have a member with the name `resources`. This member's value MUST be an object as defined in
-<<resources-section>>. It is highly advised that this member be specified, without it resources provided will be default
-for the implementing framework.
-* The Job object MAY have a member with the name `interface`. This member's value MUST be an object as defined in
-<<interface-section>>.
-* The Job object MAY have a member with the name `errors`. This member's value MUST be an array containing
-elements defined in <<errors-section>>
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
-The following annotated snippet provides quick reference to the use of Job object:
+|`name`
+|Required
+2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
+regex† `^[a-z0-9_-]+$`).
 
+|`algorithmVersion`
+|Required
+2+|MUST be a string that conforms to the SemVer standard.
+
+|`packageVersion`
+|Required
+2+|MUST be a string that conforms to the SemVer standard.
+
+|`title`
+|Required
+2+|MUST be a string and SHOULD contain a short descriptive title of the job.
+
+|`description`
+|Required
+2+|MUST be a string and SHOULD contain a full job abstract.
+
+|`tags`
+|Optional
+2+|MUST be an array of strings and MAY contain any number of elements.
+
+|`timeout`
+|Required
+2+|MUST be a integer indicating a timeout period measured in seconds. Consuming systems MUST honor this value
+as a hard limit on job execution time.
+
+|`maintainer`
+|Required
+2+|MUST be an object as defined in <<maintainer-section>>.
+
+|`resources`
+|Recommended
+2+|MUST be an object as defined in <<resources-section>>. It is highly advised that this member be specified,
+without it resources provided will be default for the implementing framework.
+
+|`interface`
+|Optional
+2+|MUST be an object as defined in <<interface-section>>.
+
+|`errors`
+|Optional
+2+|MUST be an array containing elements defined in <<errors-section>>
+
+4+h| _The following annotated snippet provides quick reference to the use of Job object:_
+
+3+a|
 [source,javascript]
 ----
 {
@@ -71,7 +111,8 @@ The following annotated snippet provides quick reference to the use of Job objec
     "errors": [ ... ] // <10>
 }
 ----
-<1> Required string containing job identifier. Limited to regex `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
+a|
+<1> Required string containing job identifier. Limited to regex† `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
 combined should be unique system-wide.
 <2> Required string containing version identifier of algorithm in SemVer format. `name` and `algorithmVersion` members
 combined should be unique system-wide.
@@ -84,23 +125,40 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 <8> Optional <<resources-section>>.
 <9> Optional <<interface-section>>.
 <10> Optional array of <<errors-section>>.
+|=====
 
 [[maintainer-section, Maintainer Object]]
 ===== Maintainer Object
 The Maintainer object is the member that identifies the individual and organization (optional) acting as a point of
 contact for a Seed job.
 
-* The Maintainer object MUST have a member with the name `name`. The member's value MUST be a string and SHOULD contain
-the full name of maintaining individual.
-* The Maintainer object MUST have a member with the name `email`. The member's value MUST be a string and SHOULD contain
-the best contact email for maintaining individual or organization.
-* The Maintainer object MAY have a member with the name `phone`. The member's value MUST be a string and SHOULD contain
-the best contact phone number for maintaining individual or organization.
-* The Maintainer object MAY have a member with the name `organization`. The member's value MUST be a string and SHOULD
-contain organization responsible for maintaining or sponsoring Seed job.
-* The Maintainer object MAY have a member with the name `url`. The member's value MUST be a string and SHOULD contain a
-publicly accessible URL to complete algorithm design or usage documentation.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
+|`name`
+|Required
+2+|MUST be a string and SHOULD contain the full name of maintaining individual.
+
+|`email`
+|Required
+2+|MUST be a string and SHOULD contain the best contact email for maintaining individual or organization.
+
+|`phone`
+|Optional
+2+|MUST be a string and SHOULD contain the best contact phone number for maintaining individual or organization.
+
+|`organization`
+|Optional
+2+|MUST be a string and SHOULD contain the organization responsible for maintaining or sponsoring Seed job.
+
+|`url`
+|Optional
+2+|MUST be a string and SHOULD contain a publicly accessible URL to complete algorithm design or usage documentation.
+
+4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+
+3+a|
 [source,javascript]
 ----
 {
@@ -111,11 +169,13 @@ publicly accessible URL to complete algorithm design or usage documentation.
     "url": "http://www.example.com" // <5>
 }
 ----
+a|
 <1> Required string containing full name of maintaining individual.
 <2> Required string containing best contact email for maintaining individual or organization.
 <3> Optional string containing best contact phone number for maintaining individual or organization.
 <4> Optional string containing organization responsible for maintaining or sponsoring Seed job.
 <5> Optional string containing publicly accessible URL to complete algorithm design or usage documentation.
+|=====
 
 [[resources-section, Resources Object]]
 ===== Resources Object
@@ -125,8 +185,15 @@ final computed resources allocated for all `scalar` elements MUST be injected as
 time. Reference <<environment-variables>> and <<resource-defaults>> for clarification on what the implementing framework
 MUST provide.
 
-* The Resources object MUST have a member with the name `scalar`. The member's value is an array of `Scalar`
-objects and MAY contain any number of elements. There is no other standard restriction on the array size.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`scalar`
+|Required
+2+|MUST be an array of `Scalar` objects and MAY contain any number of elements. There is no other standard restriction
+on the array size.
+|=====
 
 .Scalar Elements
 The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk`,
@@ -135,30 +202,47 @@ populated by all Seed compliant images, as the defaults provided at runtime will
 most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
 and will rarely be needed.
 
-* The Scalar object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the resource required by the job. Refer to
-<<variable-injection>> for details on environment variable available at execution time.
-* The Scalar object MUST have a member `value`. The member's value MUST be a number indicating the quantity of the
-resource required by the job. When dealing with storage resources such as `mem` or `disk` units of
-Mebibytes (MiB) MUST be used.
-* The Scalar object MAY have a member `inputMultiplier`. The member's value MUST be a number indicating the factor by
-which input file size is multiplied and added to the constant value for resource.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at
+execution time.
+
+|`value`
+|Required
+2+|MUST be a number indicating the quantity of the resource required by the job. When dealing with storage resources
+such as `mem` or `disk` units of Mebibytes (MiB) MUST be used.
+
+|`inputMultiplier`
+|Optional
+2+|MUST be a number indicating the factor by which input file size is multiplied and added to the constant value
+for resource.
+|=====
 
 Use of `inputMultiplier` for `mem` or `disk` resource types is useful when memory or output disk requirements of a job
 are a function of input file size. The following basic formula computes the resource requirement when an
 `inputMultiplier` is defined.
 
 ----
-resourceRequirement = inputVolume * inputMultiplier + constantValue`
+resourceRequirement = inputVolume * inputMultiplier + constantValue
 ----
 
-For example, when total input file size is 2.0MiB and an `inputMultiplier` of `4.0` and `value` of `0.1` is 
+For example, when total input file size is 2.0MiB and an `inputMultiplier` of `4.0` and `value` of `0.1` is
 specified for `disk`, the following computes the resource requirement:
 
 ----
 diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 ----
 
+[cols="2,1,2,5",options=""]
+|=====
+4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+
+3+a|
 [source,javascript]
 ----
 [
@@ -168,6 +252,7 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
     ... // <4>
 ]
 ----
+a|
 <1> Recommended Scalar element demonstrating single constant scalar value for specifying CPU requirement of job.
 <2> Optional Scalar element demonstrating single constant scalar value in addition to a multiplier based on total input
 file size for scaling disk requirement of job. This multiplier allows for scaling the output disk space required as a
@@ -175,29 +260,45 @@ function of input file size.
 <3> Recommended Scalar element demonstrating single constant scalar value in addition to a multiplier based on total
 input file size for scaling memory requirement of job.
 <4> Optional additional Scalar elements for any custom resources needed by job.
+|=====
 
 [[interface-section, Interface Object]]
 ===== Interface Object
 The Interface object is the primary member that describes the command arguments, environment variables,
 mounts, settings, inputs and outputs defined for a job.
 
-* The Interface object MAY have a member with the name `command`. The member's value MUST be a string specifying the
-complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters
-MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be
-necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
-* The Interface object MAY have a member with the name `inputs`. This member's value MUST be an object as defined in
-<<inputs-section>>.
-* The Interface object MAY have a member with the name `outputs`. This member's value MUST be an object as defined in
-<<outputs-section>>.
-* The Interface object MAY have a member with the name `mounts`. The member's value is an array of `Mounts`
-objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on
-the array size.
-* The Interface object MAY have a member with the name `settings`. The member's value is an array of `Settings`
-objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on
-the array size.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
-The following annotated snippet provides quick reference to the use of Interface object:
+|`command`
+|Optional
+2+|MUST be a string specifying the complete string passed to the container at run time. Based on the Linux shell, shell
+escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission
+of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the
+Docker CMD statement.
 
+|`inputs`
+|Optional
+2+|MUST be an object as defined in <<inputs-section>>.
+
+|`outputs`
+|Optional
+2+|MUST be an object as defined in <<outputs-section>>.
+
+|`mounts`
+|Optional
+2+|MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no 
+other standard restriction on the array size.
+
+|`settings`
+|Optional
+2+|MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no
+other standard restriction on the array size.
+
+4+h| _The following annotated snippet provides quick reference to the use of Interface object:_
+
+3+a|
 [source,javascript]
 ----
 {
@@ -208,52 +309,92 @@ The following annotated snippet provides quick reference to the use of Interface
     "settings": [ ... ] // <5>
 }
 ----
+a|
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
 <2> Optional <<inputs-section>>. This is the means to inject external data into the job container.
 <3> Optional <<outputs-section>>. This is the means to capture results from the job container.
 <4> Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
 <5> Optional <<settings-section>>. This defines any environment specific settings needed at run time.
+|=====
 
 [[inputs-section, Inputs Object]]
 ====== Inputs Object
 The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
 runtime.
 
-* The Inputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
-sub-section.
-* The Inputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
-sub-section.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`files`
+|Optional
+2+|MUST be an array of objects defined in the Files Elements sub-section.
+
+|`json`
+|Optional
+2+|MUST be an array of objects defined in the JSON Elements sub-section.
+|=====
 
 .Files Elements
 
 Critical implementation details related to `multiple` member should be referenced in
-<<environment-variables,environment variables>>.
+<<environment-variables,environment variables>>. Below are the File elements for inputs.
 
-* The Files object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the environment variable name that will be
-injected by the processing platform for job consumption. Refer to <<variable-injection>> for details on environment
-variable available at execution time.
-* The Files object MUST have a member `mediaType`. The member's value is an array of strings that MUST indicate the IANA
-Media types that the job accepts.
-* The Files object MAY have a member `multiple`. The member's value MUST be a boolean indicating whether multiple
-physical files are processed by this `Files` element. If omitted, the default value MUST be treated as false. If true,
-the `command` placeholder will be replaced with an absolute directory containing all files. If false or omitted, the
-`command` placeholder will be replaced with an absolute path to a single file.
-* The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the environment variable name that will be injected by the processing platform for job consumption. Refer to
+<<variable-injection>> for details on environment variable available at execution time.
+
+|`mediaType`
+|Required
+2+|MUST be an array of strings that MUST indicate the IANA Media types that the job accepts.
+
+|`multiple`
+|Optional
+2+|MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the
+default value MUST be treated as false. If true, the `command` placeholder will be replaced with an absolute directory
+containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single
+file.
+
+|`required`
+|Optional
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST
+be treated as true.
+|=====
 
 .JSON Elements
-* The JSON object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the environment variable name that will be
-injected by the processing platform for job consumption. Refer to <<variable-injection>> for details on environment
-variable available at execution time.
-* The JSON object MUST have a member `type`. The member's value MUST be a string and indicate a valid JSON schema type.
-* The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+Below are the JSON elements for inputs.
 
-The following annotated snippet provides quick reference to the use of Inputs object:
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
+indicating the environment variable name that will be injected by the processing platform for job consumption.
+Refer to <<variable-injection>> for details on environment variable available at execution time.
 
+|`type`
+|Required
+2+|MUST be a string and indicate a valid JSON schema type.
+
+|`required`
+|Optional
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+MUST be treated as true.
+|=====
+
+[cols="2,1,2,5"]
+|=====
+4+h| _The following annotated snippet provides quick reference to the use of Inputs object:_
+
+3+a|
 [source,javascript]
 ----
 {
@@ -275,6 +416,7 @@ The following annotated snippet provides quick reference to the use of Inputs ob
     ]
 }
 ----
+a|
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing name used to inject data via environment variables.
 <3> Required array containing a list of accepted Media types.
@@ -285,6 +427,7 @@ Default is `false`.
 <7> Required string containing name used to inject data via environment variables.
 <8> Required string containing a valid JSON schema type for input validation.
 <9> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
+|=====
 
 [[outputs-section, Outputs Object]]
 ====== Outputs Object
@@ -297,51 +440,86 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 <<output-data-permissions,output file permissions>> and support is provided for defining
 <<extended-file-metadata,extended metadata>>.
 
-* The Outputs object MAY have a member `files`. The member's value is an array of objects defined in Files Elements
-sub-section.
-* The Outputs object MAY have a member `json`. The member's value is an array of objects defined in JSON Elements
-sub-section.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`files`
+|Optional
+2+|MUST be an array of objects defined in the Files Elements sub-section.
+
+|`json`
+|Optional
+2+|MUST be an array of objects defined in the JSON Elements sub-section.
+|=====
 
 .Files Elements
-* The Files object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or underscore
-characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the key the processing system will place the file name
-captured for downstream processing.
-* The Files object MUST have a member `mediaType`. The member's value MUST indicate the IANA Media type for
-the file being captured by Outputs.
-* The Files object MUST have a member `pattern`. The member's value MUST indicate a standard glob pattern for the
-capture of files.
-* The Files object MAY have a member `count`. The member's value MUST be a string that accepts 2 possibilities:
-positive numeric values or a `\*`. Numeric values indicate an explicit match expected for `pattern` while `*` indicates
-matching with no upper bound.
-* The Files object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value SHOULD always be expected. If omitted, the default value is `true`.
+Below are the File elements for outputs.
+
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
+indicating the key the processing system will place the file name captured for downstream processing.
+
+|`mediaType`
+|Required
+2+|MUST indicate the IANA Media type for the file being captured by Outputs.
+
+|`pattern`
+|Required
+2+|MUST indicate a standard glob pattern for the capture of files.
+
+|`count`
+|Optional
+2+|MUST be a string that accepts 2 possibilities: positive numeric values or a `\*`. Numeric values indicate an
+explicit match expected for `pattern` while `*` indicates matching with no upper bound.
+
+|`required`
+|Optional
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+is `true`.
+|=====
 
 .JSON Elements
-* The JSON object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) indicating the key the processing system will place the
-JSON member value in for downstream use. When `key` member is omitted, it must be a case-sensitive match of the member
-key in result manifest.
-* The JSON object MUST have a member `type`. The member's value MUST be a string and indicate the JSON schema type of
-the member being captured from the result manifest.
-* The JSON object MAY have a member `key`. The member's value MUST be a string and indicate the case-sensitive result
-manifest member to capture. If omitted, the result member key is assumed to be a case-sensitive match for the above
-defined `name` member.
-* The JSON object MAY have a member `required`. The member's value MUST be a boolean indicating whether this input
-value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+Below are the JSON elements for outputs.
 
-The following annotated snippets provides quick reference to the use of Outputs object:
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
+
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
+indicating the key the processing system will place the JSON member value in for downstream use. When `key` member
+is omitted, it must be a case-sensitive match of the member key in result manifest.
+
+|`type`
+|Required
+2+|MUST be a string and indicate the JSON schema type of the member being captured from the result manifest.
+
+|`key`
+|Optional
+2+|MUST be a string and indicate the case-sensitive result manifest member to capture. If omitted, the result member
+key is assumed to be a case-sensitive match for the above defined `name` member.
+
+|`required`
+|Optional
+2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+MUST be treated as true.
+|=====
+
+[cols="2,1,2,5"]
+|=====
+4+h| _The following annotated snippets provides quick reference to the use of Outputs object:_
+
+3+a|
+Seed `outputs` object snippet:
 
 [source,javascript]
-.Result Manifest
-----
-{
-    "cellCount": 256,
-    ...
-}
-----
-
-[source,javascript]
-.Seed Manifest - Outputs object
 ----
 "outputs": {
     "files": [ // <1>
@@ -364,6 +542,16 @@ The following annotated snippets provides quick reference to the use of Outputs 
     ]
 }
 ----
+seed.outputs.json:
+[source,javascript]
+
+----
+{
+    "cellCount": 256, //<11>
+    ...
+}
+----
+a|
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing output identifier.
 <3> Required string containing IANA Media type of file.
@@ -379,6 +567,8 @@ result manifest in absence of `key` member.
 <9> Required string containing JSON schema type of member extracted from result manifest.
 <10> Optional string containing key of result manifest member for extraction. This allows mapping from a result manifest
 member key that differs from the value of `name` member.
+<11> Example output manifest containing key defined in (10).
+|=====
 
 [[mounts-section, Mounts Object]]
 ====== Mounts Object
@@ -386,16 +576,29 @@ The Mounts object is the member responsible for indicating any additional direct
 container for the Job to run. A mount directory is typically a shared file system directory that contains some set of
 reference data that the Job requires.
 
-* The Mounts object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) that correlates mount references elsewhere in the Interface
-to an external mount configuration that specifies how the mount is provided.
-* The Mounts object MUST have a member `path`. The member's value is an absolute file system path specifying where in
- the container the Job expects the shared directory to be mounted.
-* The Settings object MAY have a member `mode`. The member's value is a string that either specifies "ro" for read-only
- access to the directory or "rw" for read-write access. Default value is "ro".
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
-The following annotated snippet provides quick reference to the use of the Mounts object:
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
+correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the
+mount is provided.
 
+|`path`
+|Required
+2+|MUST be an absolute file system path specifying where in the container the Job expects the shared directory to be
+mounted.
+
+|`mode`
+|Optional
+2+|MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access.
+Default value is "ro".
+
+4+h| _The following annotated snippet provides quick reference to the use of Mounts object:_
+
+3+a|
 [source,javascript]
 ----
 [
@@ -407,9 +610,11 @@ The following annotated snippet provides quick reference to the use of the Mount
     ...
 ]
 ----
+a|
 <1> Required string containing the name to be used to lookup uses in the Interface.
 <2> Required string indicating the absolute file system path where the directory should be mounted.
 <3> Optional string indicating whether the directory should be mounted in read-only ("ro") or read-write ("rw") mode.
+|=====
 
 [[settings-section, Settings Object]]
 ====== Settings Object
@@ -421,43 +626,68 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 `outputs`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
-* The Settings object MUST have a member `name`. The member's value MUST be a string of only alphabetic, dash or
-underscore characters (defined by the regex `^[a-zA-Z_-]+$`) that indicates the environment variable to be injected at
-run time. Refer to <<variable-injection>> for details on environment variable available at execution time.
-* The Settings object MAY have a member `secret`. The member's value is a boolean that indicates whether the value
- associated with the named setting is secret and stored as a secure string.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
-The following annotated snippet provides quick reference to the use of the Settings object:
+|`name`
+|Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
+indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on
+environment variable available at execution time.
 
+|`secret`
+|Optional
+2+|MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a
+secure string.
+
+4+h| _The following annotated snippet provides quick reference to the use of Settings object:_
+
+3+a|
 [source,javascript]
 ----
 [
-    {
-        "name": "SETTING1", // <1>
-        "secret": true // <2>
-    },
-    ...
+   {
+       "name": "SETTING1", // <1>
+       "secret": true // <2>
+   },
+   ...
 ]
 ----
+a|
 <1> Required string containing the environment variable name to be injected at run time.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
+|=====
 
 [[errors-section, Errors Objects]]
 ===== Errors Object
-The Errors object allows for _developers_ to map arbitrary exit codes to meaningful textual descriptions. This is useful
-in passing information to the _executor_ to differentiate between data and algorithm errors.
+The Errors object allows for developers† to map arbitrary exit codes to meaningful textual descriptions. This is useful
+in passing information to the executor† to differentiate between data and algorithm errors.
 
-* The Errors object MUST have a member `code`. The member's value MUST be an integer indicating the exit code of
-the executing job process.
-* The Errors object MUST have a member `title`. The member's value MUST be a string indicating the short
-descriptive title of the error.
-* The Errors object MAY have a member `description`. The member's value MUST be a string indicating the complete
-error description and possible causes.
-* The Errors object MAY have a member `category`. If omitted, the default value is `algorithm`. The member's value
-MUST be a string containing one of the following values: `algorithm`, `data` or `system`.
+[cols="2,1,2,5",options="header"]
+|=====
+| Name | Requirement 2+| Value
 
-The following annotated snippet provides quick reference to the use of Errors objects:
+|`code`
+|Required
+2+|MUST be an integer indicating the exit code of the executing job process.
 
+|`title`
+|Required
+2+|MUST be a string indicating the short descriptive title of the error.
+
+|`description`
+|Optional
+2+|MUST be a string indicating the complete error description and possible causes.
+
+|`category`
+|Optional
+2+|MUST be a string containing one of the following values: `algorithm`, `data` or `system`. If omitted, the default
+value is `algorithm`.
+
+4+h| _The following annotated snippet provides quick reference to the use of Errors object:_
+
+3+a|
 [source,javascript]
 ----
 [
@@ -470,8 +700,10 @@ The following annotated snippet provides quick reference to the use of Errors ob
     ...
 ]
 ----
+a|
 <1> Required integer indicating job process exit code.
 <2> Required string containing human-friendly short name of error.
 <3> Optional string containing complete error code description.
 <4> Optional string containing the error type. This value MUST be either: `algorithm`, `data` or `system`. The default
 value is `algorithm`.
+|=====
