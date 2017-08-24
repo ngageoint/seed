@@ -82,16 +82,10 @@
         "code": 1,
         "title": "Error Name",
         "description": "Error Description",
-        "category": "system"
-      },
-      {
-        "code": 2,
-        "title": "Error Name",
-        "description": "Error Description",
         "category": "data"
       },
       {
-        "code": 3,
+        "code": 2,
         "title": "Error Name",
         "description": "Error Description",
         "category": "job"

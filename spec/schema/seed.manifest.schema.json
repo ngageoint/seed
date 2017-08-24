@@ -313,8 +313,7 @@
                 "default": "job",
                 "enum": [
                   "job",
-                  "data",
-                  "system"
+                  "data"
                 ]
               }
             },

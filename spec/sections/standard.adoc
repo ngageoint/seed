@@ -682,7 +682,7 @@ in passing information to the executor† to differentiate between data and job 
 
 |`category`
 |Optional
-2+|MUST be a string containing one of the following values: `job`, `data` or `system`. If omitted, the default
+2+|MUST be a string containing one of the following values: `job` or `data`. If omitted, the default
 value is `job`.
 
 4+h| _The following annotated snippet provides quick reference to the use of Errors object:_
@@ -695,7 +695,7 @@ value is `job`.
         "code": 1, // <1>
         "title": "Error Name", // <2>
         "description": "Error Description", // <3>
-        "category": "system" // <4>
+        "category": "job" // <4>
     },
     ...
 ]
@@ -704,6 +704,6 @@ a|
 <1> Required integer indicating job process exit code.
 <2> Required string containing human-friendly short name of error.
 <3> Optional string containing complete error code description.
-<4> Optional string containing the error type. This value MUST be either: `job`, `data` or `system`. The default
+<4> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
 value is `job`.
 |=====
