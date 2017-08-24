@@ -2,8 +2,8 @@
   "seedVersion": "SEED_VERSION",
   "job": {
     "name": "my-job",
-    "jobVersion": "0.1.0",
-    "packageVersion": "0.1.0",
+    "jobVersion": "1.0.0",
+    "packageVersion": "1.0.0",
     "title": "My first job",
     "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
     "tags": [
@@ -71,8 +71,8 @@
     },
     "resources": {
       "scalar": [
-        { "name": "cpu", "value": 10.0 },
-        { "name": "mem", "value": 10240.0 },
+        { "name": "cpu", "value": 1.0 },
+        { "name": "mem", "value": 128.0 },
         { "name": "sharedMem", "value": 0.0 },
         { "name": "disk", "value": 10.0, "inputMultiplier": 4.0 }
       ]

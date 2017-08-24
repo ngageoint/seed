@@ -12,6 +12,7 @@ then
     sudo mkdir ${TRAVIS_TAG}
     sudo cp -R seed.* $TRAVIS_TAG/
     sudo cp -R ../schema/*.json $TRAVIS_TAG/
+    sudo cp ../examples/complete/seed.manifest.json $TRAVIS_TAG/seed.manifest.example.json
 fi
 
 # Grab all available versions to place in gh-pages
