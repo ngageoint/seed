@@ -51,7 +51,7 @@ The Job object is the core member for describing a single unit of work and the r
 2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
 regex† `^[a-z0-9_-]+$`).
 
-|`algorithmVersion`
+|`jobVersion`
 |Required
 2+|MUST be a string that conforms to the SemVer standard.
 
@@ -99,10 +99,10 @@ without it resources provided will be default for the implementing framework.
 [source,javascript]
 ----
 {
-    "name": "my-algorithm", // <1>
-    "algorithmVersion": "1.0.0", // <2>
+    "name": "my-job", // <1>
+    "jobVersion": "1.0.0", // <2>
     "packageVersion": "1.0.0", // <3>
-    "title": "My first algorithm", // <4>
+    "title": "My first job", // <4>
     "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", // <5>
     "timeout": 3600,// <6>
     "maintainer": { ... }, // <7>
@@ -112,12 +112,12 @@ without it resources provided will be default for the implementing framework.
 }
 ----
 a|
-<1> Required string containing job identifier. Limited to regex† `^[a-z0-9_-]+$`. `name` and `algorithmVersion` members
+<1> Required string containing job identifier. Limited to regex† `^[a-z0-9_-]+$`. `name` and `jobVersion` members
 combined should be unique system-wide.
-<2> Required string containing version identifier of algorithm in SemVer format. `name` and `algorithmVersion` members
+<2> Required string containing version identifier of job in SemVer format. `name` and `jobVersion` members
 combined should be unique system-wide.
 <3> Required string containing packaging version identifier in SemVer format. `packageVersion` is used to indicate
-updates to the job interface, it should NEVER be used to indicate changes to the algorithm.
+updates to the job interface, it should NEVER be used to indicate changes to the job.
 <4> Required string containing short job title.
 <5> Required string containing job abstract. Inline markup should be avoided, but not prohibited.
 <6> Required integer containing job timeout value in seconds.
@@ -154,7 +154,7 @@ contact for a Seed job.
 
 |`url`
 |Optional
-2+|MUST be a string and SHOULD contain a publicly accessible URL to complete algorithm design or usage documentation.
+2+|MUST be a string and SHOULD contain a publicly accessible URL to complete job design or usage documentation.
 
 4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
 
@@ -174,7 +174,7 @@ a|
 <2> Required string containing best contact email for maintaining individual or organization.
 <3> Optional string containing best contact phone number for maintaining individual or organization.
 <4> Optional string containing organization responsible for maintaining or sponsoring Seed job.
-<5> Optional string containing publicly accessible URL to complete algorithm design or usage documentation.
+<5> Optional string containing publicly accessible URL to complete job design or usage documentation.
 |=====
 
 [[resources-section, Resources Object]]
@@ -662,7 +662,7 @@ a|
 [[errors-section, Errors Objects]]
 ===== Errors Object
 The Errors object allows for developers† to map arbitrary exit codes to meaningful textual descriptions. This is useful
-in passing information to the executor† to differentiate between data and algorithm errors.
+in passing information to the executor† to differentiate between data and job errors.
 
 [cols="2,1,2,5",options="header"]
 |=====
@@ -682,8 +682,8 @@ in passing information to the executor† to differentiate between data and algo
 
 |`category`
 |Optional
-2+|MUST be a string containing one of the following values: `algorithm`, `data` or `system`. If omitted, the default
-value is `algorithm`.
+2+|MUST be a string containing one of the following values: `job` or `data`. If omitted, the default
+value is `job`.
 
 4+h| _The following annotated snippet provides quick reference to the use of Errors object:_
 
@@ -695,7 +695,7 @@ value is `algorithm`.
         "code": 1, // <1>
         "title": "Error Name", // <2>
         "description": "Error Description", // <3>
-        "category": "system" // <4>
+        "category": "job" // <4>
     },
     ...
 ]
@@ -704,6 +704,6 @@ a|
 <1> Required integer indicating job process exit code.
 <2> Required string containing human-friendly short name of error.
 <3> Optional string containing complete error code description.
-<4> Optional string containing the error type. This value MUST be either: `algorithm`, `data` or `system`. The default
-value is `algorithm`.
+<4> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
+value is `job`.
 |=====

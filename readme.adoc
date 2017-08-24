@@ -10,13 +10,13 @@ See the link:http://ngageoint.github.io/seed/[specification] for details.
 
 == Usage
 
-The specification is intended to inform both algorithm and execution framework developers. Detailed examples
-are provided for Seed usage in both simple and complex algorithm scenarios and these are recommended for
-algorithm developers interested in getting started quickly.
+The specification is intended to inform both job and execution framework developers. Detailed examples
+are provided for Seed usage in both simple and complex job scenarios and these are recommended for
+job developers interested in getting started quickly.
 
 The Seed team is in the process of developing a fully featured CLI that will minimize the domain expertise
-required for an algorithm developer† to get a Seed image ready for distribution. This will handle the Docker
-image construction and publish, so focus can be given to what really matters - describing your algorithm's
+required for an job developer to get a Seed image ready for distribution. This will handle the Docker
+image construction and publish, so focus can be given to what really matters - describing your job's
 purpose, requirements and interface.
 
 == Development
