@@ -2,7 +2,7 @@
   "seedVersion": "SEED_VERSION",
   "job": {
     "name": "image-watermark",
-    "algorithmVersion": "0.1.0",
+    "jobVersion": "0.1.0",
     "packageVersion": "0.1.0",
     "title": "Image Watermarker",
     "description": "Processes an input PNG and outputs watermarked PNG.",

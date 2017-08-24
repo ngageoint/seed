@@ -24,11 +24,11 @@ the development and packaging of jobs according to the Seed specification.
 === Format
 
 The Docker image created must adhere to a specific naming convention. The standard requires specification of both an
-algorithm and a packaging version, tracking changes individually between the algorithm logic and the packaging of it.
+job and a packaging version, tracking changes individually between the job logic and the packaging of it.
 The following image naming template maps to members defined under the <<job-section>>:
 
 ----
-<name>-<algorithmVersion>-seed:<packageVersion>
+<name>-<jobVersion>-seed:<packageVersion>
 ----
 
 Dockerfile snippet containing required label for Seed compliance:
