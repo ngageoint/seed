@@ -80,7 +80,7 @@ The following snippet demonstrates the optional values that may be specified:
 .Metadata JSON
 ----
 {
-    "seedVersion": "SEED_VERSION", <1>
+    "seedVersion": "0.1.0", <1>
     "geometry": { <2>
         "type": "Polygon",
 	    "coordinates": [

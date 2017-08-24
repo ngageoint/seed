@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "0.1.0",
   "job": {
     "name": "random-number-gen",
     "jobVersion": "0.1.0",

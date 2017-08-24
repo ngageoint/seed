@@ -5,7 +5,7 @@
   "properties": {
     "seedVersion": {
       "type": "string",
-      "pattern": "^SEED_VERSION$"
+      "pattern": "0.1.0"
     },
     "job": {
       "type": "object",
@@ -252,7 +252,7 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                        "pattern": "^[a-zA-Z_-]+$"
+                    "pattern": "^[a-zA-Z_-]+$"
                   },
                   "path": {
                     "type": "string"
