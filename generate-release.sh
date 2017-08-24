@@ -71,6 +71,11 @@ tput sgr0
 git push --tags
 
 tput setaf 2
+echo -e "\nSleeping 30 seconds so that tag is built prior to GitHub pages build"
+tput sgr0
+sleep 30
+
+tput setaf 2
 echo -e "\nCheckout back to ${DEFAULT_BRANCH}"
 tput sgr0
 git checkout ${DEFAULT_BRANCH}
