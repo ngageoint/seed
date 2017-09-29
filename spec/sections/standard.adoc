@@ -351,9 +351,10 @@ Critical implementation details related to `multiple` member should be reference
 the environment variable name that will be injected by the executor† for job consumption. Refer to
 <<variable-injection>> for details on environment variable available at execution time.
 
-|`mediaType`
-|Required
-2+|MUST be an array of strings that MUST indicate the IANA Media types that the job accepts.
+|`mediaTypes`
+|Optional
+2+|MUST be an array of strings that MUST indicate the IANA Media types that the job accepts. If omitted, executor† will
+not be able to perform validation.
 
 |`multiple`
 |Optional
@@ -401,7 +402,7 @@ MUST be treated as true.
     "files": [ // <1>
         {
             "name": "INPUT_FILE", // <2>
-            "mediaType": [ "image/x-hdf5-image" ], // <3>
+            "mediaTypes": [ "image/x-hdf5-image" ], // <3>
             "multiple": false, // <4>
             "required": true // <5>
         },
@@ -419,7 +420,7 @@ MUST be treated as true.
 a|
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing name used to inject data via environment variables.
-<3> Required array containing a list of accepted Media types.
+<3> Optional array containing a list of accepted Media types. Omission will disable executor† validation.
 <4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
 Default is `false`.
 <5> Optional boolean indicating whether job requires this particular file. Default is `true`.
@@ -554,7 +555,7 @@ seed.outputs.json:
 a|
 <1> Optional array containing elements defined by Files Elements sub-section.
 <2> Required string containing output identifier.
-<3> Required string containing IANA Media type of file.
+<3> Optional string containing IANA Media type of file.
 <4> Required string containing glob expression for file capture. Executor† is expected to
 capture output relative to OUTPUT_DIR.
 <5> Optional boolean indicating whether a single or multiple values are supported. The executor† is expected to
