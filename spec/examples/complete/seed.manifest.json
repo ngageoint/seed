@@ -38,7 +38,7 @@
           {
             "name": "output_file_tiffs",
             "mediaType": "image/tiff",
-            "count": "2",
+            "multiple": true,
             "pattern": "outfile*.tif"
           },
           {
