@@ -363,6 +363,12 @@ default value MUST be treated as false. If true, the `command` placeholder will 
 containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single
 file.
 
+|`partial`
+|Optional
+2+|MUST be a boolean indicating whether input file is required in whole or in part. This allows an executor† to make
+intelligent choices when providing very large files to a job. This should only be set to true if the job is expected to
+use less than half of very large input files. If omitted, the default value MUST be treated as true.
+
 |`required`
 |Optional
 2+|MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST
@@ -404,15 +410,16 @@ MUST be treated as true.
             "name": "INPUT_FILE", // <2>
             "mediaTypes": [ "image/x-hdf5-image" ], // <3>
             "multiple": false, // <4>
-            "required": true // <5>
+            "partial": true, // <5>
+            "required": true // <6>
         },
         ...
     ]
-    "json": [ // <6>
+    "json": [ // <7>
         {
-            "name": "INPUT_STRING",<7>
-            "type": "string", // <8>
-            "required": false // <9>
+            "name": "INPUT_STRING",<8>
+            "type": "string", // <9>
+            "required": false // <10>
         }
     ]
 }
@@ -423,11 +430,12 @@ a|
 <3> Optional array containing a list of accepted Media types. Omission will disable executor† validation.
 <4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
 Default is `false`.
-<5> Optional boolean indicating whether job requires this particular file. Default is `true`.
-<6> Optional array containing elements defined by JSON Elements sub-section.
-<7> Required string containing name used to inject data via environment variables.
-<8> Required string containing a valid JSON schema type for input validation.
-<9> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
+<5> Optional boolean indicating that a job consumes only a small portion of input file. Default is `false`.
+<6> Optional boolean indicating whether job requires this particular file. Default is `true`.
+<7> Optional array containing elements defined by JSON Elements sub-section.
+<8> Required string containing name used to inject data via environment variables.
+<9> Required string containing a valid JSON schema type for input validation.
+<10> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
 |=====
 
 [[outputs-section, Outputs Object]]

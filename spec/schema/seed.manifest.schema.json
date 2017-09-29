@@ -129,6 +129,10 @@
                       "multiple": {
                         "type": "boolean",
                         "default": false
+                      },
+                      "partial": {
+                        "type": "boolean",
+                        "default": false
                       }
                     },
                     "required": [

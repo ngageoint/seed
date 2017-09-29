@@ -29,7 +29,8 @@
             "required": true,
             "mediaTypes": [
               "image/x-hdf5-image"
-            ]
+            ],
+            "partial": true
           }
         ]
       },
