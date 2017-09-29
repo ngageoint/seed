@@ -446,15 +446,15 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 
 |`files`
 |Optional
-2+|MUST be an array of objects defined in the Files Elements sub-section.
+2+|MUST be an array of objects defined in the Files Object sub-section.
 
 |`json`
 |Optional
-2+|MUST be an array of objects defined in the JSON Elements sub-section.
+2+|MUST be an array of objects defined in the JSON Object sub-section.
 |=====
 
-.Files Elements
-Below are the File elements for outputs.
+.Files Object
+The following table defines the `ouputs.files` object members.
 
 [cols="2,1,2,5",options="header"]
 |=====
@@ -466,7 +466,7 @@ Below are the File elements for outputs.
 indicating the key the processing system will place the file name captured for downstream processing.
 
 |`mediaType`
-|Required
+|Optional
 2+|MUST indicate the IANA Media type for the file being captured by Outputs.
 
 |`pattern`
@@ -484,8 +484,8 @@ explicit match expected for `pattern` while `*` indicates matching with no upper
 is `true`.
 |=====
 
-.JSON Elements
-Below are the JSON elements for outputs.
+.JSON Object
+The following table defines the `ouputs.json` object members.
 
 [cols="2,1,2,5",options="header"]
 |=====
@@ -499,11 +499,11 @@ is omitted, it must be a case-sensitive match of the member key in result manife
 
 |`type`
 |Required
-2+|MUST be a string and indicate the JSON schema type of the member being captured from the result manifest.
+2+|MUST be a string indicating the JSON schema type of the member being captured from the result manifest.
 
 |`key`
 |Optional
-2+|MUST be a string and indicate the case-sensitive result manifest member to capture. If omitted, the result member
+2+|MUST be a string indicating the case-sensitive result manifest member to capture. If omitted, the result member
 key is assumed to be a case-sensitive match for the above defined `name` member.
 
 |`required`
@@ -521,7 +521,7 @@ Seed `outputs` object snippet:
 
 [source,javascript]
 ----
-"outputs": {
+{
     "files": [ // <1>
         {
             "name": "OUTPUT_TIFFS", // <2>

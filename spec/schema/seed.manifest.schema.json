@@ -202,7 +202,6 @@
                     },
                     "required": [
                       "name",
-                      "mediaType",
                       "pattern"
                     ]
                   }

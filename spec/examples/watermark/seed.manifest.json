@@ -16,10 +16,7 @@
       "inputs": {
         "files": [
           {
-            "name": "INPUT_IMAGE",
-            "mediaTypes": [
-              "image/png"
-            ]
+            "name": "INPUT_IMAGE"
           }
         ]
       },
@@ -27,7 +24,6 @@
         "files": [
           {
             "name": "OUTPUT_IMAGE",
-            "mediaType": "image/png",
             "pattern": "*_watermark.png"
           }
         ]
