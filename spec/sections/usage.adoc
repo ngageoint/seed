@@ -68,12 +68,12 @@ following sample command: `chmod +r yourfile.txt`
 
 Special attention should also be given to the number of files matched per `interface.outputs.files` element to ensure it
 is consistent in plurality to that defined by `multiple` member. If multiple files are matched using the `pattern`
-member value, while the `multiple` member is set to false, these job SHOULD be failed by the executor†. On the other
+member value, while the `multiple` member is set to false, these jobs SHOULD be failed by the executor†. On the other
 hand, even if multiple files are not present when `multiple` is true it SHOULD NOT force a job failure by the executor†.
 
 [[extended-file-metadata, Extended File Metadata]]
 ==== Extended File Metadata
-There is often a need by the executor to capture additional job extracted metadata on output files. The Seed
+There is often a need by the executor† to capture additional job extracted metadata on output files. The Seed
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
 must be formatted according to the <<seed-metadata-schema,Seed Metadata Schema>>. This allows for both

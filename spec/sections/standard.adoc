@@ -348,13 +348,14 @@ Critical implementation details related to `multiple` member should be reference
 |`name`
 |Required
 2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the environment variable name that will be injected by the executor† for job consumption. Refer to
-<<variable-injection>> for details on environment variable available at execution time.
+the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
+environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
+variables available at execution time.
 
 |`mediaTypes`
 |Optional
-2+|MUST be an array of strings that MUST indicate the IANA Media types that the job accepts. If omitted, executor† will
-not be able to perform validation.
+2+|MUST be an array of strings that MUST indicate the IANA Media types that the job accepts. An executor† MAY use any
+provided media types to report validation warnings to the user in the case of mismatched types.
 
 |`multiple`
 |Optional
@@ -367,7 +368,7 @@ file.
 |Optional
 2+|MUST be a boolean indicating whether input file is required in whole or in part. This allows an executor† to make
 intelligent choices when providing very large files to a job. This should only be set to true if the job is expected to
-use less than half of very large input files. If omitted, the default value MUST be treated as true.
+use less than half of very large input files. If omitted, the default value MUST be treated as false.
 
 |`required`
 |Optional
@@ -383,9 +384,10 @@ The following table defines the `json` object members.
 | Name | Requirement 2+| Value
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
-indicating the environment variable name that will be injected by the executor† for job consumption.
-Refer to <<variable-injection>> for details on environment variable available at execution time.
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
+environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
+variables available at execution time.
 
 |`type`
 |Required
@@ -425,15 +427,15 @@ MUST be treated as true.
 }
 ----
 a|
-<1> Optional array containing elements defined by Files Elements sub-section.
-<2> Required string containing name used to inject data via environment variables.
-<3> Optional array containing a list of accepted Media types. Omission will disable executor† validation.
+<1> Optional array containing elements defined by Files Object sub-section.
+<2> Required string containing unique name used to refer to this input.
+<3> Optional array containing a list of accepted media types.
 <4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
 Default is `false`.
 <5> Optional boolean indicating that a job consumes only a small portion of input file. Default is `false`.
 <6> Optional boolean indicating whether job requires this particular file. Default is `true`.
-<7> Optional array containing elements defined by JSON Elements sub-section.
-<8> Required string containing name used to inject data via environment variables.
+<7> Optional array containing elements defined by JSON Object sub-section.
+<8> Required string containing unique name used to refer to this input.
 <9> Required string containing a valid JSON schema type for input validation.
 <10> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
 |=====
@@ -471,8 +473,8 @@ The following table defines the `files` object members.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
-indicating the key the executor† will place the file name captured for downstream processing.
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the unique name to use for referring to this output.
 
 |`mediaType`
 |Optional
@@ -502,9 +504,9 @@ The following table defines the `json` object members.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`)
-indicating the key the executor† will place the JSON member value in for downstream use. When `key` member
-is omitted, it must be a case-sensitive match of the member key in `seed.outputs.json` file.
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
+the unique name to use for referring to this output. When `key` member is omitted, it must be a case-sensitive match of
+the member key in `seed.outputs.json` file.
 
 |`type`
 |Required
@@ -561,17 +563,16 @@ seed.outputs.json:
 }
 ----
 a|
-<1> Optional array containing elements defined by Files Elements sub-section.
-<2> Required string containing output identifier.
+<1> Optional array containing elements defined by Files Object sub-section.
+<2> Required string containing unique output identifier.
 <3> Optional string containing IANA Media type of file.
 <4> Required string containing glob expression for file capture. Executor† is expected to
 capture output relative to OUTPUT_DIR.
-<5> Optional boolean indicating whether a single or multiple values are supported. The executor† is expected to
-validate that matched outputs are consistent with this value - one or at least one. Default value is false.
+<5> Optional boolean indicating whether a single or multiple values are supported. Default value is false.
 <6> Optional boolean indicating whether executor† should assume failure if output data is missing. Default value
 is true.
-<7> Optional array containing elements defined by JSON Elements sub-section.
-<8> Required string containing output identifier. MUST be used by executor† to match member for capture from
+<7> Optional array containing elements defined by JSON Object sub-section.
+<8> Required string containing unique output identifier. MUST be used by executor† to match member for capture from
 `seed.outputs.json` in absence of `key` member.
 <9> Required string containing JSON schema type of member extracted from `seed.outputs.json` file.
 <10> Optional string containing key of member for extraction. This allows mapping from a `seed.outputs.json` file
