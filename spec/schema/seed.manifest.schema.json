@@ -129,6 +129,10 @@
                       "multiple": {
                         "type": "boolean",
                         "default": false
+                      },
+                      "partial": {
+                        "type": "boolean",
+                        "default": false
                       }
                     },
                     "required": [
@@ -190,10 +194,9 @@
                       "pattern": {
                         "type": "string"
                       },
-                      "count": {
-                        "type": "string",
-                        "default": "1",
-                        "pattern": "^([0-9]+|\\*)$"
+                      "multiple": {
+                        "type": "boolean",
+                        "default": false
                       },
                       "required": {
                         "type": "boolean",

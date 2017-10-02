@@ -79,7 +79,8 @@ throughout the document.
 |creator and packager of Seed compliant image
 
 |executor
-|process responsible for injecting all run-time context: inputs, mounts and environment settings
+|process responsible for injecting run-time context (inputs, mounts and environment settings) and capturing all
+resulting output (files, json).
 
 |implementer
 |developer of framework for discovering or running Seed compliant images - must provide executor
