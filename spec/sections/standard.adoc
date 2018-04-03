@@ -240,7 +240,7 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 
 [cols="2,1,2,5",options=""]
 |=====
-4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+4+h| _The following annotated snippet provides quick reference to the use of Scalar object:_
 
 3+a|
 [source,javascript]
