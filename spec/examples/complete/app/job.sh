@@ -3,13 +3,17 @@
 err_count=0
 
 if [ "$#" -ne 3 ]; then
-    echo "Expected 3 input parameters: \${INPUT_FILE} \${OUTPUT_DIR} test_constant"
+    echo "Expected 3 input parameters: \${INPUT_FILE} \${OUTPUT_DIR} ${VERSION}"
     echo "Received" $*
     err_count=$((err_count+1))
+else
+    version=$3
 fi
 
+echo "version = " $version
+
 if [[ $3 != 1 && $3 != 2 ]]; then
-    echo "Expected 1 or 2 for third input parameter, received " $3
+    echo "Expected 1 or 2 for \${VERSION}, received " $3
     err_count=$((err_count+1))
 fi
 
@@ -74,4 +78,6 @@ if [[ -z "${DB_PASS}" ]]; then
   err_count=$((err_count+1))
 fi
 
-return err_count
+echo "Encountered " $err_count " errors running test seed image"
+
+exit $err_count

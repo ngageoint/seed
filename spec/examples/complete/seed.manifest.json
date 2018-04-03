@@ -21,7 +21,7 @@
     },
     "timeout": 3600,
     "interface": {
-      "command": "${INPUT_FILE} ${OUTPUT_DIR} test_constant",
+      "command": "${INPUT_FILE} ${OUTPUT_DIR} ${VERSION}",
       "inputs": {
         "files": [
           {
@@ -75,6 +75,10 @@
         }
       ],
       "settings": [
+        {
+          "name": "VERSION",
+          "secret": false
+        },
         {
           "name": "DB_HOST",
           "secret": false
