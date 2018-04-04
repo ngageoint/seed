@@ -1,12 +1,8 @@
-FROM alpine
+FROM bash
 
-ADD app app
-ADD *.png
-ADD *.csv
-ADD seed.outputs*.json
+COPY app app
+COPY . .
 
 RUN chmod -R 777 app
 
-ENTRYPOINT /app/job.sh
-
-LABEL com.ngageoint.seed.manifest="SEED_MANIFEST"
+ENTRYPOINT ["/app/job.sh"]

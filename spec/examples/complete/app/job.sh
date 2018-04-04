@@ -2,15 +2,15 @@
 
 err_count=0
 
+version=1
+
 if [ "$#" -ne 3 ]; then
-    echo "Expected 3 input parameters: \${INPUT_FILE} \${OUTPUT_DIR} ${VERSION}"
+    echo "Expected 3 input parameters: \${INPUT_FILE} \${OUTPUT_DIR} \${VERSION}"
     echo "Received" $*
     err_count=$((err_count+1))
 else
     version=$3
 fi
-
-echo "version = " $version
 
 if [[ $3 != 1 && $3 != 2 ]]; then
     echo "Expected 1 or 2 for \${VERSION}, received " $3
