@@ -1,12 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://json-schema.org/geojson/geojson.json#",
+  "id": "https://tools.ietf.org/html/rfc7946#",
   "title": "Geo JSON object",
   "description": "Schema for a Geo JSON object",
   "type": "object",
   "required": [ "type" ],
   "properties": {
-    "crs": { "$ref": "http://json-schema.org/geojson/crs.json#" },
     "bbox": { "$ref": "http://json-schema.org/geojson/bbox.json#" }
   },
   "oneOf": [
@@ -123,7 +122,7 @@
         "type": { "enum": [ "GeometryCollection" ] },
         "geometries": {
           "type": "array",
-          "items": { "$ref": "http://json-schema.org/geojson/geometry.json#" }
+          "items": { "$ref": "#/definitions/geometry" }
         }
       }
     },
@@ -136,11 +135,11 @@
         "geometry": {
           "oneOf": [
             { "type": "null" },
-            { "$ref": "http://json-schema.org/geojson/geometry.json#" }
+            { "$ref": "#/definitions/geometry" }
           ]
         },
-        "properties": { "type": [ "object", "null" ] },
-        "id": { "FIXME": "may be there, type not known (string? number?)" }
+          "properties": { "type": [ "object", "null" ] },
+          "id": { "type": [ "string", "number" ] }
       }
     },
     "featureCollection": {
@@ -159,7 +158,11 @@
         "description": "A single position",
         "type": "array",
         "minItems": 2,
+        "maxItems": 3,
         "items": [
+          {
+            "type": "number"
+          },
           {
             "type": "number"
           },
