@@ -110,7 +110,7 @@ time down to minute precision. If the data is a single point-in-time the end dat
 ==== Resource Defaults
 At a minimum, the executor† MUST provide at least the resources indicated by a Seed manifest at run time. If the
 resource requirement specified by the manifest is below the minimum amount allowed by the executor† it MAY increase the
-requirement to that value. Developers† SHOULD specify the `cpu`, `mem` and `disk` requirements of their Seed job, but
+requirement to that value. Developers† SHOULD specify the `cpus`, `mem` and `disk` requirements of their Seed job, but
 if these are not set, the executor† is free to allocate minimal defaults.
 
 For the `sharedMem` reserved resource, the executor† SHOULD make use of the Docker run argument `shm-size` to provide

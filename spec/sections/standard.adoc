@@ -196,8 +196,8 @@ on the array size.
 |=====
 
 .Scalar Object
-The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk`,
-`mem` and `sharedMem` that have special meaning. The reserved resource names `cpu`, `disk` and `mem` SHOULD be
+The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpus`, `disk`,
+`mem` and `sharedMem` that have special meaning. The reserved resource names `cpus`, `disk` and `mem` SHOULD be
 populated by all Seed compliant images, as the defaults provided at runtime will likely be inadequate to run all but the
 most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
 and will rarely be needed.
