@@ -360,9 +360,9 @@ provided media types to report validation warnings to the user in the case of mi
 |`multiple`
 |Optional
 2+|MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the
-default value MUST be treated as false. If true, the `command` placeholder will be replaced with an absolute directory
-containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single
-file.
+default value MUST be treated as false. If true, the value injected into the `command` placeholder will be an absolute directory
+containing all files for this input. If false or omitted, the value injected into the `command` placeholder will be an
+absolute path to a single file.
 
 |`partial`
 |Optional
