@@ -48,6 +48,11 @@ if [[ -z "${INPUT_FILE}" ]]; then
   err_count=$((err_count+1))
 fi
 
+if [[ -z "${INPUT_JSON}" ]]; then
+  echo "Need to set input INPUT_JSON to non-empty environment variable"
+  err_count=$((err_count+1))
+fi
+
 if [[ -z "${OUTPUT_DIR}" ]]; then
   echo "Need to set OUTPUT_DIR to non-empty environment variable"
   err_count=$((err_count+1))
@@ -68,6 +73,11 @@ if [[ ! -w "/write" ]]; then
     err_count=$((err_count+1))
 fi
 
+if [[ -z "${VERSION}" ]]; then
+  echo "Need to set setting VERSION to non-empty environment variable"
+  err_count=$((err_count+1))
+fi
+
 if [[ -z "${DB_HOST}" ]]; then
   echo "Need to set setting DB_HOST to non-empty environment variable"
   err_count=$((err_count+1))
@@ -75,6 +85,28 @@ fi
 
 if [[ -z "${DB_PASS}" ]]; then
   echo "Need to set setting DB_PASS to non-empty environment variable"
+  err_count=$((err_count+1))
+fi
+
+if [ "${CPUS}" != "10.0" ]; then
+  echo "Need to set setting CPUS to environment variable with a value of 10.0"
+  err_count=$((err_count+1))
+fi
+
+#TODO: add check for avaialble memory
+if [ "${MEM}" != "1024.0" ]; then
+  echo "Need to set setting MEM to environment variable with a value of 1024.0"
+  err_count=$((err_count+1))
+fi
+
+if [ "${SHAREDMEM}" != "1024.0" ]; then
+  echo "Need to set setting SHAREDMEM to environment variable with a value of 1024.0"
+  err_count=$((err_count+1))
+fi
+
+#TODO: add check for avaialble disk space and calculate the required space based on input file size
+if [[ -z "${DISK}" ]]; then
+  echo "Need to set setting DISK to non-empty environment variable"
   err_count=$((err_count+1))
 fi
 

@@ -32,6 +32,13 @@
             ],
             "partial": true
           }
+        ],
+        "json": [
+          {
+            "name": "INPUT_JSON",
+            "type": "string",
+            "required": true
+          }
         ]
       },
       "outputs": {
