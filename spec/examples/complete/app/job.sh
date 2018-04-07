@@ -38,7 +38,7 @@ else
         cp *.csv $2
     fi
     if [[ $3 == 2 ]]; then
-        cp seed.outputs2.json $2
+        cp seed.outputs2.json $2/seed.outputs.json
         cat seed.outputs2.json
     fi
 fi
@@ -88,18 +88,18 @@ if [[ -z "${DB_PASS}" ]]; then
   err_count=$((err_count+1))
 fi
 
-if [ "${CPUS}" != "10.0" ]; then
+if [ "${CPUS}" != "10.000000" ]; then
   echo "Need to set setting CPUS to environment variable with a value of 10.0"
   err_count=$((err_count+1))
 fi
 
 #TODO: add check for avaialble memory
-if [ "${MEM}" != "1024.0" ]; then
+if [ "${MEM}" != "1024" ]; then
   echo "Need to set setting MEM to environment variable with a value of 1024.0"
   err_count=$((err_count+1))
 fi
 
-if [ "${SHAREDMEM}" != "1024.0" ]; then
+if [ "${SHAREDMEM}" != "1024" ]; then
   echo "Need to set setting SHAREDMEM to environment variable with a value of 1024.0"
   err_count=$((err_count+1))
 fi

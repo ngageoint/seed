@@ -5,10 +5,10 @@
     "jobVersion": "1.0.0",
     "packageVersion": "1.0.0",
     "title": "My first job",
-    "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count",
+    "description": "Reads an HDF5 file and outputs two png images, a CSV and manifest containing cell_count",
     "tags": [
       "hdf5",
-      "tiff",
+      "png",
       "csv",
       "image processing"
     ],
@@ -44,10 +44,10 @@
       "outputs": {
         "files": [
           {
-            "name": "output_file_tiffs",
-            "mediaType": "image/tiff",
+            "name": "output_file_pngs",
+            "mediaType": "image/png",
             "multiple": true,
-            "pattern": "outfile*.tif"
+            "pattern": "outfile*.png"
           },
           {
             "name": "output_file_csv",
