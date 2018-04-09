@@ -88,7 +88,7 @@ if [[ -z "${DB_PASS}" ]]; then
   err_count=$((err_count+1))
 fi
 
-if [ "${CPUS}" != "10.000000" ]; then
+if [ "${CPUS}" != "1.000000" ]; then
   echo "Need to set setting CPUS to environment variable with a value of 10.0"
   err_count=$((err_count+1))
 fi
