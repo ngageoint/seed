@@ -196,8 +196,8 @@ on the array size.
 |=====
 
 .Scalar Object
-The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpu`, `disk`,
-`mem` and `sharedMem` that have special meaning. The reserved resource names `cpu`, `disk` and `mem` SHOULD be
+The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpus`, `disk`,
+`mem` and `sharedMem` that have special meaning. The reserved resource names `cpus`, `disk` and `mem` SHOULD be
 populated by all Seed compliant images, as the defaults provided at runtime will likely be inadequate to run all but the
 most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
 and will rarely be needed.
@@ -240,7 +240,7 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 
 [cols="2,1,2,5",options=""]
 |=====
-4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
+4+h| _The following annotated snippet provides quick reference to the use of Scalar object:_
 
 3+a|
 [source,javascript]
@@ -360,9 +360,9 @@ provided media types to report validation warnings to the user in the case of mi
 |`multiple`
 |Optional
 2+|MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the
-default value MUST be treated as false. If true, the `command` placeholder will be replaced with an absolute directory
-containing all files. If false or omitted, the `command` placeholder will be replaced with an absolute path to a single
-file.
+default value MUST be treated as false. If true, the value injected into the `command` placeholder will be an absolute directory
+containing all files for this input. If false or omitted, the value injected into the `command` placeholder will be an
+absolute path to a single file.
 
 |`partial`
 |Optional

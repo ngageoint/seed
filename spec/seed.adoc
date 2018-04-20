@@ -48,12 +48,12 @@ include::examples/complete/seed.manifest.json[]
 * Seed specific terms defined in the <<Glossary>> supersede all following definitions. These terms can be found
 _italicized_ throughout the specification.
 * GeoJSON, and the terms Geometry and Polygon are defined in
-https://www.ietf.org/id/draft-ietf-geojson-03.txt[IETF GeoJSON Draft-03]
+https://tools.ietf.org/html/rfc7946[RFC 7946 GeoJSON]
 * Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
 http://www.iana.org/assignments/media-types/media-types.xhtml[IETF RFC 6838]
 * ISO 8601 and the specifics of the date format are defined in https://tools.ietf.org/html/rfc3339[IETF RFC 3339]
-* JavaScript Object Notation (JSON), and the terms object, name, value, array, and number, are defined in
-http://www.ietf.org/rfc/rfc4627.txt[IETF RFC 4627].
+* JavaScript Object Notation (JSON), and the terms object, name, value, array, integer, and number, are defined in
+http://json-schema.org/latest/json-schema-validation.html[JSON Schema].
 * Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
 http://semver.org/spec/v2.0.0.html
 * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and

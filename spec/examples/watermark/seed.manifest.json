@@ -31,7 +31,7 @@
     },
     "resources": {
       "scalar": [
-        { "name": "cpu", "value": 1.0 },
+        { "name": "cpus", "value": 1.0 },
         { "name": "mem", "value": 64.0 }
       ]
     },
