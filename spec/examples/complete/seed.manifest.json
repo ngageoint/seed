@@ -1,5 +1,5 @@
 {
-  "seedVersion": "1.0.0",
+  "seedVersion": "SEED_VERSION",
   "job": {
     "name": "my-job",
     "jobVersion": "1.0.0",
