@@ -36,6 +36,7 @@ then
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.html
         # We want https://ngageoint.github.io/$VERSION/ to also serve up versioned spec... not require /seed.html
         sudo cp seed.html index.html
+        sudo cp index.html detail.html
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.pdf
         cd schema
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.manifest.schema.json
