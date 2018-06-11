@@ -444,7 +444,8 @@ Default is `false`.
 ====== Outputs Object
 The Outputs object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
-extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. Recursively scanning
+directories is NOT supported, but a known subdirectory structure will work (e.g. base/sub-*/*.ext).  JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
 output directory as `seed.outputs.json`. The absolute path to the job output directory is REQUIRED to be passed
 into the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
