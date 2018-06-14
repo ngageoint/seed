@@ -48,8 +48,7 @@ The Job object is the core member for describing a single unit of work and the r
 
 |`name`
 |Required
-2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
-regex† `^[a-z0-9_-]+$`).
+2+|MUST be a string of only alpha-numeric or dash characters (defined by the regex† `^[a-zA-Z0-9-]+$`).
 
 |`jobVersion`
 |Required
@@ -112,8 +111,7 @@ without it resources provided will be default for the implementing framework.
 }
 ----
 a|
-<1> Required string containing job identifier. Limited to regex† `^[a-z0-9_-]+$`. `name` and `jobVersion` members
-combined should be unique system-wide.
+<1> Required string containing job identifier. `name` and `jobVersion` members combined should be unique system-wide.
 <2> Required string containing version identifier of job in SemVer format. `name` and `jobVersion` members
 combined should be unique system-wide.
 <3> Required string containing packaging version identifier in SemVer format. `packageVersion` is used to indicate
@@ -684,8 +682,8 @@ in passing information to the executor† to differentiate between data and job 
 
 |`name`
 |Required
-2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
-regex† `^[a-z0-9_-]+$`) indicating the unique name to use for referring to this error.
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
+indicating the unique name to use for referring to this error.
 
 |`title`
 |Optional
