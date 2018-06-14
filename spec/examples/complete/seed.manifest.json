@@ -107,12 +107,14 @@
     "errors": [
       {
         "code": 1,
+        "name": "error-name-one",
         "title": "Error Name",
         "description": "Error Description",
         "category": "data"
       },
       {
         "code": 2,
+        "name": "error-name-two",
         "title": "Error Name",
         "description": "Error Description",
         "category": "job"
