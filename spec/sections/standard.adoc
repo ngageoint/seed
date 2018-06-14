@@ -682,8 +682,13 @@ in passing information to the executor† to differentiate between data and job 
 |Required
 2+|MUST be an integer indicating the exit code of the executing job process.
 
-|`title`
+|`name`
 |Required
+2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
+regex† `^[a-z0-9_-]+$`) indicating the unique name to use for referring to this error.
+
+|`title`
+|Optional
 2+|MUST be a string indicating the short descriptive title of the error.
 
 |`description`
@@ -703,17 +708,19 @@ value is `job`.
 [
     {
         "code": 1, // <1>
-        "title": "Error Name", // <2>
-        "description": "Error Description", // <3>
-        "category": "job" // <4>
+        "name": "error-name", // <2>
+        "title": "Error Name", // <3>
+        "description": "Error Description", // <4>
+        "category": "job" // <5>
     },
     ...
 ]
 ----
 a|
 <1> Required integer indicating job process exit code.
-<2> Required string containing human-friendly short name of error.
-<3> Optional string containing complete error code description.
-<4> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
+<2> Required string containing machine-friendly identifier of error.
+<3> Optional string containing human-friendly short name of error.
+<4> Optional string containing complete error code description.
+<5> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
 value is `job`.
 |=====
