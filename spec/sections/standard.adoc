@@ -48,8 +48,7 @@ The Job object is the core member for describing a single unit of work and the r
 
 |`name`
 |Required
-2+|MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the
-regex† `^[a-z0-9_-]+$`).
+2+|MUST be a string of only alphabetic or dash characters (defined by the regex† `^[a-zA-Z-]+$`).
 
 |`jobVersion`
 |Required
@@ -112,8 +111,7 @@ without it resources provided will be default for the implementing framework.
 }
 ----
 a|
-<1> Required string containing job identifier. Limited to regex† `^[a-z0-9_-]+$`. `name` and `jobVersion` members
-combined should be unique system-wide.
+<1> Required string containing job identifier. `name` and `jobVersion` members combined should be unique system-wide.
 <2> Required string containing version identifier of job in SemVer format. `name` and `jobVersion` members
 combined should be unique system-wide.
 <3> Required string containing packaging version identifier in SemVer format. `packageVersion` is used to indicate
@@ -682,8 +680,14 @@ in passing information to the executor† to differentiate between data and job 
 |Required
 2+|MUST be an integer indicating the exit code of the executing job process.
 
-|`title`
+|`name`
 |Required
+2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
+indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
+of error codes across job versions.
+
+|`title`
+|Optional
 2+|MUST be a string indicating the short descriptive title of the error.
 
 |`description`
@@ -703,17 +707,19 @@ value is `job`.
 [
     {
         "code": 1, // <1>
-        "title": "Error Name", // <2>
-        "description": "Error Description", // <3>
-        "category": "job" // <4>
+        "name": "error-name", // <2>
+        "title": "Error Name", // <3>
+        "description": "Error Description", // <4>
+        "category": "job" // <5>
     },
     ...
 ]
 ----
 a|
 <1> Required integer indicating job process exit code.
-<2> Required string containing human-friendly short name of error.
-<3> Optional string containing complete error code description.
-<4> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
+<2> Required string containing machine-friendly identifier of error.
+<3> Optional string containing human-friendly short name of error.
+<4> Optional string containing complete error code description.
+<5> Optional string containing the error type. This value MUST be either: `job` or `data`. The default
 value is `job`.
 |=====

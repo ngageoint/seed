@@ -38,9 +38,13 @@
     "errors": [
       {
         "code": 1,
-        "title": "Image Corrupt",
+        "name": "image-Corrupt",
         "description": "Image input is not recognized as a valid PNG.",
         "category": "data"
+      },
+      {
+        "code": 2,
+        "name": "algorithm-failure"
       }
     ]
   }
