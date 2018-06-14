@@ -683,7 +683,8 @@ in passing information to the executor† to differentiate between data and job 
 |`name`
 |Required
 2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
-indicating the unique name to use for referring to this error.
+indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
+of error codes across job versions.
 
 |`title`
 |Optional
