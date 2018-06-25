@@ -14,14 +14,14 @@ before_install:
 script:
   # Build index.adoc WITHOUT snapshot tag
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}; ./spec/examples/inject-manifests.sh; fi
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc
   - git checkout -- spec
   # Use snapshot for remainder for master builds
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
   - ./spec/examples/validate-examples.sh
   - ./spec/add-version-links.sh
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output seed.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc
 
 after_failure:
   - docker logs asciidoc-to-html
