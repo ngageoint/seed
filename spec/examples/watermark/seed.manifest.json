@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "1.0.0",
   "job": {
     "name": "image-watermark",
     "jobVersion": "0.1.0",
@@ -31,8 +31,14 @@
     },
     "resources": {
       "scalar": [
-        { "name": "cpus", "value": 1.0 },
-        { "name": "mem", "value": 64.0 }
+        {
+          "name": "cpus",
+          "value": 1
+        },
+        {
+          "name": "mem",
+          "value": 64
+        }
       ]
     },
     "errors": [
