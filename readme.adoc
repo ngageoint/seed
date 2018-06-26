@@ -38,6 +38,6 @@ You can also easily generate release notes and nicely formatted changelog by usi
 # Assuming gren installed via NPM globally. If not, find here: https://github.com/github-tools/github-release-notes
 gren release --override
 gren changelog --override
-git commit -a -m "Update changlog for release"
+git commit -a -m "Update changelog for release"
 git push
 ```

@@ -1,6 +1,6 @@
 # Changelog
 
-## Seed 1.0.0 (25/06/2018)
+## Seed 1.0.0 (26/06/2018)
 
 Breaking Changes
 ================
@@ -16,12 +16,13 @@ Enhancements
 * [#107](https://github.com/ngageoint/seed/issues/107) - Make `job.interface.inputs.mediaTypes` and `job.interface.outputs.mediaType` members optional
 * [#101](https://github.com/ngageoint/seed/issues/101) - Add sample Docker image to support Seed compliant executor validation
 * [#95](https://github.com/ngageoint/seed/issues/95) - Adopt GeoJSON format for sidecar metadata schema
-* [#92](https://github.com/ngageoint/seed/issues/92) - Add `partial` member to `job.interface.inputs.files` to support limit read of large files
+* [#92](https://github.com/ngageoint/seed/issues/92) - Add `partial` member to `job.interface.inputs.files` to support limited read of large files
 
 Clarification
 ================
 
 * [#108](https://github.com/ngageoint/seed/issues/108) - Consistently specify error categories supported
+* [#106](https://github.com/ngageoint/seed/issues/106) - Specify lack of support for recursive glob patterns in file outputs
 * [#98](https://github.com/ngageoint/seed/issues/98) - Correct reference to JSON RFC
 * [#97](https://github.com/ngageoint/seed/issues/97) - Indicate environment variable injection behavior when `job.interface.files.*.multiple` is True
 
