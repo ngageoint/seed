@@ -13,9 +13,6 @@ then
     sudo cp -R seed.* $TRAVIS_TAG/
     sudo cp -R ../schema/*.json $TRAVIS_TAG/
     sudo cp ../examples/complete/seed.manifest.json $TRAVIS_TAG/seed.manifest.example.json
-    # Make detail.html for old links
-    sudo cp $TRAVIS_TAG/index.html $TRAVIS_TAG/detail.html
-    sudo cp $TRAVIS_TAG/index.html $TRAVIS_TAG/details.html
 fi
 
 # Grab all available versions to place in gh-pages
@@ -39,8 +36,6 @@ then
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.html
         # We want https://ngageoint.github.io/$VERSION/ to also serve up versioned spec... not require /seed.html
         sudo cp seed.html index.html
-        # Make detail.html work too for old links
-        sudo cp seed.html detail.html
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.pdf
         cd schema
         sudo wget https://github.com/ngageoint/seed/releases/download/${VERSION}/seed.manifest.schema.json
