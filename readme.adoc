@@ -31,3 +31,13 @@ Generation of new releases may be done from a clean master branch:
 This will create a new tag, that will kick off a TravisCI tag build to create release artifacts, update
 the master branch with a pointer to that release and finally a TravisCI build of master to update GitHub
 pages with the permalink to all available releases.
+
+You can also easily generate release notes and nicely formatted changelog by using the gren CLI:
+
+```
+# Assuming gren installed via NPM globally. If not, find here: https://github.com/github-tools/github-release-notes
+gren release --override
+gren changelog --override
+git commit -a -m "Update changlog for release"
+git push
+```
