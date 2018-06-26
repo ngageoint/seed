@@ -21,8 +21,9 @@ do
 done
 
 # Update schemas
-jq_in_place .properties.seedVersion.pattern=\"^${VERSION}$\" spec/schema/seed.manifest.schema.json
-jq_in_place .properties.seedVersion.pattern=\"^${VERSION}$\" spec/schema/seed.metadata.schema.json
+VERSION_PATTERN=$(echo ${VERSION} | sed 's^\.^\\\\\.^g')
+jq_in_place .properties.seedVersion.pattern=\"^${VERSION_PATTERN}$\" spec/schema/seed.manifest.schema.json
+jq_in_place .properties.seedVersion.pattern=\"^${VERSION_PATTERN}$\" spec/schema/seed.metadata.schema.json
 
 # Update examples
 FILES=$(grep -r seedVersion spec/examples/ | cut -d ':' -f 1 | sort | uniq | grep -v Dockerfile)
