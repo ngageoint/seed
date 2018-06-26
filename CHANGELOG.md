@@ -1,38 +1,5 @@
 # Changelog
 
-## Seed 1.0.0 (26/06/2018)
-
-Breaking Changes
-================
-
-* [#115](https://github.com/ngageoint/seed/issues/115) - Allow only alphabetic set for value of `name` members
-* [#114](https://github.com/ngageoint/seed/issues/114) - Update `job.errors` to include `name` member
-* [#100](https://github.com/ngageoint/seed/issues/100) - Use `cpus` reserved name in `job.resources.scalar`
-* [#93](https://github.com/ngageoint/seed/issues/93) - Remove `job.interface.outputs.files` member `count` with simpler `multiple` boolean
-
-Enhancements
-================
-
-* [#107](https://github.com/ngageoint/seed/issues/107) - Make `job.interface.inputs.mediaTypes` and `job.interface.outputs.mediaType` members optional
-* [#101](https://github.com/ngageoint/seed/issues/101) - Add sample Docker image to support Seed compliant executor validation
-* [#95](https://github.com/ngageoint/seed/issues/95) - Adopt GeoJSON format for sidecar metadata schema
-* [#92](https://github.com/ngageoint/seed/issues/92) - Add `partial` member to `job.interface.inputs.files` to support limited read of large files
-
-Clarification
-================
-
-* [#108](https://github.com/ngageoint/seed/issues/108) - Consistently specify error categories supported
-* [#106](https://github.com/ngageoint/seed/issues/106) - Specify lack of support for recursive glob patterns in file outputs
-* [#98](https://github.com/ngageoint/seed/issues/98) - Correct reference to JSON RFC
-* [#97](https://github.com/ngageoint/seed/issues/97) - Indicate environment variable injection behavior when `job.interface.files.*.multiple` is True
-
-Bugs
-================
-
-* [#89](https://github.com/ngageoint/seed/issues/89) - Update Seed document reference to `job.interface.outputs.mediaTypes` to match schema
-
----
-
 ## Seed 0.1.0 (24/08/2017)
 Breaking Changes
 =================
