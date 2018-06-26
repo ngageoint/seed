@@ -19,13 +19,6 @@ then
     echo Updated default branch to $2
 fi
 
-if [[ "$(which -s gren; echo $?)" == 1 ]]
-then
-    echo Missing gren application!
-    echo Changelog generation requires gren.
-    echo Install with: npm install -g gren
-fi
-
 # Ensure script directory is CWD
 cd "${0%/*}"
 
@@ -55,22 +48,16 @@ tput sgr0
 git checkout --detach
 
 tput setaf 2
-echo -e "\nChange the revision on the release, inject manifests, add version history, and create changelog"
+echo -e "\nChange the revision on the release, inject manifests and add version history"
 tput sgr0
 ./set-version.sh $VERSION
 ./spec/examples/inject-manifests.sh
 echo $VERSION >> .versions
-gren changelog -G -f temp.md -M $VERSION
-cat temp.md <(echo) <(cat CHANGELOG.md | sed 's^# Changelog^---^') > temp2.md
-rm temp.md
-mv temp2.md CHANGELOG.md
-
-
 
 tput setaf 2
 echo -e "\nCommit the change"
 tput sgr0
-git commit -a -m "Update version values and create changelog for release $VERSION"
+git commit -a -m "Update version values for release $VERSION"
 
 tput setaf 2
 echo -e "\nTag the release"
