@@ -44,6 +44,8 @@ then
         # We are going to place all versions in the root, the last one will win, which satisfies our goal of latest tag
         # being the one seen when hitting the GitHub Pages site.
         cd $OUTPUT_DIR
+	# Place seed.html at detail.html for purposes of legacy shared links
+        sudo cp -rf $VERSION/seed.html ./detail.html
         sudo cp -rf $VERSION/seed* ./
         sudo cp -rf $VERSION/schema/ schema/
     done
