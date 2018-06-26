@@ -4,7 +4,7 @@
     "groupBy": {
         "Breaking Changes": ["breaking change"],
         "Enhancements": ["enhancement"],
-        "Clarification": ["clarification"],
+        "Clarifications": ["clarification"],
         "Bugs": ["bug"] 
     },
     "milestoneMatch": "{{tag_name}}",
