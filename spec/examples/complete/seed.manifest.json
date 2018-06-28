@@ -1,5 +1,5 @@
 {
-  "seedVersion": "SEED_VERSION",
+  "seedVersion": "1.0.0",
   "job": {
     "name": "my-job",
     "jobVersion": "1.0.0",
@@ -98,10 +98,23 @@
     },
     "resources": {
       "scalar": [
-        { "name": "cpus", "value": 1.0 },
-        { "name": "mem", "value": 1024.0 },
-        { "name": "sharedMem", "value": 1024.0 },
-        { "name": "disk", "value": 1000.0, "inputMultiplier": 4.0 }
+        {
+          "name": "cpus",
+          "value": 1
+        },
+        {
+          "name": "mem",
+          "value": 1024
+        },
+        {
+          "name": "sharedMem",
+          "value": 1024
+        },
+        {
+          "name": "disk",
+          "value": 1000,
+          "inputMultiplier": 4
+        }
       ]
     },
     "errors": [
