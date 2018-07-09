@@ -441,6 +441,10 @@ in passing information to the executor† to differentiate between data and job 
 
 *code* ::
     Required; MUST be an integer indicating the exit code of the executing job process.
+*name* ::
+    MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
+indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
+of error codes across job versions.
 *title* ::
     Required; MUST be a string indicating the human-friendly, short descriptive title of the error.
 *description* ::
