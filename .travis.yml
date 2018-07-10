@@ -6,20 +6,28 @@ services:
   - docker
 
 before_install:
-  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh $(tail -1 .versions)-snapshot; ./spec/examples/inject-manifests.sh; fi
+  - export SEED_LATEST=$(tail -1 .versions)
   - mkdir -p output
   - docker pull rochdev/alpine-asciidoctor:mini
   - pip install json-spec
 
 script:
-  - ./spec/examples/validate-examples.sh
+  # Build index.adoc WITHOUT snapshot tag
+  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}; ./spec/examples/inject-manifests.sh; fi
   - ./spec/add-version-links.sh
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-html rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc seed.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name asciidoc-to-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -D /documents/output seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=index rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output index.adoc
+  - git checkout -- spec
+  # Use snapshot for remainder for master builds
+  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
+  - ./spec/examples/validate-examples.sh
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output seed.adoc
+  - perl -0777 -i.bak -pe 's/\/\/{pdf\+4}\na/4\+a/g;' -pe 's/\/\/{pdf\+1}\n3\+a/4\+a/g' $TRAVIS_BUILD_DIR/spec/sections/standard.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -a pdf-style=style/pdf-theme.yml -a pdf-fontsdir=style/ -D /documents/output seed.adoc
 
 after_failure:
-  - docker logs asciidoc-to-html
-  - docker logs asciidoc-to-pdf
+  - docker logs index
+  - docker logs seed
+  - docker logs seed-pdf
 
 before_deploy:
   - ./spec/collect-versioned-docs.sh

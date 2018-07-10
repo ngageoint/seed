@@ -19,7 +19,6 @@ then
     echo Updated default branch to $2
 fi
 
-
 # Ensure script directory is CWD
 cd "${0%/*}"
 

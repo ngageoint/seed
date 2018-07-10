@@ -1,0 +1,21 @@
+{
+    "dataSource": "milestones",
+    "prefix": "",
+    "groupBy": {
+        "Breaking Changes": ["breaking change"],
+        "Enhancements": ["enhancement"],
+        "Clarifications": ["clarification"],
+        "Bugs": ["bug"] 
+    },
+    "milestoneMatch": "{{tag_name}}",
+    "changelogFilename": "CHANGELOG.md",
+    "template" : {
+        "issue": "* [{{text}}]({{url}}) - {{name}}",
+        "label": "[**{{label}}**]",
+        "noLabel": "closed",
+        "group": "\n{{heading}}\n================\n",
+        "changelogTitle": "# Changelog\n\n",
+        "release": "## Seed {{release}} ({{date}})\n{{body}}",
+        "releaseSeparator": "\n---\n\n"
+    }
+}

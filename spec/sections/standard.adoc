@@ -16,7 +16,7 @@ and null. An array consists of elements where each element is a value as describ
 The Seed object is the root JSON object that MUST be placed within a `com.ngageoint.seed.manifest` Docker image label.
 At a minimum this object MUST define the `seedVersion` and `job` names.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -42,7 +42,7 @@ At a minimum this object MUST define the `seedVersion` and `job` names.
 ==== Job Object
 The Job object is the core member for describing a single unit of work and the resources it requires.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -94,6 +94,7 @@ without it resources provided will be default for the implementing framework.
 
 4+h| _The following annotated snippet provides quick reference to the use of Job object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -110,6 +111,7 @@ without it resources provided will be default for the implementing framework.
     "errors": [ ... ] // <10>
 }
 ----
+//{pdf+4}
 a|
 <1> Required string containing job identifier. `name` and `jobVersion` members combined should be unique system-wide.
 <2> Required string containing version identifier of job in SemVer format. `name` and `jobVersion` members
@@ -130,7 +132,7 @@ updates to the job interface, it should NEVER be used to indicate changes to the
 The Maintainer object is the member that identifies the individual and organization (optional) acting as a point of
 contact for a Seed job.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -156,6 +158,7 @@ contact for a Seed job.
 
 4+h| _The following annotated snippet provides quick reference to the use of Maintainer object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -167,6 +170,7 @@ contact for a Seed job.
     "url": "http://www.example.com" // <5>
 }
 ----
+//{pdf+4}
 a|
 <1> Required string containing full name of maintaining individual.
 <2> Required string containing best contact email for maintaining individual or organization.
@@ -183,7 +187,7 @@ final computed resources allocated for all `scalar` elements MUST be injected as
 time. Reference <<environment-variables>> and <<resource-defaults>> for clarification on what the implementing framework
 MUST provide.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -200,7 +204,7 @@ populated by all Seed compliant images, as the defaults provided at runtime will
 most minimal job. The `sharedMem` resource applies primarily to high-performance and scientific applications
 and will rarely be needed.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -240,6 +244,7 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 |=====
 4+h| _The following annotated snippet provides quick reference to the use of Scalar object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -250,6 +255,7 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
     ... // <4>
 ]
 ----
+//{pdf+4}
 a|
 <1> Recommended Scalar object demonstrating single constant scalar value for specifying CPU requirement of job.
 <2> Optional Scalar object demonstrating single constant scalar value in addition to a multiplier based on total input
@@ -265,7 +271,7 @@ input file size for scaling memory requirement of job.
 The Interface object is the primary member that describes the command arguments, environment variables,
 mounts, settings, inputs and outputs defined for a job.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -294,8 +300,9 @@ other standard restriction on the array size.
 2+|MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no
 other standard restriction on the array size.
 
-4+h| _The following annotated snippet provides quick reference to the use of Interface object:_
+3+h| _The following annotated snippet provides quick reference to the use of Interface object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -307,6 +314,7 @@ other standard restriction on the array size.
     "settings": [ ... ] // <5>
 }
 ----
+//{pdf+4}
 a|
 <1> Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
 implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
@@ -321,7 +329,7 @@ implementing framework MUST provide. Linux shell escaping MAY be needed in the c
 The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
 runtime.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -339,7 +347,7 @@ runtime.
 Critical implementation details related to `multiple` member should be referenced in
 <<environment-variables,environment variables>>. The following table defines the `files` object members.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -377,7 +385,7 @@ be treated as true.
 .JSON Object
 The following table defines the `json` object members.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 |`name`
@@ -401,6 +409,7 @@ MUST be treated as true.
 |=====
 4+h| _The following annotated snippet provides quick reference to the use of Inputs object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -424,6 +433,7 @@ MUST be treated as true.
     ]
 }
 ----
+//{pdf+4}
 a|
 <1> Optional array containing elements defined by Files Object sub-section.
 <2> Required string containing unique name used to refer to this input.
@@ -442,14 +452,15 @@ Default is `false`.
 ====== Outputs Object
 The Outputs object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
-extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. Recursively scanning
+directories is NOT supported, but a known subdirectory structure will work (e.g. base/sub-*/*.ext).  JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
 output directory as `seed.outputs.json`. The absolute path to the job output directory is REQUIRED to be passed
 into the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
 <<output-data-capture,output file permissions>> and support is provided for defining
 <<extended-file-metadata,extended metadata>>.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -465,7 +476,7 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 .Files Object
 The following table defines the `files` object members.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -496,7 +507,7 @@ is `true`.
 .JSON Object
 The following table defines the `json` object members.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -525,6 +536,7 @@ MUST be treated as true.
 |=====
 4+h| _The following annotated snippets provides quick reference to the use of Outputs object:_
 
+//{pdf+1}
 3+a|
 Seed `outputs` object snippet:
 
@@ -560,6 +572,7 @@ seed.outputs.json:
     ...
 }
 ----
+//{pdf+4}
 a|
 <1> Optional array containing elements defined by Files Object sub-section.
 <2> Required string containing unique output identifier.
@@ -584,7 +597,7 @@ The Mounts object is the member responsible for indicating any additional direct
 container for the Job to run. A mount directory is typically a shared file system directory that contains some set of
 reference data that the Job requires.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -606,6 +619,7 @@ Default value is "ro".
 
 4+h| _The following annotated snippet provides quick reference to the use of Mounts object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -618,6 +632,7 @@ Default value is "ro".
     ...
 ]
 ----
+//{pdf+4}
 a|
 <1> Required string containing the name to be used to lookup uses in the Interface.
 <2> Required string indicating the absolute file system path where the directory should be mounted.
@@ -634,7 +649,7 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 `outputs`), there are justified use cases for violating this encapsulation. If database ingestion or downstream
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -651,6 +666,7 @@ secure string.
 
 4+h| _The following annotated snippet provides quick reference to the use of Settings object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -662,6 +678,7 @@ secure string.
    ...
 ]
 ----
+//{pdf+4}
 a|
 <1> Required string containing the environment variable name to be injected at run time.
 <2> Optional boolean indicating whether the setting value is sensitive and stored as a secret.
@@ -672,7 +689,7 @@ a|
 The Errors object allows for developers† to map arbitrary exit codes to meaningful textual descriptions. This is useful
 in passing information to the executor† to differentiate between data and job errors.
 
-[cols="2,1,2,5",options="header"]
+[cols="2,2,1,5",options="header"]
 |=====
 | Name | Requirement 2+| Value
 
@@ -701,6 +718,7 @@ value is `job`.
 
 4+h| _The following annotated snippet provides quick reference to the use of Errors object:_
 
+//{pdf+1}
 3+a|
 [source,javascript]
 ----
@@ -715,6 +733,7 @@ value is `job`.
     ...
 ]
 ----
+//{pdf+4}
 a|
 <1> Required integer indicating job process exit code.
 <2> Required string containing machine-friendly identifier of error.
