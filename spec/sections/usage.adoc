@@ -17,7 +17,7 @@ All environment variables injected MUST be normalized to remove any special char
 variable injection is dynamic and tied to `name` member values. These values MUST be sanitized based on the following
 rules:
 
-* Only upper-case alphabetic and underscore characters are permitted unaltered.
+* Only upper-case alphabetic, numeric and underscore characters are permitted unaltered.
 * All lower-case alphabetic characters MUST be capitalized.
 * All dash characters MUST be replaced with underscores.
 
