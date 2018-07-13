@@ -48,7 +48,7 @@ The Job object is the core member for describing a single unit of work and the r
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic or dash characters (defined by the regex† `^[a-zA-Z-]+$`).
+2+|MUST be a string of only alphanumeric or dash characters (defined by the regex† `^[a-zA-Z0-9-]+$`).
 
 |`jobVersion`
 |Required
@@ -210,9 +210,9 @@ and will rarely be needed.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at
-execution time.
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the resource required by the job. Refer to <<variable-injection>> for details on environment variable
+available at execution time.
 
 |`value`
 |Required
@@ -353,9 +353,9 @@ Critical implementation details related to `multiple` member should be reference
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
-environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with
+the environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
 variables available at execution time.
 
 |`mediaTypes`
@@ -390,9 +390,9 @@ The following table defines the `json` object members.
 | Name | Requirement 2+| Value
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
-environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with
+the environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
 variables available at execution time.
 
 |`type`
@@ -482,8 +482,8 @@ The following table defines the `files` object members.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this output.
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the unique name to use for referring to this output.
 
 |`mediaType`
 |Optional
@@ -513,9 +513,9 @@ The following table defines the `json` object members.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this output. When `key` member is omitted, it must be a case-sensitive match of
-the member key in `seed.outputs.json` file.
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the unique name to use for referring to this output. When `key` member is omitted, it must be a
+case-sensitive match of the member key in `seed.outputs.json` file.
 
 |`type`
 |Required
@@ -603,7 +603,7 @@ reference data that the Job requires.
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) that
 correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the
 mount is provided.
 
@@ -655,8 +655,8 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that
-indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
+indicating the environment variable to be injected at run time. Refer to <<variable-injection>> for details on
 environment variable available at execution time.
 
 |`secret`
@@ -699,7 +699,7 @@ in passing information to the executor† to differentiate between data and job 
 
 |`name`
 |Required
-2+|MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
+2+|MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`)
 indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
 of error codes across job versions.
 
