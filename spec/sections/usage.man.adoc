@@ -38,7 +38,8 @@ the allocated value computed using an `inputMultiplier` value MUST NOT include t
 additional space needed for output files during execution.
 * All `name` member values of `interface.inputs.files` elements MUST map to environment variables. Variable names
 must follow <<variable-normalization,normalization rules>>. Executor's MUST ensure data is mounted and
-provide a container resolvable absolute path. _Injection behavioior_  _Injection behavior is dependent on the boolean value of `multiple` member._ When `multiple` is `true` the injected environment variable MUST be an absolute path to a _directory_ with all
+provide a container resolvable absolute path. _Injection behavioior_  _Injection behavior is dependent on the boolean value of `multiple` 
+member._ When `multiple` is `true` the injected environment variable MUST be an absolute path to a _directory_ with all
 files immediately beneath it. When `multiple` is `false` it MUST be an absolute path to the single _file_ provided. This
 environment variable MUST be left unset if member `required` is false and the input is not present.
 * All `name` member values of `interface.inputs.json` elements MUST map to environment variables. Variable names

@@ -33,7 +33,7 @@ At a minimum this object MUST define the `seedVersion` and `job` names.
 The Job object is the core member for describing a single unit of work and the resources it requires.
 
 *name* ::
-    Required string containing job identifier; MUST be a string of only lowercase alpha-numeric, dash or underscore characters (defined by the regex† `^[a-z0-9_-]+$`); `name` and `jobVersion` members combined should be unique system-wide.
+    Required string containing job identifier; MUST be a string of only alphabetic or dash characters (defined by the regex† `^[a-zA-Z-]+$`); `name` and `jobVersion` members combined should be unique system-wide.
 *jobVersion* ::
     Required string containing version identifier of job; MUST be in SemVer format. `name` and `jobVersion` members combined should be unique system-wide.
 *packageVersion* ::
@@ -169,35 +169,27 @@ The Interface object is the primary member that describes the command arguments,
 mounts, settings, inputs and outputs defined for a job.
 
 *command* ::
-    Optional; MUST be a string specifying the complete string passed to the container at run time. Based on the Linux shell, shell escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission  of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement.
+    Optional; MUST be a string specifying the complete string, includeing job arguments, passed to the container at run time. Based on the Linux shell, shell escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission  of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide. 
 *inputs* :: 
-    Optional; MUST be an object as defined in <<inputs-section>>.
+    Optional; This is the means to inject external data into the job container. MUST be an object as defined in <<inputs-section>>. 
 *outputs* ::
-    Optional; MUST be an object as defined in <<outputs-section>>.
+    Optional; This is the means to capture results from the job container. MUST be an object as defined in <<outputs-section>>. 
 *mounts* ::
-    Optional; MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no 
-other standard restriction on the array size.
+    Optional; This defines any directories that need to be mounted into the job container. MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on the array size. 
 *settings* :: 
-    Optional; MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on the array size.
+    Optional; This defines any environment specific settings needed at run time. MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on the array size. 
 
 _The following annotated snippet provides quick reference to the use of Interface object:_
 [source,javascript]
 ----
 {
-    "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}", // <1>
-    "inputs": { "files": [ { "name": "INPUT_FILE", ... }, ... ] }, // <2>
-    "outputs": { ... }, // <3>
-    "mounts": [ ... ], // <4>
-    "settings": [ ... ] // <5>
+    "command": "/app/job.sh ${INPUT_FILE} ${OUTPUT_DIR}",
+    "inputs": { "files": [ { "name": "INPUT_FILE", ... }, ... ] },
+    "outputs": { ... },
+    "mounts": [ ... ],
+    "settings": [ ... ]
 }
 ----
-
-<1> *command*: Optional string indicating the job arguments. Reference <<environment-variables>> for clarification on what the
-implementing framework MUST provide. Linux shell escaping MAY be needed in the case of special characters.
-<2> *inputs*: Optional <<inputs-section>>. This is the means to inject external data into the job container.
-<3> *outputs*: Optional <<outputs-section>>. This is the means to capture results from the job container.
-<4> *mounts*: Optional <<mounts-section>>. This defines any directories that need to be mounted into the job container.
-<5> *settings*: Optional <<settings-section>>. This defines any environment specific settings needed at run time.
 
 [[inputs-section, Inputs Object]]
 ====== Inputs Object
