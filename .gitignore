@@ -4,6 +4,8 @@
 
 # scratch files during development
 output/
+html.css*
+*.man.adoc
 
 # System metadata
 .DS_Store

@@ -63,9 +63,6 @@ if __name__== "__main__":
                 else:
                     manfile.write(line)
 
-    # move generated seed.man.adoc to seed.adoc
-    shutil.move(gen_seed_spec, seed_spec)
-
     for section_file_name in os.listdir(section_dir):
         if section_file_name.endswith(".adoc"):
             filename = "man." + section_file_name
