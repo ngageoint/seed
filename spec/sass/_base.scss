@@ -1,0 +1,26 @@
+body {
+  background-color: transparent;
+  width: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 $pad;
+  box-sizing: border-box;
+
+  &.toc-left {
+    max-width: 1020px;
+    margin-left: ($col * 2);
+
+    @media screen and (max-width: 990px) {
+      margin-left: auto;
+    }
+  }
+}
+
+html {
+  font-size: 10px;
+  background-color: color(grey, 100);
+  // Toggle baseline grid
+  // background-image: url('images/grid.png');
+  // background-position: left top;
+  // background-repeat: repeat;
+}

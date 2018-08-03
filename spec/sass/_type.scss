@@ -1,0 +1,106 @@
+a {
+  text-decoration: none;
+  color: color(blue, 700);
+}
+
+body {
+  color: color(grey, 900);
+  font-family: font(copy);
+  font-weight: 300;
+}
+
+h1 {
+  font-size: size(h1);
+  font-family: font(headings);
+  font-weight: 500;
+  @include type-space(4px, 6px, baseline(2), baseline(2), baseline(2));
+}
+
+h2 {
+  font-size: size(h2);
+  font-family: font(headings);
+  font-weight: 500;
+  color: color(green);
+  @include type-space(0, 0, baseline(2), baseline(), baseline(2));
+}
+
+h3 {
+  font-size: size(h3);
+  font-family: font(headings);
+  font-weight: 600;
+  color: color(green);
+  @include type-space(3px, 7px, baseline(), 0, baseline());
+}
+
+h4 {
+  font-size: size(h4);
+  font-family: font(headings);
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  color: color(green);
+  @include type-space(5px, 5px, baseline(), 0, baseline());
+}
+
+h5 {
+  font-size: size(h5);
+  font-family: font(headings);
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  color: color(green);
+  @include type-space(6px, 4px, baseline(), 0, baseline());
+}
+
+h6,
+.paragraph > .title,
+.listingblock > .title {
+  font-size: size(h6);
+  font-family: font(headings);
+  font-weight: 600;
+  letter-spacing: 0.15rem;
+  text-transform: uppercase;
+  color: color(green);
+  @include type-space(6px, 4px, 0, 0, baseline());
+}
+li {
+  font-size: size(base);
+  @include type-space($line-height: size(baseline));
+  & > *:first-child {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  & > *:last-child,
+  & > p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+p {
+  font-size: size(base);
+  @include type-space(5px, 5px, 0, 0, size(baseline));
+}
+
+pre,
+.listingblock pre {
+  font-size: size(base);
+  color: color(grey, 300);
+  background-color: color(grey, 800);
+  border-radius: 4px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  @include type-space(14px, 16px, size(baseline), size(baseline), size(baseline));
+  @include col-pad;
+  &:not(.highlight) {
+    background-color: color(grey, 800);
+  }
+}
+
+ul {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  ul {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

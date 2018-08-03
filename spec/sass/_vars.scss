@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css?family=Dosis:500,600,700|Roboto:100,100i,300,300i,700,700i');
+@import url('https://use.fontawesome.com/releases/v5.2.0/css/all.css');
+
+$colors: (
+  grey: (
+    100: #ECECEC,
+    300: #DBDAD5,
+    500: #C3C0B5,
+    600: #959387,
+    700: #726E59,
+    800: #56523E,
+    900: #413D29
+  ),
+  green: (
+    100: #B5E861,
+    300: #94D627,
+    500: #74BA00,
+    600: #5B9102,
+    700: #4B7604,
+    800: #375703,
+    900: #1B2B00
+  ),
+  blue: (
+    100: #BFECFF,
+    300: #A3E1FD,
+    500: #78D6FF,
+    600: #4DAED8,
+    700: #3096C3,
+    800: #1B78A0,
+    900: #08435D
+  ),
+  purple: (
+    100: #D6BEFF,
+    300: #BD9AFA,
+    500: #A06AFC,
+    600: #7D46D9,
+    700: #622BBE,
+    800: #40128E,
+    900: #1B0344
+  ),
+  red: (
+    100: #FFC1C1,
+    300: #FF9191,
+    500: #FB5959,
+    600: #D93C3C,
+    700: #BC2828,
+    800: #951111,
+    900: #5D0808
+  ),
+  orange: (
+    100: #FFD2B2,
+    300: #FFB682,
+    500: #FF9345,
+    600: #E27A2E,
+    700: #C5631D,
+    800: #98480F,
+    900: #693006
+  ),
+  yellow: (
+    100: #FFF4C7,
+    300: #FEEB97,
+    500: #FDDD52,
+    600: #DCBD35,
+    700: #C0A428,
+    800: #9A8118,
+    900: #6B5A0E,
+  )
+);
+
+$sizes: (
+  baseline: 2rem,
+  base: 1.4rem,
+  h1: 4rem,
+  h2: 2.8rem,
+  h3: 2.1rem,
+  h4: 1.6rem,
+  h5: 1.3rem,
+  h6: 1.3rem
+);
+
+$fonts: (
+  headings: (Dosis, sans-serif),
+  copy: ('Roboto', Arial, sans-serif)
+);
+
+$gutter: 40px;
+$pad: $gutter / 2;
+$col: 1200px / 12;

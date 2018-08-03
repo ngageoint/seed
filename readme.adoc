@@ -29,6 +29,16 @@ images and creating jobs out of them.
 All Seed documentation is made via the excellent AsciiDoc standard. Travis CI is used to compile all the
 documentation into html / pdf releases and update the GitHub pages site with all available Seed releases.
 
+Complilation of repo documentation can be performed locally using this command:
+
+```
+spec/generate-outputs.sh
+```
+
+Output files will be placed under `spec/output`.
+
+== Releases
+
 Generation of new releases may be done from a clean master branch:
 
 `./generate-release.sh 1.0.0`
