@@ -1,5 +1,13 @@
 = Seed
 Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>; John Tobe <jtobe@ball.com>
+:toc: left
+:toclevels: 5
+:stylesheet: styles/html.css
+:sectlinks:
+:sectnums:
+:sectnumlevels: 5
+:icons: font
+:docinfo:
 
 Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
 image.

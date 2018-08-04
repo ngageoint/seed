@@ -12,16 +12,15 @@ before_install:
 
 script:
   - : ${ASCIIDOCTOR_IMAGE:=rochdev/alpine-asciidoctor:mini}
-  # Build index.adoc WITHOUT snapshot tag
-  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}; spec/examples/inject-manifests.sh; fi
-  - spec/add-version-links.sh
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
-  - git checkout -- spec
   # Use snapshot for remainder for master builds
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
   - spec/examples/validate-examples.sh
   - spec/generate-outputs.sh
-
+  - git checkout -- spec
+  # Build index.adoc WITHOUT snapshot tag
+  - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}; spec/examples/inject-manifests.sh; fi
+  - spec/add-version-links.sh
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
 
 before_deploy:
   - ./spec/collect-versioned-docs.sh

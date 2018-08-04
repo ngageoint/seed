@@ -14,7 +14,7 @@
 : ${PYTHON_IMAGE:=python:2-alpine}
 : ${SASS_IMAGE:=catchdigital/node-sass}
 
-pushd $(dirname $0)
+pushd $(dirname $0) > /dev/null
 
 # Compile css from sass
 docker run --rm -v $(pwd)/styles:/var/www ${SASS_IMAGE} node-sass --include-path=sass --source-map=true html.scss html.css
@@ -39,4 +39,4 @@ docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -b manpage
 # Replace original doc following PDF generation
 mv $(pwd)/sections/standard.adoc.bak $(pwd)/sections/standard.adoc
 
-popd
+popd > /dev/null
