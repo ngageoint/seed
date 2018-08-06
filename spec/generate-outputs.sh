@@ -17,9 +17,7 @@
 pushd $(dirname $0) > /dev/null
 
 # Compile css from sass
-docker run --rm -v $(pwd)/styles:/var/www ${SASS_IMAGE} node-sass --include-path=sass --source-map=true html.scss html.css
-# Inject logo inline into css
-sed -i.bak 's^url("images/logo.svg")^url("data:image/svg+xml;base64,'$(cat images/logo.svg|base64)'")^g' styles/html.css
+docker run --rm -v $(pwd):/var/www ${SASS_IMAGE} sh styles/compile-sass.sh
 
 # Generate HTML
 docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output seed.adoc
