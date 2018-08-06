@@ -1,6 +1,6 @@
 sudo: required
 
-language: python
+language: node
 
 services:
   - docker
@@ -9,7 +9,7 @@ before_install:
   - export SEED_LATEST=$(tail -1 .versions)
   - mkdir -p output
   - docker pull rochdev/alpine-asciidoctor:mini
-  - pip install json-spec
+  - npm install -g ajv-cli
 
 script:
   # Build index.adoc WITHOUT snapshot tag
