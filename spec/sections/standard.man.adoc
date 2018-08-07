@@ -33,27 +33,27 @@ At a minimum this object MUST define the `seedVersion` and `job` names.
 The Job object is the core member for describing a single unit of work and the resources it requires.
 
 *name* ::
-    Required string containing job identifier; MUST be a string of only alphabetic or dash characters (defined by the regex† `^[a-zA-Z-]+$`); `name` and `jobVersion` members combined should be unique system-wide.
+    Required string containing job identifier. MUST be a string of only alphanumeric or dash characters (defined by the regex† `^[a-zA-Z0-9-]+$`). `name` and `jobVersion` members combined should be unique system-wide.
 *jobVersion* ::
-    Required string containing version identifier of job; MUST be in SemVer format. `name` and `jobVersion` members combined should be unique system-wide.
+    Required string containing version identifier of job in SemVer format. `name` and `jobVersion` members combined should be unique system-wide.
 *packageVersion* ::
-    Required string containing packaging version identifier; MUST be in SemVer format. `packageVersion` is used to indicate updates to the job interface, it should NEVER be used to indicate changes to the job.
+    Required string containing packaging version identifier in SemVer format. `packageVersion` is used to indicate updates to the job interface, it should NEVER be used to indicate changes to the job.
 *title* ::
-    Required string containing short job title; Should contain a short descriptive title of the job.
+    Required string that should contain a short descriptive title of the job.
 *description* ::
-    Required string containing a full job abstract. Inline markup should be avoided, but is not 
+    Required string containing a full job abstract. Inline markup should be avoided, but is not prohibited.
 *tags* ::
-    Optional array of strings an MAY contain any number of elements.
+    Optional array of strings and may contain any number of elements.
 *timeout* ::
-    Required; MUST be an integer indicating a job timeout period measured in seconds; Consuming systems MUST honor this value as a hard limit on job execution time.
+    Required integer indicating a job timeout period measured in seconds. Consuming systems MUST honor this value as a hard limit on job execution time.
 *maintainer* ::
-    Required <<maintainer-section>>.
+    Required object as defined in <<maintainer-section>>.
 *resources* ::
-    Optional <<resources-section>>; It is highly advised that this member be specified; Without it resources provided will be default for the implementing framework.
+    Optional object as defined in <<resources-section>>. It is highly advised that this member be specified; Without it resources provided will be default for the implementing framework.
 *interface* ::
-    Optional <<interface-section>>.
+    Optional object as defined in <<interface-section>>.
 *errors* ::
-    Optional array of <<errors-section>>.
+    Optional array containing elements defined in <<errors-section>>.
 
 *EXAMPLE* +
 [source,javascript]
@@ -73,22 +73,21 @@ The Job object is the core member for describing a single unit of work and the r
 }
 ----
 
-
 [[maintainer-section, Maintainer Object]]
 ===== Maintainer Object
 The Maintainer object is the member that identifies the individual and organization (optional) acting as a point of
 contact for a Seed job.
 
 *name* ::
-    Required string containing full name of maintaining individual.
+    Required string containing the full name of maintaining individual.
 *email* ::
-    Required string containing best contact email for maintaining individual or organization.
+    Required string containing the best contact email for maintaining individual or organization.
 *phone* ::
     Optional string containing best contact phone number for maintaining individual or organization.
 *organization* ::
-    Optional string containing organization responsible for maintaining or sponsoring Seed job.
+    Optional string containing the organization responsible for maintaining or sponsoring the Seed job.
 *url* ::
-    Optional string containing publicly accessible URL to complete job design or usage documentation.
+    Optional string containing a publicly accessible URL to complete job design or usage documentation.
 
 *EXAMPLE* +
 [source,javascript]
@@ -110,8 +109,8 @@ final computed resources allocated for all `scalar` elements MUST be injected as
 time. Reference <<environment-variables>> and <<resource-defaults>> for clarification on what the implementing framework
 MUST provide.
 
-
-The Scalar object is required and MUST be an array of <<.Scalar Object>>s that MAY contain any number of elements. There is no other standard restriction on the array size.
+The Scalar object is required and MUST be an array of <<.Scalar Object>>s that MAY contain any number of elements. There 
+is no other standard restriction on the array size.
 
 .Scalar Object
 The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources `cpus`, `disk`,
@@ -121,17 +120,15 @@ most minimal job. The `sharedMem` resource applies primarily to high-performance
 and will rarely be needed.
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at execution time.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) indicating the resource required by the job. Refer to <<variable-injection>> for details on environment variable available at execution time.
 
 *value* ::
     Required; MUST be a number indicating the quantity of the resource required by the job. When dealing with storage resources such as `mem` or `disk` units of Mebibytes (MiB) MUST be used.
 
 *inputMultiplier* :: 
-    Optional; MUST be a number indicating the factor by which input file size is multiplied and added to the constant value for resource.
+    Optional number indicating the factor by which input file size is multiplied and added to the constant value for resource.
 
-*NOTE*: Use of `inputMultiplier` for `mem` or `disk` resource types is useful when memory or output disk requirements of a job
-are a function of input file size. The following basic formula computes the resource requirement when an
-`inputMultiplier` is defined.
+*NOTE*: Use of `inputMultiplier` for `mem` or `disk` resource types is useful when memory or output disk requirements of a job are a function of input file size. The following basic formula computes the resource requirement when an `inputMultiplier` is defined.
 
 ----
 resourceRequirement = inputVolume * inputMultiplier + constantValue
@@ -144,7 +141,7 @@ specified for `disk`, the following computes the resource requirement:
 diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 ----
 
-*EXAMPLE* +
+_The following annotated snippet provides quick reference to the use of Scalar object:_ +
 [source,javascript]
 ----
 [
@@ -156,30 +153,26 @@ diskRequirement = 2.0MiB * 4.0 + 0.1MiB
 ----
 
 <1> Recommended Scalar object demonstrating single constant scalar value for specifying CPU requirement of job.
-<2> Optional Scalar object demonstrating single constant scalar value in addition to a multiplier based on total input
-file size for scaling disk requirement of job. This multiplier allows for scaling the output disk space required as a
-function of input file size.
-<3> Recommended Scalar object demonstrating single constant scalar value in addition to a multiplier based on total
-input file size for scaling memory requirement of job.
+<2> Optional Scalar object demonstrating single constant scalar value in addition to a multiplier based on total input file size for scaling disk requirement of job. This multiplier allows for scaling the output disk space required as a function of input file size.
+<3> Recommended Scalar object demonstrating single constant scalar value in addition to a multiplier based on total input file size for scaling memory requirement of job.
 <4> Optional additional Scalar objects for any custom resources needed by job.
 
 [[interface-section, Interface Object]]
 ===== Interface Object
-The Interface object is the primary member that describes the command arguments, environment variables,
-mounts, settings, inputs and outputs defined for a job.
+The Interface object is the primary member that describes the command arguments, environment variables, mounts, settings, inputs and outputs defined for a job.
 
 *command* ::
-    Optional; MUST be a string specifying the complete string, includeing job arguments, passed to the container at run time. Based on the Linux shell, shell escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission  of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide. 
+    Optional string specifying the complete string, including job arguments, passed to the container at run time. Based on the Linux shell, shell escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission of the executable MAY be necessary in `command` string. The Seed `command` member can be treated as analogous to the Docker CMD statement. Reference <<environment-variables>> for clarification on what the implementing framework MUST provide. 
 *inputs* :: 
-    Optional; This is the means to inject external data into the job container. MUST be an object as defined in <<inputs-section>>. 
+    Optional object as defined in <<inputs-section>> as a means to inject external data into the job container.
 *outputs* ::
-    Optional; This is the means to capture results from the job container. MUST be an object as defined in <<outputs-section>>. 
+    Optional object as defined in <<outputs-section>> as the means to capture results from the job container.
 *mounts* ::
-    Optional; This defines any directories that need to be mounted into the job container. MUST be an array of `Mounts` objects (see <<mounts-section>>) and MAY contain any number of elements. There is no other standard restriction on the array size. 
+    Optional array of `Mounts` objects (see <<mounts-section>>) that defines any directories that need to be mounted into the job container. MUST be an array and MAY contain any number of elements. There is no other standard restriction on the array size. 
 *settings* :: 
-    Optional; This defines any environment specific settings needed at run time. MUST be an array of `Settings` objects (see <<settings-section>>) and MAY contain any number of elements. There is no other standard restriction on the array size. 
+    Optional array of `Settings` objects (see <<settings-section>>) that defines any environment specific settings needed at run time. MUST be an array and MAY contain any number of elements. There is no other standard restriction on the array size. 
 
-_The following annotated snippet provides quick reference to the use of Interface object:_
+*EXAMPLE:* +
 [source,javascript]
 ----
 {
@@ -193,103 +186,75 @@ _The following annotated snippet provides quick reference to the use of Interfac
 
 [[inputs-section, Inputs Object]]
 ====== Inputs Object
-The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
-runtime.
+The Inputs object is the member responsible for indicating immutable input data available to the Seed image at runtime.
 
 *files* ::
-    Optional; MUST be an array of objects defined in the Files Object sub-section.
+    Optional array of objects defined in the <<.Files Object>> sub-section.
 
 *json* ::
-    Optional; MUST be an array of objects defined in the JSON Object sub-section.
+    Optional array of objects defined in the <<.JSON Object>> sub-section.
 
 .Files Object
 
-Critical implementation details related to `multiple` member should be referenced in
-<<environment-variables,environment variables>>. The following table defines the `files` object members.
+Critical implementation details related to `multiple` member should be referenced in<<environment-variables,environment variables>>. The following description defines the `files` object members.
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
-environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
-variables available at execution time.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with the environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment variables available at execution time.
 
 *mediaTypes* ::
-    Optional; MUST be an array of strings that MUST indicate the IANA Media types that the job accepts. An executor† MAY use any
-provided media types to report validation warnings to the user in the case of mismatched types.
+    Optional array of strings that MUST indicate the IANA Media types that the job accepts. An executor† MAY use any provided media types to report validation warnings to the user in the case of mismatched types.
 
 *multiple* ::
-    Optional; MUST be a boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the
-default value MUST be treated as false. If true, the value injected into the `command` placeholder will be an absolute directory
-containing all files for this input. If false or omitted, the value injected into the `command` placeholder will be an
-absolute path to a single file.
+    Optional boolean indicating whether multiple physical files are processed by this `Files` element. If omitted, the default value MUST be treated as false. If true, the value injected into the `command` placeholder will be an absolute directory containing all files for this input. If false (or omitted), the value injected into the `command` placeholder will be an absolute path to a single file.
 
 *partial* ::
-    Optional; MUST be a boolean indicating whether input file is required in whole or in part. This allows an executor† to make
-intelligent choices when providing very large files to a job. This should only be set to true if the job is expected to
-use less than half of very large input files. If omitted, the default value MUST be treated as false.
+    Optional boolean indicating whether input file is required in whole or in part. This allows an executor† to make intelligent choices when providing very large files to a job. This should only be set to true if the job is expected to use less than half of very large input files. If omitted, the default value MUST be treated as false.
 
 *required* ::
-    Optional; MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST
-be treated as true.
+    Optional boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
 .JSON Object
-The following table defines the `json` object members.
+The following description defines the `json` object members.
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating
-the unique name to use for referring to this input. All inputs will be passed as environment variables, with the
-environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment
-variables available at execution time.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with the environment variable names based upon the input names. Refer to <<variable-injection>> for details on environment variables available at execution time.
 
 *type* ::
-    Required; MUST be a string and indicate a valid JSON schema type.
+    Required string that indicates a valid JSON schema type.
 
 *required* ::
-    Optional; MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
-MUST be treated as true.
+    Optional boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-_The following annotated snippet provides quick reference to the use of Inputs object:_
+*EXAMPLE:* +
 [source,javascript]
 ----
 {
-    "files": [ // <1>
+    "files": [ 
         {
-            "name": "INPUT_FILE", // <2>
-            "mediaTypes": [ "image/x-hdf5-image" ], // <3>
-            "multiple": false, // <4>
-            "partial": true, // <5>
-            "required": true // <6>
+            "name": "INPUT_FILE", 
+            "mediaTypes": [ "image/x-hdf5-image" ],
+            "multiple": false,
+            "partial": true,
+            "required": true
         },
         ...
     ]
-    "json": [ // <7>
+    "json": [
         {
-            "name": "INPUT_STRING",<8>
-            "type": "string", // <9>
-            "required": false // <10>
+            "name": "INPUT_STRING",
+            "type": "string",
+            "required": false
         }
     ]
 }
 ----
 
-
-<1> Optional array containing elements defined by Files Object sub-section.
-<2> Required string containing unique name used to refer to this input.
-<3> Optional array containing a list of accepted media types.
-<4> Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
-Default is `false`.
-<5> Optional boolean indicating that a job consumes only a small portion of input file. Default is `false`.
-<6> Optional boolean indicating whether job requires this particular file. Default is `true`.
-<7> Optional array containing elements defined by JSON Object sub-section.
-<8> Required string containing unique name used to refer to this input.
-<9> Required string containing a valid JSON schema type for input validation.
-<10> Optional boolean indicating whether job requires this particular JSON input. Default is `true`.
-
 [[outputs-section, Outputs Object]]
 ====== Outputs Object
 The Outputs object is the member responsible for indicating all output data and the means to capture that data
 following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
-extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. JSON objects are
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. Recursively scanning
+directories is NOT supported, but a known subdirectory structure will work (e.g. base/sub-*/*.ext).  JSON objects are
 expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
 output directory as `seed.outputs.json`. The absolute path to the job output directory is REQUIRED to be passed
 into the container at job execution time in the `OUTPUT_DIR` environment variable. Special attention should be given to
@@ -297,81 +262,68 @@ into the container at job execution time in the `OUTPUT_DIR` environment variabl
 <<extended-file-metadata,extended metadata>>.
 
 *files* ::
-    Optional; MUST be an array of objects defined in the Files Object sub-section.
+    Optional array containing elements defined in the Files Object sub-section.
 
 *json* ::
-    Optional; MUST be an array of objects defined in the JSON Object sub-section.
+    Optional array containing elements defined in the JSON Object sub-section.
 
 .Files Object
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating the unique name to use for referring to this output.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) indicating the unique name to use for referring to this output.
 *mediaType* ::
-    Optional; MUST indicate the IANA Media type for the file being captured by Outputs.
+    Optional string indicating the IANA Media type for the file being captured by Outputs.
 *pattern* ::
-    Required; MUST indicate a standard glob pattern for the capture of files.
+    Required string indicating a standard glob pattern for the capture of files. Executor† is expected to capture output relative to OUTPUT_DIR.
 *multiple* ::
-    Optional; MUST be a boolean indicating whether multiple output files may be captured by this `Files` element. If omitted, the default value MUST be treated as false.
+    Optional boolean indicating whether single or multiple output files may be captured by this `Files` element. If omitted, the default value MUST be treated as false.
 *required* ::
-    Optional; MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value is `true`.
+    Optional boolean indicating whether this input value SHOULD always be expected and if the executor† should assume failure if output data is missing. If omitted, the default value is `true`.
 
 .JSON Object
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating the unique name to use for referring to this output. When `key` member is omitted, it must be a case-sensitive match of the member key in `seed.outputs.json` file.
+    Required; MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) indicating the unique name to use for referring to this output. When `key` member is omitted, it must be a case-sensitive match of the member key in `seed.outputs.json` file.
 *type* ::
-    Required; MUST be a string indicating the JSON schema type of the member being captured from the `seed.outputs.json` file.
+    Required string indicating the JSON schema type of the member being captured from the `seed.outputs.json` file.
 *key* ::
-    Optional; MUST be a string indicating the case-sensitive `seed.outputs.json` member to capture. If omitted, the member key is assumed to be a case-sensitive match for the above defined `name` member.
+    Optional string indicating the case-sensitive `seed.outputs.json` member to capture. If omitted, the member key is assumed to be a case-sensitive match for the above defined `name` member.
 *required* ::
-    Optional; MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST be treated as true.
+    Optional boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST be treated as true.
 
-_The following annotated snippets provides quick reference to the use of Outputs object:_
+*EXAMPLE*: +
 [source,javascript]
 ----
 {
-    "files": [ // <1>
+    "files": [
         {
-            "name": "OUTPUT_TIFFS", // <2>
-            "mediaType": "image/tiff", // <3>
-            "pattern": "outfile*.tif", // <4>
-            "multiple": false, // <5>
-            "required": true // <6>
+            "name": "OUTPUT_TIFFS",
+            "mediaType": "image/tiff",
+            "pattern": "outfile*.tif",
+            "multiple": false,
+            "required": true
         },
         ...
     ],
-    "json": [ // <7>
+    "json": [
         {
-            "name": "CELL_COUNT", // <8>
-            "type": "integer", // <9>
-            "key": "cellCount" // <10>
+            "name": "CELL_COUNT",
+            "type": "integer",
+            "key": "cellCount"
         },
         ...
     ]
 }
 ----
 
-Resulting seed.outputs.json:
+Resulting seed.outputs.json: +
 [source,javascript]
 ----
 {
-    "cellCount": 256, //<11>
+    "cellCount": 256,
     ...
 }
 ----
-
-<1> Optional array containing elements defined by Files Object sub-section.
-<2> Required string containing unique output identifier.
-<3> Optional string containing IANA Media type of file.
-<4> Required string containing glob expression for file capture. Executor† is expected to capture output relative to OUTPUT_DIR.
-<5> Optional boolean indicating whether a single or multiple values are supported. Default value is false.
-<6> Optional boolean indicating whether executor† should assume failure if output data is missing. Default value is true.
-<7> Optional array containing elements defined by JSON Object sub-section.
-<8> Required string containing unique output identifier. MUST be used by executor† to match member for capture from `seed.outputs.json` in absence of `key` member.
-<9> Required string containing JSON schema type of member extracted from `seed.outputs.json` file.
-<10> Optional string containing key of member for extraction. This allows mapping from a `seed.outputs.json` file member key that differs from the value of `name` member.
-<11> Example output manifest containing key defined in (10).
-
 
 [[mounts-section, Mounts Object]]
 ====== Mounts Object
@@ -380,11 +332,11 @@ container for the Job to run. A mount directory is typically a shared file syste
 reference data that the Job requires.
 
 *name* ::
-    Required; MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the mount is provided.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) that correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the mount is provided.
 *path* ::
-    Required; MUST be an absolute file system path specifying where in the container the Job expects the shared directory to be mounted.
+    Required string indicating an absolute file system path specifying where in the container the Job expects the shared directory to be mounted.
 *mode* ::
-    Optional; MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access. Default value is "ro".
+    Optional string that either specifies "ro" for read-only access to the directory or "rw" for read-write access. Default value is "ro".
 
 *EXAMPLE* +
 [source,javascript]
@@ -410,11 +362,11 @@ While it is _highly_ advised that Seed jobs SHOULD limit input / output to the p
  messaging are necessary, this is a reasonable mechanism to accomplish that.
 
 *name* ::
-    Required;  MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) that indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on environment variable available at execution time.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z0-9_-]+$`) that indicates the environment variable to be injected at run time. Refer to <<variable-injection>> for details on environment variable available at execution time.
 *secret* ::
-    Optional; MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a secure string.
+    Optional boolean that indicates whether the value associated with the named setting is secret and stored as a secure string.
 
-_The following annotated snippet provides quick reference to the use of Settings object:_
+*EXAMPLE:* +
 [source,javascript]
 ----
 [
@@ -432,19 +384,17 @@ The Errors object allows for developers† to map arbitrary exit codes to meanin
 in passing information to the executor† to differentiate between data and job errors.
 
 *code* ::
-    Required; MUST be an integer indicating the exit code of the executing job process.
+    Required integer indicating the exit code of the executing job process.
 *name* ::
-    MUST be a string of only alphabetic, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) 
-indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
-of error codes across job versions.
+    Required string of only alphanumeric, dash or underscore characters (defined by the regex† `^[a-zA-Z_-]+$`) indicating the unique name to use for referring to this error. An executor† MAY use member for correlation of error codes across job versions.
 *title* ::
-    Required; MUST be a string indicating the human-friendly, short descriptive title of the error.
+    Required string indicating the human-friendly, short descriptive title of the error.
 *description* ::
-    Optional; MUST be a string indicating the complete error code description and possible causes.
+    Optional string indicating the complete error code description and possible causes.
 *category* ::
-    Optional; MUST be a string containing one of the following values: `job` or `data`. If omitted, the default value is `job`.
+    Optional string containing one of the following values: `job` or `data`. If omitted, the default value is `job`.
 
-_The following annotated snippet provides quick reference to the use of Errors object:_
+*EXAMPLE:* +
 [source,javascript]
 ----
 [

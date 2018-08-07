@@ -79,25 +79,20 @@ include::sections/discovery.man.adoc[]
 The following terms are specific to Seed and are provided to clarify their meaning. They are marked with a dagger (†)
 throughout the document.
 
-|===
-|Term |Description
+*developer* ::
+    creator and packager of Seed compliant image
 
-|developer
-|creator and packager of Seed compliant image
+*executor* ::
+    process responsible for injecting run-time context (inputs, mounts and environment settings) and capturing all resulting output (files, json).
 
-|executor
-|process responsible for injecting run-time context (inputs, mounts and environment settings) and capturing all
-resulting output (files, json).
+*implementer* ::
+    developer of framework for discovering or running Seed compliant images - must provide executor
 
-|implementer
-|developer of framework for discovering or running Seed compliant images - must provide executor
+*regex* ::
+    short hand for "Regular Expression," a text string that defines a pattern to be applied to other strings. http://regexr.com/[More info]
 
-|regex
-|short hand for "Regular Expression," a text string that defines a pattern to be applied to other strings. http://regexr.com/[More info]
-
-|glob
-|a string defining a pattern to be applied to files on *nix operating systems. http://man7.org/linux/man-pages/man7/glob.7.html[More info]
-|===
+*glob* ::
+    a string defining a pattern to be applied to files on *nix operating systems. http://man7.org/linux/man-pages/man7/glob.7.html[More info]
 
 == Schema
 
