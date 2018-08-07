@@ -43,3 +43,11 @@ environment specific values.
 === Docker Trusted Registry
 There is a ticket in with Docker Trusted Registry team to natively support label search. Presently there is no API
 support to inspect hosted images for label metadata. Images must be pulled locally for inspection.
+
+=== SILO
+The Seed team has developed a tool to overcome these limitations in docker registries called SILO.
+
+SILO (Seed Images Location Operation) is a REST API provided by the Seed team for discovering Seed images. The API
+allows users to scan one or more repositories for seed images and then search the resulting images and their manifests
+by keywords. Frameworks such as Scale can use these endpoints to assist users in finding algorithm images and creating
+jobs out of them.
