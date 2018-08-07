@@ -77,34 +77,33 @@ There is often a need by the executor† to capture additional job extracted met
 standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
 describe, with the addition of the `.metadata.json` extension to the original file name (extension included). The file
 must be formatted according to the <<seed-metadata-schema,Seed Metadata Schema>>. This allows for both
-spatial and temporal metadata to be specified.
+spatial and any custom associated metadata to be specified. The `properties` member is of the object type which allows
+for any JSON member type that satisfies your specific use-cases.
 
-The following snippet demonstrates the optional values that may be specified:
+The following snippet is a notional example specifying a geometry and temporal bounded feature associated with a file:
 
 [source,javascript]
 .Metadata JSON
 ----
 {
-    "seedVersion": "SEED_VERSION", <1>
+    "type": "Feature", { <1>
     "geometry": { <2>
         "type": "Polygon",
-	    "coordinates": [
-	        [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
+        "coordinates": [
+            [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
         ]
     },
-    "time": { <3>
-        "start": "2016-08-06T00:00:00.000Z", <4>
-        "end": "2016-08-06T00:00:00.000Z" <5>
+    "properties": { <3>
+        "time": {
+            "start": "2016-08-06T00:00:00.000Z",
+            "end": "2016-08-06T00:00:00.000Z"
+        }
     }
 }
 ----
-<1> Required string indicating the Seed standard it complies with.
-<2> Optional GeoJSON Geometry object defining spatial extent of file.
-<3> Optional Time object defining temporal extent of file.
-<4> Required string containing an ISO 8601 date indicating the start temporal extent of file. String must include full
-time down to minute precision.
-<5> Required string containing an ISO 8601 date indicating the end temporal extent of file. String must include full
-time down to minute precision. If the data is a single point-in-time the end date should match the start date.
+<1> Required string indicating the GeoJSON type being defined.
+<2> Required geometry member defining spatial extent of file.
+<3> Required properties member containing example definition temporal extent of file.
 
 [[resource-defaults, Resource Defaults]]
 ==== Resource Defaults

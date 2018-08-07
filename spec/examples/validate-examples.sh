@@ -8,7 +8,12 @@ pushd "${0%/*}" > /dev/null
 for DIRECTORY in $(ls -F | grep /)
 do
     echo "Validating manifest for example in ${DIRECTORY}..."
-    json validate --schema-file=../schema/seed.manifest.schema.json < ${DIRECTORY}/seed.manifest.json
+    ajv validate -s ../schema/seed.manifest.schema.json -d ${DIRECTORY}seed.manifest.json
+    for METADATA in $(ls ${DIRECTORY} | grep '.metadata.json')
+    do
+        echo "Validating ${DIRECTORY}${METADATA} against schema..."
+        ajv -s ../schema/seed.metadata.schema.json -d ${DIRECTORY}${METADATA} --missing-refs=ignore
+    done
 done
 
 popd > /dev/null
