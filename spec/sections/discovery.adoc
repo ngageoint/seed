@@ -45,7 +45,7 @@ There is a ticket in with Docker Trusted Registry team to natively support label
 support to inspect hosted images for label metadata. Images must be pulled locally for inspection.
 
 === SILO
-The Seed team has developed a tool to overcome these limitations in docker registries called SILO.
+The Seed team has developed a tool to overcome these limitations in docker registries called https://github.com/ngageoint/seed-silo[SILO].
 
 SILO (Seed Images Location Operation) is a REST API provided by the Seed team for discovering Seed images. The API
 allows users to scan one or more repositories for seed images and then search the resulting images and their manifests
