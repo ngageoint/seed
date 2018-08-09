@@ -14,13 +14,12 @@ vSEED_VERSION
 
 == Name
 
-Seed - Seed Specification
+seed-spec - A general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker image.
 
 == Introduction
 
-Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
-image. While initially developed to support the http://ngageoint.github.io/scale/[Scale] data processing system with job
-discovery, it is designed to be readily applied to other systems as well.
+While initially developed to support the http://ngageoint.github.io/scale/[Scale] data processing system with job
+discovery, the seed specification is designed to be readily applied to other systems as well.
 
 Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
 and Registry services. The suffix `-seed` must be used when naming images to enable discovery, prior to Hub or
