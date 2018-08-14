@@ -14,10 +14,15 @@ The specification is intended to inform both job and execution framework develop
 are provided for Seed usage in both simple and complex job scenarios and these are recommended for
 job developers interested in getting started quickly.
 
-The Seed team is in the process of developing a fully featured CLI that will minimize the domain expertise
-required for an job developer to get a Seed image ready for distribution. This will handle the Docker
+The Seed team provides a fully featured link:http://github.com/ngageoint/seed-cli[CLI] to minimize the domain
+expertise required for a job developer to get a Seed image ready for distribution. This will handle the Docker
 image construction and publish, so focus can be given to what really matters - describing your job's
 purpose, requirements and interface.
+
+link:http://github.com/ngageoint/seed-silo[Silo] offers a REST API, also implemented by the Seed team, for discovering
+Seed images. The API allows users to scan one or more repositories for Seed images and then search the resulting
+images and their manifests by keywords. An implementer can leverage these endpoints to assist users in discovering Seed
+images and creating jobs out of them.
 
 == Development
 
@@ -41,13 +46,3 @@ gren changelog --override
 git commit -a -m "Update changelog for release"
 git push
 ```
-
-=== Local development
-
-Run and test this repo locally using this command from within the `spec` directory:
-
-```
-docker run -v `pwd`:/documents rochdev/alpine-asciidoctor:mini asciidoctor -a stylesheet=style.css -D /documents/output seed.adoc
-```
-
-The custom stylesheet implemented here uses Sass, so a sass processor such as the `sass` Ruby gem or `node-sass` should be used to process style changes.
