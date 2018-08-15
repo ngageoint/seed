@@ -1,4 +1,4 @@
-= Seed
+= image:spec/images/wordmark.svg[link="http://ngageoint.github.io/seed/"]
 
 image:https://badges.gitter.im/ngageoint/seed.svg[link="https://gitter.im/ngageoint/seed?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 image:https://travis-ci.org/ngageoint/seed.svg?branch=master[link="https://travis-ci.org/ngageoint/seed"]
@@ -14,10 +14,15 @@ The specification is intended to inform both job and execution framework develop
 are provided for Seed usage in both simple and complex job scenarios and these are recommended for
 job developers interested in getting started quickly.
 
-The Seed team is in the process of developing a fully featured CLI that will minimize the domain expertise
-required for an job developer to get a Seed image ready for distribution. This will handle the Docker
+The Seed team provides a fully featured link:http://github.com/ngageoint/seed-cli[CLI] to minimize the domain
+expertise required for a job developer to get a Seed image ready for distribution. This will handle the Docker
 image construction and publish, so focus can be given to what really matters - describing your job's
 purpose, requirements and interface.
+
+link:http://github.com/ngageoint/seed-silo[Silo] offers a REST API, also implemented by the Seed team, for discovering
+Seed images. The API allows users to scan one or more repositories for Seed images and then search the resulting
+images and their manifests by keywords. An implementer can leverage these endpoints to assist users in discovering Seed
+images and creating jobs out of them.
 
 == Development
 
