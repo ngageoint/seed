@@ -1,15 +1,15 @@
 import re
 import os
+import shutil
 
 if __name__== "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
     seed_spec = os.path.join(dir_path, "seed.adoc")
-    man_seed_spec = os.path.join(dir_path, "seed.man.adoc")
+    gen_seed_spec = os.path.join(dir_path, "seed.man.adoc")
     section_dir = os.path.join(dir_path, "sections")
-    man_section_dir = os.path.join(dir_path, "sections-man")
 
     # process seed.adoc
-    with open(man_seed_spec, "w+") as manfile:
+    with open(gen_seed_spec, "w+") as manfile:
         with open(seed_spec, "r") as infile:
             intable = False
             columns = 0
@@ -27,11 +27,11 @@ if __name__== "__main__":
                     manfile.write("seed-spec - A general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker image.\n")
                 
                 # Replace include with to be created manpage includes
-                elif re.match("include::sections", line):
-                    idx = line.index(".adoc")
-                    line = line[:idx] + ".man" + line[idx:]
-                    line = line.replace("sections", "sections-man")
-                    manfile.write(line)
+                # elif re.match("include::sections", line):
+                #     idx = line.index(".adoc")
+                #     line = line[:idx] + ".man" + line[idx:]
+                #     line = line.replace("sections", "sections-man")
+                #     manfile.write(line)
 
                 # find the start of a table    
                 elif re.match("\[cols", line) and re.match("\|=+", next(infile, '')):
@@ -63,15 +63,13 @@ if __name__== "__main__":
                 else:
                     manfile.write(line)
 
-    try:
-        os.stat(man_section_dir)
-    except:
-        os.mkdir(man_section_dir)
+    # move generated seed.man.adoc to seed.adoc
+    shutil.move(gen_seed_spec, seed_spec)
 
     for section_file_name in os.listdir(section_dir):
         if section_file_name.endswith(".adoc"):
-            filename = section_file_name[:section_file_name.index(".adoc")] + ".man.adoc"
-            with open(os.path.join(man_section_dir, filename), "w+") as outfile:
+            filename = "man." + section_file_name
+            with open(os.path.join(section_dir, filename), "w+") as outfile:
                 with open(os.path.join(section_dir, section_file_name)) as infile:
                     intable = False
                     columns = 0
@@ -134,4 +132,6 @@ if __name__== "__main__":
                             outfile.write(line)
                         else:
                             outfile.write(line)
+                # move generated file to overwrite original
+                shutil.move(os.path.join(section_dir, filename), os.path.join(section_dir, section_file_name))
 

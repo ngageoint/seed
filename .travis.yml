@@ -22,10 +22,11 @@ script:
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
   - ./spec/examples/validate-examples.sh
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed rochdev/alpine-asciidoctor:mini asciidoctor -D /documents/output seed.adoc
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=gen-manpage-doc python:2-alpine python /documents/generate-manpage.py
-  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed-man rochdev/alpine-asciidoctor:mini asciidoctor -b manpage -D /documents/output seed.man.adoc
   - perl -0777 -i.bak -pe 's/\/\/{pdf\+4}\na/4\+a/g;' -pe 's/\/\/{pdf\+1}\n3\+a/4\+a/g' $TRAVIS_BUILD_DIR/spec/sections/standard.adoc
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed-pdf rochdev/alpine-asciidoctor:mini asciidoctor-pdf -a pdf-style=style/pdf-theme.yml -a pdf-fontsdir=style/ -D /documents/output seed.adoc
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=gen-manpage-doc python:2-alpine python /documents/generate-manpage.py
+
+  - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --name=seed-man rochdev/alpine-asciidoctor:mini asciidoctor -b manpage -D /documents/output seed.adoc
 
 after_failure:
   - docker logs index
