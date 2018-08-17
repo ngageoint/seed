@@ -14,8 +14,11 @@ if __name__== "__main__":
             intable = False
             columns = 0
             for line in infile:
+                if re.match("= Seed Standard Definition", line):
+                    line = line.replace("\n", "(1)\n")
+                    manfile.write(line)
                 # insert manpage attributes and Name section
-                if re.match(":docinfo:\n", line):
+                elif re.match(":docinfo:\n", line):
                     manfile.write(line)
                     manfile.write(":doctype: manpage\n")
                     manfile.write(":manmanual: Seed Specification\n")
