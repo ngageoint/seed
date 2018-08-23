@@ -6,6 +6,7 @@
 output/
 html.css*
 *.man.adoc
+*.bak
 
 # System metadata
 .DS_Store
