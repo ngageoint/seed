@@ -26,7 +26,7 @@ docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /docume
 perl -0777 -i.bak -pe 's/\/\/{pdf\+4}\na/4\+a/g;' -pe 's/\/\/{pdf\+1}\n3\+a/4\+a/g' $(pwd)/sections/standard.adoc
 
 # Generate PDF
-docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor-pdf -a pdf-style=styles/pdf-theme.yml -a pdf-fontsdir=styles/ -D /documents/output seed.adoc
+docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor-pdf -a pdf-style=styles/pdf-theme.yml -a pdf-fontsdir=styles/fonts/ -D /documents/output seed.adoc
 
 # Generate manpage styled adoc
 docker run -v $(pwd):/documents --rm ${PYTHON_IMAGE} python /documents/generate-manpage.py
