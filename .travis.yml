@@ -11,7 +11,7 @@ before_install:
   - npm install -g ajv-cli
 
 script:
-  - : ${ASCIIDOCTOR_IMAGE:=rochdev/alpine-asciidoctor:mini}
+  - ASCIIDOCTOR_IMAGE=${ASCIIDOCTOR_IMAGE:=rochdev/alpine-asciidoctor:mini}
   # Use snapshot for remainder for master builds
   - if [[ "${TRAVIS_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
   - spec/examples/validate-examples.sh
