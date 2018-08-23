@@ -107,8 +107,9 @@ heading:
   margin_bottom: $vertical_rhythm * 0.9
 title_page:
   align: right
+  logo_image: image:/documents/images/logo.png[align=right]
   logo:
-    top: 10%
+    top: 40%
   title:
     top: 55%
     font_family: $heading_font_family
