@@ -1,0 +1,41 @@
+.admonitionblock {
+  border-width: 2px;
+  border-style: solid;
+  border-color: color(grey);
+  padding: 8px $pad / 2 9px;
+  border-radius: 4px;
+  table {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  .icon {
+    font-size: size(h3);
+    vertical-align: middle;
+  }
+  &.note {
+    border-color: color(purple, 600);
+    background-color: color(purple, 100);
+    color: color(purple, 800);
+    .icon {
+      color: color(purple, 600);
+    }
+  }
+  &.warning {
+    border-color: color(red, 600);
+    background-color: color(red, 100);
+    color: color(red, 800);
+    .icon {
+      color: color(red, 600);
+    }
+  }
+}
+
+.icon-note::before {
+  content: "\f05a";
+}
+.icon-warning::before {
+  content: "\f071";
+}

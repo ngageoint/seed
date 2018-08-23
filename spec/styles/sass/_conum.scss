@@ -1,0 +1,25 @@
+.conum[data-value] {
+  display: inline-block;
+  color: color(grey, 900);
+  background-color: color(green, 300);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  font-style: normal;
+  padding-top: 2px;
+  box-sizing: border-box;
+  margin-top: -2px;
+  margin-bottom: -2px;
+  position: relative;
+  top: 1px;
+  &:after {
+    content: attr(data-value);
+    font-size: size(h6);
+    font-family: font(headings);
+    font-weight: 700;
+  }
+  & + b {
+    display: none;
+  }
+}

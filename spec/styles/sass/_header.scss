@@ -1,0 +1,163 @@
+#header {
+  position: relative;
+  margin-left: -1 * $pad;
+  margin-right: -1 * $pad;
+  padding-top: size(baseline);
+  padding-bottom: size(baseline);
+  @include col-pad;
+  & > h1 {
+    padding-top: 6px;
+    padding-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    font-size: 5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: size(baseline) * 2.5;
+    &::before {
+      @include pseudo-el(64px, 64px);
+      background: url('images/logo.svg') left top no-repeat;
+      background-size: 64px;
+      border-radius: 4px;
+      float: left;
+      margin-right: $pad;
+      position: relative;
+      top: -8px;
+      margin-bottom: -4px;
+    }
+    &::after {
+      @include pseudo-el;
+      clear: both;
+    }
+  }
+  .details {
+    font-size: size(base);
+    line-height: baseline();
+    color: color(grey, 600);
+    max-width: 500px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    br {
+      display: none;
+    }
+    .author {
+      display: inline-block;
+    }
+    .email {
+      display: inline-block;
+      padding-right: $pad / 2;
+      a {
+        color: color(blue, 600);
+      }
+    }
+  }
+}
+#toc {
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: $col * 2;
+  overflow: auto;
+  background-color: color(grey, 300);
+  padding: baseline() $pad;
+  ul {
+    @include col-pad($pad / 16, 0);
+    list-style: none;
+    li {
+      padding-left: 5px;
+      text-indent: -5px;
+    }
+  }
+  .sectlevel1 {
+    font-weight: 700;
+    padding-left: 0;
+  }
+  .sectlevel2 {}
+  .sectlevel3 {}
+  .sectlevel4 {}
+}
+#toctitle {
+  font-size: size(h3);
+  font-family: font(headings);
+  @include type-space(1px, 9px, 0, 0, baseline());
+}
+
+@media screen and (max-width: 990px) {
+
+  body {
+    padding-top: 100px;
+  }
+  #header {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: color(grey, 100);
+    & > h1 {
+      font-size: size(h2);
+      line-height: baseline(1.5);
+      padding-top: 4px;
+      padding-bottom: 6px;
+      &::before {
+        @include pseudo-el(32px, 32px);
+        background-size: 32px;
+        margin-right: $pad;
+        top: -1px;
+        margin-bottom: 8px;
+      }
+    }
+    .details {
+      .email { display: none; }
+      .author { margin-right: $pad / 2; }
+    }
+  }
+
+  .toc-left {
+    #header {
+      padding-left: 100px + $pad;
+      padding-top: baseline(0.5);
+    }
+    #toc {
+      position: absolute;
+      overflow: visible;
+      width: 100px;
+      height: 110px;
+      padding-top: 34px;
+      &:hover .sectlevel1 {
+        display: block;
+      }
+      .sectlevel1 {
+        display: none;
+        box-sizing: border-box;
+        @include col-pad;
+        width: $col * 2;
+        height: 80vh;
+        overflow: auto;
+        background-color: color(grey, 300);
+        position: absolute;
+        top: baseline(5);
+        left: 0;
+      }
+    }
+    #toctitle {
+      font-size: size(h4);
+      font-family: font(headings);
+      @include type-space(9px, 1px, 0, 0, baseline());
+    }
+  }
+
+}
+
+@media screen and (max-width: 600px) {
+  #header {
+    & > h1 {
+      font-size: size(h4);
+      line-height: baseline();
+    }
+  }
+}
