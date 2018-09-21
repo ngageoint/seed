@@ -26,6 +26,6 @@ push. This requirement will be deprecated as label search support is standardize
 See the latest version of the link:seed.html[full specification] for complete detail on manifest format.
 
 Seed was developed at the National Geospatial-Intelligence Agency (NGA) Research in collaboration with
-[Ball Aerospace](http://www.ballaerospace.com/) and [Applied Information Sciences (AIS)](http://www.appliedis.com/).
+link:http://www.ballaerospace.com/[Ball Aerospace] and link:http://www.appliedis.com[Applied Information Sciences (AIS)].
 
 Specification versions:
