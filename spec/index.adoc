@@ -1,5 +1,5 @@
 = Seed
-Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>; John Tobe <jtobe@ball.com>
+Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mholt1@ball.com>; Derick Faller <dfaller@ball.com>; John Tobe <jtobe@ball.com>; Emily Smith <emily.smith@appliedis.com>
 :toc: left
 :toclevels: 5
 :stylesheet: styles/html.css
@@ -24,5 +24,8 @@ and Registry services. The suffix `-seed` must be used when naming images to ena
 push. This requirement will be deprecated as label search support is standardized across Docker registry services.
 
 See the latest version of the link:seed.html[full specification] for complete detail on manifest format.
+
+Seed was developed at the National Geospatial-Intelligence Agency (NGA) Research in collaboration with
+[Ball Aerospace](http://www.ballaerospace.com/) and [Applied Information Sciences (AIS)](http://www.appliedis.com/).
 
 Specification versions:
