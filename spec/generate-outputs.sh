@@ -12,7 +12,7 @@
 : ${ALPINE_IMAGE:=alpine}
 : ${ASCIIDOCTOR_IMAGE:=rochdev/alpine-asciidoctor:mini}
 : ${PYTHON_IMAGE:=python:2-alpine}
-: ${SASS_IMAGE:=catchdigital/node-sass}
+: ${SASS_IMAGE:=catchdigital/node-sass:8.12.0-alpine}
 
 pushd $(dirname $0) > /dev/null
 
