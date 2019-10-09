@@ -28,5 +28,3 @@ build:
   cache:
     paths:
       - node_modules
-  only:
-  - master
