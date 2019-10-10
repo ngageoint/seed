@@ -26,6 +26,7 @@ build:
     - ${DIND_IMAGE}
 
   script:
+  - apk add -U git
   - export SEED_LATEST=$(tail -1 .versions)
   - mkdir -p output
   # Use snapshot for remainder for master builds
