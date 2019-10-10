@@ -1,7 +1,7 @@
 variables:
   DOCKER_IMAGE: docker:stable
   DIND_IMAGE: docker:dind
-  NODE_IMAGE: node
+  NODE_IMAGE: node:alpine
 
 before_script:
   - apk add -U jq bash
