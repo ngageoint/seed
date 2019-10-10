@@ -3,6 +3,9 @@ variables:
   DIND_IMAGE: docker:dind
   NODE_IMAGE: node
 
+before_script:
+  - apk add -U jq bash
+
 validate:
   image: ${NODE_IMAGE}
 
