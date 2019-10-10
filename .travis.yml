@@ -23,7 +23,7 @@ script:
   - docker run -v $TRAVIS_BUILD_DIR/spec:/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
 
 before_deploy:
-  - ./spec/collect-versioned-docs.sh
+  - sudo ./spec/collect-versioned-docs.sh
 
 deploy:
   # Deployment that pushes GitHub releases of compiled spec docs associated with tag
