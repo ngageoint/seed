@@ -11,7 +11,7 @@ validate:
 
   script:
   - export SEED_LATEST=$(tail -1 .versions)
-  - npm install ajv-cli
+  - npm install -g ajv-cli
   # Use snapshot for remainder for master builds
   - if [[ "${CI_COMMIT_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
   - spec/examples/validate-examples.sh
