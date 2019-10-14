@@ -22,7 +22,10 @@ validate:
     paths:
       - node_modules
 
-build:
+pages:
+  dependencies:
+    - validate
+
   image: ${DOCKER_IMAGE}
 
   services:
