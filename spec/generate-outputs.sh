@@ -4,12 +4,10 @@
 # Usage: ./generate-outputs.sh
 # Requires: Docker and perl installed locally
 # Variables:
-# ALPINE_IMAGE: optional override for Alpine Docker image
 # ASCIDOCTOR_IMAGE: optional override for Asciidoctor Docker image
 # PYTHON_IMAGE: optional override for Python 2.7.x Docker image
 # SASS_IMAGE: optional override for Node SASS Docker image
 
-: ${ALPINE_IMAGE:=alpine}
 : ${ASCIIDOCTOR_IMAGE:=rochdev/alpine-asciidoctor:mini}
 : ${PYTHON_IMAGE:=python:2-alpine}
 : ${SASS_IMAGE:=catchdigital/node-sass:8.12.0-alpine}

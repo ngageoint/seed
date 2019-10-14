@@ -1,0 +1,62 @@
+variables:
+  ASCIIDOCTOR_IMAGE: rochdev/alpine-asciidoctor:mini
+  DIND_IMAGE: docker:dind
+  DOCKER_IMAGE: docker:stable
+  NODE_IMAGE: node:alpine
+  PYTHON_IMAGE: python:2-alpine
+  SASS_IMAGE: catchdigital/node-sass:8.12.0-alpine
+
+before_script:
+  - apk add -U jq bash
+
+build:
+  image: ${DOCKER_IMAGE}
+
+  services:
+    - ${DIND_IMAGE}
+
+  script:
+  - apk add -U git
+  - export SEED_LATEST=$(tail -1 .versions)
+  - export BUILD_TAG=${CI_COMMIT_TAG}
+  - mkdir -p output
+  # Use snapshot for remainder for master builds
+  - if [[ "${CI_COMMIT_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
+  - spec/generate-outputs.sh
+  - git checkout -- spec
+  # Build index.adoc WITHOUT snapshot tag
+  - if [[ "${CI_COMMIT_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}; spec/examples/inject-manifests.sh; fi
+  - spec/add-version-links.sh
+  - docker run -v $(pwd)/spec:/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
+  - ./spec/collect-versioned-docs.sh
+  artifacts:
+    paths:
+    - spec/output
+
+test:
+  image: ${NODE_IMAGE}
+
+  script:
+  - export SEED_LATEST=$(tail -1 .versions)
+  - npm install -g ajv-cli
+  # Use snapshot for remainder for master builds
+  - if [[ "${CI_COMMIT_TAG}x" == "x" ]] ; then ./set-version.sh ${SEED_LATEST}-snapshot; ./spec/examples/inject-manifests.sh; fi
+  - spec/examples/validate-examples.sh
+  cache:
+    paths:
+      - node_modules
+
+pages:
+  stage: deploy
+
+  dependencies:
+    - build
+
+  script:
+  - mv spec/output public
+  artifacts:
+    paths:
+    - public
+
+  only:
+    - master
