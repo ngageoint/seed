@@ -3,9 +3,9 @@
 : ${BUILD_TAG:=${TRAVIS_TAG}}
 
 # Ensure script directory is CWD
-OUTPUT_DIR="${0%/*}"/output
+OUTPUT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/output
 pushd ${OUTPUT_DIR}
-OUTPUT_DIR=${pwd}
+OUTPUT_DIR=$(pwd)
 
 
 # Collect files for GitHub Releases
