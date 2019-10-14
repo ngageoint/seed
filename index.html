@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.5">
+<meta name="author" content="Jonathan Meyer, Mike Holt, John Tobe, Emily Smith">
+<title>Seed</title>
+<style>
+@import url("https://fonts.googleapis.com/css?family=Dosis:500,600,700|Roboto:100,100i,300,300i,700,700i");
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
+@import url("https://fonts.googleapis.com/css?family=Dosis:500,600,700|Roboto:100,100i,300,300i,700,700i");
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
+body {
+  background-color: transparent;
+  width: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+  body.toc-left {
+    max-width: 1020px;
+    margin-left: 200px; }
+    @media screen and (max-width: 990px) {
+      body.toc-left {
+        margin-left: auto; } }
+
+html {
+  font-size: 10px;
+  background-color: #ECECEC; }
+
+a {
+  text-decoration: none;
+  color: #3096C3; }
+
+body {
+  color: #413D29;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 300; }
+
+h1 {
+  font-size: 4rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 500;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  padding-top: 4px;
+  padding-bottom: 6px;
+  line-height: 4rem; }
+
+h2 {
+  font-size: 2.8rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 500;
+  color: #74BA00;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 4rem; }
+
+h3 {
+  font-size: 2.1rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 600;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 3px;
+  padding-bottom: 7px;
+  line-height: 2rem; }
+
+h4 {
+  font-size: 1.6rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+h5 {
+  font-size: 1.3rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 6px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+
+h6,
+.paragraph > .title,
+.listingblock > .title {
+  font-size: 1.3rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.15rem;
+  text-transform: uppercase;
+  color: #74BA00;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 6px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+
+li {
+  font-size: 1.4rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  line-height: 2rem; }
+  li > *:first-child {
+    margin-top: 0;
+    padding-top: 0; }
+  li > *:last-child,
+  li > p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0; }
+
+p {
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+pre,
+.listingblock pre {
+  font-size: 1.4rem;
+  color: #DBDAD5;
+  background-color: #56523E;
+  border-radius: 4px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 14px;
+  padding-bottom: 16px;
+  line-height: 2rem;
+  padding-left: 20px;
+  padding-right: 20px; }
+  pre:not(.highlight),
+  .listingblock pre:not(.highlight) {
+    background-color: #56523E; }
+
+ul {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+  ul ul {
+    padding-top: 0;
+    padding-bottom: 0; }
+
+table {
+  border-collapse: collapse;
+  margin-top: 10px;
+  margin-bottom: 20px; }
+
+td, th {
+  box-sizing: border-box;
+  border-bottom: 1px solid #DBDAD5;
+  font-size: 1.4rem;
+  vertical-align: top;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+  td > *:first-child,
+  td .paragraph:first-child p, th > *:first-child,
+  th .paragraph:first-child p {
+    margin-top: 0;
+    padding-top: 0; }
+  td > *:last-child,
+  td .paragraph:last-child p, th > *:last-child,
+  th .paragraph:last-child p {
+    margin-bottom: 0;
+    padding-bottom: 0; }
+  td .paragraph ~ .listingblock:last-child, th .paragraph ~ .listingblock:last-child {
+    margin-bottom: 9px; }
+  td pre,
+  td .listingblock pre, th pre,
+  th .listingblock pre {
+    margin-top: 6px;
+    margin-bottom: 4px; }
+  td .listingblock:first-child pre, th .listingblock:first-child pre {
+    margin-top: 15px;
+    margin-bottom: 5px; }
+  td table, th table {
+    margin-bottom: 19px; }
+  td td, th td {
+    border-bottom-color: transparent; }
+  td tr:first-child td, th tr:first-child td {
+    padding-top: 0; }
+  td tr:last-child td, th tr:last-child td {
+    padding-bottom: 0; }
+
+th {
+  font-weight: 700;
+  text-align: left; }
+
+#header {
+  position: relative;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 20px;
+  padding-right: 20px; }
+  #header > h1 {
+    padding-top: 6px;
+    padding-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    font-size: 5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 5rem; }
+    #header > h1::before {
+      content: '';
+      display: block;
+      width: 64px;
+      height: 64px;
+      background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTI4cHgiIGhlaWdodD0iMTI3cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI3IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA1MS4xICg1NzUwMSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+bG9nbzwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJDb25jZXB0LTIiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJsb2dvIj4KICAgICAgICAgICAgPHBhdGggZD0iTTg5LjI2NjEwMTcsMjYuNzkxNTI1NCBDNzIuNzQxMDQ2OSwzMi40Njk2NDg5IDczLjY2MjcxMTksNzQuNDkwNzIxNSA2Ni4xMjg4MTM2LDg0LjQyNzExODYgQzU4LjU5NDkxNTMsOTQuMzYzNTE1OCA0MC44MzcyODgxLDEwNi40OTY2MSA0Ni41MjU0MjM3LDExOC41MTM1NTkgQzUyLjIxMzU1OTMsMTMwLjUzMDUwOCA5Mi44MjM4NzcsMTMyLjk4MTEwNCAxMTQuMjc2MjcxLDEwMC42NjQ0MDcgQzE0NS40NzQ1NzYsNTMuNjY2MTAxNyAxMTUuNTUyNTQyLDE3Ljc1OTMyMiA4OS4yNjYxMDE3LDI2Ljc5MTUyNTQgWiIgaWQ9IkJlYW4iIGZpbGw9IiM1MTRDNDUiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTE4LjUxNzM3MjUsNDYuOTU2NDAxOSBDMTguNDc2OTUxOCw0NS43Njc4MzY4IDE4LjQ1Njc0MTUsNDQuNTQyNTM0NCAxOC40NTY3NDE1LDQzLjI4MDQ5NSBDMTguNDU2NzQxNSwyMi4wMzUwMDEyIDMzLjg0OTAwMDUsMy43NDQ1NjIxMyA1My43Nzc3NTcsMS4zODY0Njg3OCBDODYuMjA1NjgyNCwtMi40NTA2MDMzIDk2LjQ2NDUxMzUsNy4yNTA0MjAyOSAxMTEuOTU2MDA4LDMuODg5NjMwMDEgQzEyNy40NDc1MDMsMC41Mjg4Mzk3MjUgMTEwLjk0MzkwOSwxOC40MDY1NzA2IDk2Ljk0MTMzMTYsMTguNDA2NTcwNiBDODIuOTM4NzUzOSwxOC40MDY1NzA2IDczLjMwNDIzODEsMjcuMTYyMDAzMiA2Ni4wNDM5NjQxLDQ4LjY3MTM4MjggQzYxLjQyMTY1MzIsNjIuMzY1NDk5NiA0OS4wNjg2LDcwLjA0MDQxMDQgMjguOTg0ODA0NSw3MS42OTYxMTUxIEMyOS42MDUxNzQ0LDc2LjM1NTg2NjggMzAuOTA1NTU0LDgxLjkzMjQwOTYgMzUuNzE1MjEyMSw5MC40MTUyNTQyIEMyNS41NzI4ODE0LDkwLjQxNTI1NDIgMTEuODEwMTY5NSw5MC40MTUyNTQyIDQuMjEzNTU5MzIsNzcuNDU0MjM3MyBDLTMuMzgzMDUwODUsNjQuNDkzMjIwMyAxLjc0NDE4ODM2LDQzLjYwMzkyNjMgNC4yMTM1NTkzMiwzNS4xMjIwMzM5IEM2LjY4MjkzMDI5LDI2LjY0MDE0MTUgOC40Mjc1NzY1OSwzNi4zMDQ2NTQ1IDEwLjI2NDQwNjgsMzkuMDgxMzU1OSBDMTEuMzgyOTI3MSw0MC43NzIyMDIgMTQuNzkwMTE1OCw0My4wMzIxNCAxOC41MTczNzI1LDQ2Ljk1NjQwMTkgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlIiBmaWxsPSIjNzRCQTAwIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik03MC41ODgxMzU2LDcyLjg0NTc2MjcgQzY0LjIxODY0NDEsNzcuMjYzNTU5MyA2Mi41NTM4MTM2LDg4LjEwMzM4OTggNTIuNyw4OC4xMDMzODk4IEM0Mi4yMzg5ODMxLDg4LjEwMzM4OTggMjYuNTI1ODQ3NSw3Ni40OTE5NDkyIDI5LjUwNTA4NDcsNTcuNjYwMTY5NSBDMzIuNDg0MzIyLDM4LjgyODM4OTggNTEuMzExMDE2OSwyNS42OTM2NDQxIDY0LjgxMDE2OTUsMjEuMzUwODQ3NSBDNjcuMDI4MjY0OCwyMC42MzcyNjY2IDY3LjkzNDM4MDIsMTkuNzAzNTM0NiA2NC44MTAxNjk1LDE5Ljg4ODEzNTYgQzUyLjEzMTc3OTcsMjAuNjM3MjY2NiAyMS4yNDc0NTc2LDM2LjQ0ODMwNTEgMjEuMjQ3NDU3Niw2MS43MjExODY0IEMyMS4yNDc0NTc2LDg2Ljk5NDA2NzggMzkuMTkzMjIwMyw5OC41NTc2MjcxIDUyLjcsOTguNTU3NjI3MSBDNjYuMjA2Nzc5Nyw5OC41NTc2MjcxIDc2Ljk1NzYyNzEsNjguNDI3OTY2MSA3MC41ODgxMzU2LDcyLjg0NTc2MjcgWiIgaWQ9IlN0ZW0iIGZpbGw9IiM1QjkxMDIiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==") left top no-repeat;
+      background-size: 64px;
+      border-radius: 4px;
+      float: left;
+      margin-right: 20px;
+      position: relative;
+      top: -8px;
+      margin-bottom: -4px; }
+    #header > h1::after {
+      content: '';
+      display: block;
+      width: auto;
+      height: auto;
+      clear: both; }
+  #header .details {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    color: #959387;
+    max-width: 500px;
+    padding-top: 5px;
+    padding-bottom: 5px; }
+    #header .details br {
+      display: none; }
+    #header .details .author {
+      display: inline-block; }
+    #header .details .email {
+      display: inline-block;
+      padding-right: 10px; }
+      #header .details .email a {
+        color: #4DAED8; }
+
+#toc {
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  overflow: auto;
+  background-color: #DBDAD5;
+  padding: 2rem 20px; }
+  #toc ul {
+    padding-left: 1.25px;
+    padding-right: 0;
+    list-style: none; }
+    #toc ul li {
+      padding-left: 5px;
+      text-indent: -5px; }
+  #toc .sectlevel1 {
+    font-weight: 700;
+    padding-left: 0; }
+
+#toctitle {
+  font-size: 2.1rem;
+  font-family: Dosis, sans-serif;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 1px;
+  padding-bottom: 9px;
+  line-height: 2rem; }
+
+@media screen and (max-width: 990px) {
+  body {
+    padding-top: 100px; }
+  #header {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #ECECEC; }
+    #header > h1 {
+      font-size: 2.8rem;
+      line-height: 3rem;
+      padding-top: 4px;
+      padding-bottom: 6px; }
+      #header > h1::before {
+        content: '';
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-size: 32px;
+        margin-right: 20px;
+        top: -1px;
+        margin-bottom: 8px; }
+    #header .details .email {
+      display: none; }
+    #header .details .author {
+      margin-right: 10px; }
+  .toc-left #header {
+    padding-left: 120px;
+    padding-top: 1rem; }
+  .toc-left #toc {
+    position: absolute;
+    overflow: visible;
+    width: 100px;
+    height: 110px;
+    padding-top: 34px; }
+    .toc-left #toc:hover .sectlevel1 {
+      display: block; }
+    .toc-left #toc .sectlevel1 {
+      display: none;
+      box-sizing: border-box;
+      padding-left: 20px;
+      padding-right: 20px;
+      width: 200px;
+      height: 80vh;
+      overflow: auto;
+      background-color: #DBDAD5;
+      position: absolute;
+      top: 10rem;
+      left: 0; }
+  .toc-left #toctitle {
+    font-size: 1.6rem;
+    font-family: Dosis, sans-serif;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 9px;
+    padding-bottom: 1px;
+    line-height: 2rem; } }
+
+@media screen and (max-width: 600px) {
+  #header > h1 {
+    font-size: 1.6rem;
+    line-height: 2rem; } }
+
+#footer-text {
+  font-size: 1.4rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+.conum[data-value] {
+  display: inline-block;
+  color: #413D29;
+  background-color: #94D627;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  font-style: normal;
+  padding-top: 2px;
+  box-sizing: border-box;
+  margin-top: -2px;
+  margin-bottom: -2px;
+  position: relative;
+  top: 1px; }
+  .conum[data-value]:after {
+    content: attr(data-value);
+    font-size: 1.3rem;
+    font-family: Dosis, sans-serif;
+    font-weight: 700; }
+  .conum[data-value] + b {
+    display: none; }
+
+.admonitionblock {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #C3C0B5;
+  padding: 8px 10px 9px;
+  border-radius: 4px; }
+  .admonitionblock table {
+    margin-top: 0;
+    margin-bottom: 0; }
+  .admonitionblock tr:last-child td {
+    border-bottom: 0; }
+  .admonitionblock .icon {
+    font-size: 2.1rem;
+    vertical-align: middle; }
+  .admonitionblock.note {
+    border-color: #7D46D9;
+    background-color: #D6BEFF;
+    color: #40128E; }
+    .admonitionblock.note .icon {
+      color: #7D46D9; }
+  .admonitionblock.warning {
+    border-color: #D93C3C;
+    background-color: #FFC1C1;
+    color: #951111; }
+    .admonitionblock.warning .icon {
+      color: #D93C3C; }
+
+.icon-note::before {
+  content: "\f05a"; }
+
+.icon-warning::before {
+  content: "\f071"; }
+
+.image .image img {
+  position: relative;
+  top: 6px;
+  margin-top: -6px; }
+
+/*# sourceMappingURL=html.css.map */
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Seed</h1>
+<div class="details">
+<span id="author" class="author">Jonathan Meyer</span><br>
+<span id="email" class="email"><a href="mailto:jonathan.meyer@appliedis.com">jonathan.meyer@appliedis.com</a></span><br>
+<span id="author2" class="author">Mike Holt</span><br>
+<span id="email2" class="email"><a href="mailto:mike.holt@appliedis.com">mike.holt@appliedis.com</a></span><br>
+<span id="author3" class="author">John Tobe</span><br>
+<span id="email3" class="email"><a href="mailto:jtobe@ball.com">jtobe@ball.com</a></span><br>
+<span id="author4" class="author">Emily Smith</span><br>
+<span id="email4" class="email"><a href="mailto:emily.smith@appliedis.com">emily.smith@appliedis.com</a></span><br>
+</div>
+</div>
+<div id="content">
+<div class="paragraph">
+<p>Seed was developed at the National Geospatial-Intelligence Agency (NGA) Research.</p>
+</div>
+<div class="paragraph">
+<p>Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image.</p>
+</div>
+<div class="paragraph">
+<p>To comply with the Seed standard a Docker image must have a single label used for discovery. This can be applied
+with the following Dockerfile snippet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>FROM alpine
+
+ENTRYPOINT /app/job.sh
+
+LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{ ... }}"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix <code>-seed</code> must be used when naming images to enable discovery, prior to Hub or Registry
+push. This requirement will be deprecated as label search support is standardized across Docker registry services.</p>
+</div>
+<div class="paragraph">
+<p>See the latest version of the <a href="seed.html">full specification</a> for complete detail on manifest format.</p>
+</div>
+<div class="paragraph">
+<p>Specification versions:
+<span class="image"><a class="image" href="1.0.0/"><img src="https://img.shields.io/badge/seed-1.0.0-brightgreen.svg" alt="seed 1.0.0 brightgreen"></a></span>
+<span class="image"><a class="image" href="master/"><img src="https://img.shields.io/badge/seed-master-brightgreen.svg" alt="seed master brightgreen"></a></span></p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-10-14 19:45:32 UTC
+</div>
+</div>
+</body>
+</html>

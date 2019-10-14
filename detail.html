@@ -1,0 +1,3043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.5">
+<meta name="author" content="Jonathan Meyer, Mike Holt, Derick Faller, John Tobe">
+<title>Seed Standard Definition</title>
+<style>
+@import url("https://fonts.googleapis.com/css?family=Dosis:500,600,700|Roboto:100,100i,300,300i,700,700i");
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
+@import url("https://fonts.googleapis.com/css?family=Dosis:500,600,700|Roboto:100,100i,300,300i,700,700i");
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
+body {
+  background-color: transparent;
+  width: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+  body.toc-left {
+    max-width: 1020px;
+    margin-left: 200px; }
+    @media screen and (max-width: 990px) {
+      body.toc-left {
+        margin-left: auto; } }
+
+html {
+  font-size: 10px;
+  background-color: #ECECEC; }
+
+a {
+  text-decoration: none;
+  color: #3096C3; }
+
+body {
+  color: #413D29;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 300; }
+
+h1 {
+  font-size: 4rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 500;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  padding-top: 4px;
+  padding-bottom: 6px;
+  line-height: 4rem; }
+
+h2 {
+  font-size: 2.8rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 500;
+  color: #74BA00;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 4rem; }
+
+h3 {
+  font-size: 2.1rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 600;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 3px;
+  padding-bottom: 7px;
+  line-height: 2rem; }
+
+h4 {
+  font-size: 1.6rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+h5 {
+  font-size: 1.3rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  color: #74BA00;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-top: 6px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+
+h6,
+.paragraph > .title,
+.listingblock > .title {
+  font-size: 1.3rem;
+  font-family: Dosis, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.15rem;
+  text-transform: uppercase;
+  color: #74BA00;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 6px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+
+li {
+  font-size: 1.4rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  line-height: 2rem; }
+  li > *:first-child {
+    margin-top: 0;
+    padding-top: 0; }
+  li > *:last-child,
+  li > p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0; }
+
+p {
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+pre,
+.listingblock pre {
+  font-size: 1.4rem;
+  color: #DBDAD5;
+  background-color: #56523E;
+  border-radius: 4px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 14px;
+  padding-bottom: 16px;
+  line-height: 2rem;
+  padding-left: 20px;
+  padding-right: 20px; }
+  pre:not(.highlight),
+  .listingblock pre:not(.highlight) {
+    background-color: #56523E; }
+
+ul {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+  ul ul {
+    padding-top: 0;
+    padding-bottom: 0; }
+
+table {
+  border-collapse: collapse;
+  margin-top: 10px;
+  margin-bottom: 20px; }
+
+td, th {
+  box-sizing: border-box;
+  border-bottom: 1px solid #DBDAD5;
+  font-size: 1.4rem;
+  vertical-align: top;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  line-height: 2rem; }
+  td > *:first-child,
+  td .paragraph:first-child p, th > *:first-child,
+  th .paragraph:first-child p {
+    margin-top: 0;
+    padding-top: 0; }
+  td > *:last-child,
+  td .paragraph:last-child p, th > *:last-child,
+  th .paragraph:last-child p {
+    margin-bottom: 0;
+    padding-bottom: 0; }
+  td .paragraph ~ .listingblock:last-child, th .paragraph ~ .listingblock:last-child {
+    margin-bottom: 9px; }
+  td pre,
+  td .listingblock pre, th pre,
+  th .listingblock pre {
+    margin-top: 6px;
+    margin-bottom: 4px; }
+  td .listingblock:first-child pre, th .listingblock:first-child pre {
+    margin-top: 15px;
+    margin-bottom: 5px; }
+  td table, th table {
+    margin-bottom: 19px; }
+  td td, th td {
+    border-bottom-color: transparent; }
+  td tr:first-child td, th tr:first-child td {
+    padding-top: 0; }
+  td tr:last-child td, th tr:last-child td {
+    padding-bottom: 0; }
+
+th {
+  font-weight: 700;
+  text-align: left; }
+
+#header {
+  position: relative;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 20px;
+  padding-right: 20px; }
+  #header > h1 {
+    padding-top: 6px;
+    padding-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    font-size: 5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 5rem; }
+    #header > h1::before {
+      content: '';
+      display: block;
+      width: 64px;
+      height: 64px;
+      background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTI4cHgiIGhlaWdodD0iMTI3cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI3IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA1MS4xICg1NzUwMSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+bG9nbzwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJDb25jZXB0LTIiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJsb2dvIj4KICAgICAgICAgICAgPHBhdGggZD0iTTg5LjI2NjEwMTcsMjYuNzkxNTI1NCBDNzIuNzQxMDQ2OSwzMi40Njk2NDg5IDczLjY2MjcxMTksNzQuNDkwNzIxNSA2Ni4xMjg4MTM2LDg0LjQyNzExODYgQzU4LjU5NDkxNTMsOTQuMzYzNTE1OCA0MC44MzcyODgxLDEwNi40OTY2MSA0Ni41MjU0MjM3LDExOC41MTM1NTkgQzUyLjIxMzU1OTMsMTMwLjUzMDUwOCA5Mi44MjM4NzcsMTMyLjk4MTEwNCAxMTQuMjc2MjcxLDEwMC42NjQ0MDcgQzE0NS40NzQ1NzYsNTMuNjY2MTAxNyAxMTUuNTUyNTQyLDE3Ljc1OTMyMiA4OS4yNjYxMDE3LDI2Ljc5MTUyNTQgWiIgaWQ9IkJlYW4iIGZpbGw9IiM1MTRDNDUiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTE4LjUxNzM3MjUsNDYuOTU2NDAxOSBDMTguNDc2OTUxOCw0NS43Njc4MzY4IDE4LjQ1Njc0MTUsNDQuNTQyNTM0NCAxOC40NTY3NDE1LDQzLjI4MDQ5NSBDMTguNDU2NzQxNSwyMi4wMzUwMDEyIDMzLjg0OTAwMDUsMy43NDQ1NjIxMyA1My43Nzc3NTcsMS4zODY0Njg3OCBDODYuMjA1NjgyNCwtMi40NTA2MDMzIDk2LjQ2NDUxMzUsNy4yNTA0MjAyOSAxMTEuOTU2MDA4LDMuODg5NjMwMDEgQzEyNy40NDc1MDMsMC41Mjg4Mzk3MjUgMTEwLjk0MzkwOSwxOC40MDY1NzA2IDk2Ljk0MTMzMTYsMTguNDA2NTcwNiBDODIuOTM4NzUzOSwxOC40MDY1NzA2IDczLjMwNDIzODEsMjcuMTYyMDAzMiA2Ni4wNDM5NjQxLDQ4LjY3MTM4MjggQzYxLjQyMTY1MzIsNjIuMzY1NDk5NiA0OS4wNjg2LDcwLjA0MDQxMDQgMjguOTg0ODA0NSw3MS42OTYxMTUxIEMyOS42MDUxNzQ0LDc2LjM1NTg2NjggMzAuOTA1NTU0LDgxLjkzMjQwOTYgMzUuNzE1MjEyMSw5MC40MTUyNTQyIEMyNS41NzI4ODE0LDkwLjQxNTI1NDIgMTEuODEwMTY5NSw5MC40MTUyNTQyIDQuMjEzNTU5MzIsNzcuNDU0MjM3MyBDLTMuMzgzMDUwODUsNjQuNDkzMjIwMyAxLjc0NDE4ODM2LDQzLjYwMzkyNjMgNC4yMTM1NTkzMiwzNS4xMjIwMzM5IEM2LjY4MjkzMDI5LDI2LjY0MDE0MTUgOC40Mjc1NzY1OSwzNi4zMDQ2NTQ1IDEwLjI2NDQwNjgsMzkuMDgxMzU1OSBDMTEuMzgyOTI3MSw0MC43NzIyMDIgMTQuNzkwMTE1OCw0My4wMzIxNCAxOC41MTczNzI1LDQ2Ljk1NjQwMTkgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlIiBmaWxsPSIjNzRCQTAwIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik03MC41ODgxMzU2LDcyLjg0NTc2MjcgQzY0LjIxODY0NDEsNzcuMjYzNTU5MyA2Mi41NTM4MTM2LDg4LjEwMzM4OTggNTIuNyw4OC4xMDMzODk4IEM0Mi4yMzg5ODMxLDg4LjEwMzM4OTggMjYuNTI1ODQ3NSw3Ni40OTE5NDkyIDI5LjUwNTA4NDcsNTcuNjYwMTY5NSBDMzIuNDg0MzIyLDM4LjgyODM4OTggNTEuMzExMDE2OSwyNS42OTM2NDQxIDY0LjgxMDE2OTUsMjEuMzUwODQ3NSBDNjcuMDI4MjY0OCwyMC42MzcyNjY2IDY3LjkzNDM4MDIsMTkuNzAzNTM0NiA2NC44MTAxNjk1LDE5Ljg4ODEzNTYgQzUyLjEzMTc3OTcsMjAuNjM3MjY2NiAyMS4yNDc0NTc2LDM2LjQ0ODMwNTEgMjEuMjQ3NDU3Niw2MS43MjExODY0IEMyMS4yNDc0NTc2LDg2Ljk5NDA2NzggMzkuMTkzMjIwMyw5OC41NTc2MjcxIDUyLjcsOTguNTU3NjI3MSBDNjYuMjA2Nzc5Nyw5OC41NTc2MjcxIDc2Ljk1NzYyNzEsNjguNDI3OTY2MSA3MC41ODgxMzU2LDcyLjg0NTc2MjcgWiIgaWQ9IlN0ZW0iIGZpbGw9IiM1QjkxMDIiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==") left top no-repeat;
+      background-size: 64px;
+      border-radius: 4px;
+      float: left;
+      margin-right: 20px;
+      position: relative;
+      top: -8px;
+      margin-bottom: -4px; }
+    #header > h1::after {
+      content: '';
+      display: block;
+      width: auto;
+      height: auto;
+      clear: both; }
+  #header .details {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    color: #959387;
+    max-width: 500px;
+    padding-top: 5px;
+    padding-bottom: 5px; }
+    #header .details br {
+      display: none; }
+    #header .details .author {
+      display: inline-block; }
+    #header .details .email {
+      display: inline-block;
+      padding-right: 10px; }
+      #header .details .email a {
+        color: #4DAED8; }
+
+#toc {
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  overflow: auto;
+  background-color: #DBDAD5;
+  padding: 2rem 20px; }
+  #toc ul {
+    padding-left: 1.25px;
+    padding-right: 0;
+    list-style: none; }
+    #toc ul li {
+      padding-left: 5px;
+      text-indent: -5px; }
+  #toc .sectlevel1 {
+    font-weight: 700;
+    padding-left: 0; }
+
+#toctitle {
+  font-size: 2.1rem;
+  font-family: Dosis, sans-serif;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 1px;
+  padding-bottom: 9px;
+  line-height: 2rem; }
+
+@media screen and (max-width: 990px) {
+  body {
+    padding-top: 100px; }
+  #header {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #ECECEC; }
+    #header > h1 {
+      font-size: 2.8rem;
+      line-height: 3rem;
+      padding-top: 4px;
+      padding-bottom: 6px; }
+      #header > h1::before {
+        content: '';
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-size: 32px;
+        margin-right: 20px;
+        top: -1px;
+        margin-bottom: 8px; }
+    #header .details .email {
+      display: none; }
+    #header .details .author {
+      margin-right: 10px; }
+  .toc-left #header {
+    padding-left: 120px;
+    padding-top: 1rem; }
+  .toc-left #toc {
+    position: absolute;
+    overflow: visible;
+    width: 100px;
+    height: 110px;
+    padding-top: 34px; }
+    .toc-left #toc:hover .sectlevel1 {
+      display: block; }
+    .toc-left #toc .sectlevel1 {
+      display: none;
+      box-sizing: border-box;
+      padding-left: 20px;
+      padding-right: 20px;
+      width: 200px;
+      height: 80vh;
+      overflow: auto;
+      background-color: #DBDAD5;
+      position: absolute;
+      top: 10rem;
+      left: 0; }
+  .toc-left #toctitle {
+    font-size: 1.6rem;
+    font-family: Dosis, sans-serif;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 9px;
+    padding-bottom: 1px;
+    line-height: 2rem; } }
+
+@media screen and (max-width: 600px) {
+  #header > h1 {
+    font-size: 1.6rem;
+    line-height: 2rem; } }
+
+#footer-text {
+  font-size: 1.4rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 2rem; }
+
+.conum[data-value] {
+  display: inline-block;
+  color: #413D29;
+  background-color: #94D627;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  font-style: normal;
+  padding-top: 2px;
+  box-sizing: border-box;
+  margin-top: -2px;
+  margin-bottom: -2px;
+  position: relative;
+  top: 1px; }
+  .conum[data-value]:after {
+    content: attr(data-value);
+    font-size: 1.3rem;
+    font-family: Dosis, sans-serif;
+    font-weight: 700; }
+  .conum[data-value] + b {
+    display: none; }
+
+.admonitionblock {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #C3C0B5;
+  padding: 8px 10px 9px;
+  border-radius: 4px; }
+  .admonitionblock table {
+    margin-top: 0;
+    margin-bottom: 0; }
+  .admonitionblock tr:last-child td {
+    border-bottom: 0; }
+  .admonitionblock .icon {
+    font-size: 2.1rem;
+    vertical-align: middle; }
+  .admonitionblock.note {
+    border-color: #7D46D9;
+    background-color: #D6BEFF;
+    color: #40128E; }
+    .admonitionblock.note .icon {
+      color: #7D46D9; }
+  .admonitionblock.warning {
+    border-color: #D93C3C;
+    background-color: #FFC1C1;
+    color: #951111; }
+    .admonitionblock.warning .icon {
+      color: #D93C3C; }
+
+.icon-note::before {
+  content: "\f05a"; }
+
+.icon-warning::before {
+  content: "\f071"; }
+
+.image .image img {
+  position: relative;
+  top: 6px;
+  margin-top: -6px; }
+
+/*# sourceMappingURL=html.css.map */
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<style>
+    /* disable the default striping of rows */
+    table tr.even, table tr.alt, table tr:nth-of-type(even) {
+        background: none
+    }
+    /* stripe even rows only when the "striped" CSS class is used */
+    table.striped tr.even, table.striped tr.alt, table.striped tr:nth-of-type(even) td:nth-child(){
+        background: #f8f8f7;
+    }
+</style>
+
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Seed Standard Definition</h1>
+<div class="details">
+<span id="author" class="author">Jonathan Meyer</span><br>
+<span id="email" class="email"><a href="mailto:jonathan.meyer@appliedis.com">jonathan.meyer@appliedis.com</a></span><br>
+<span id="author2" class="author">Mike Holt</span><br>
+<span id="email2" class="email"><a href="mailto:mholt1@ball.com">mholt1@ball.com</a></span><br>
+<span id="author3" class="author">Derick Faller</span><br>
+<span id="email3" class="email"><a href="mailto:dfaller@ball.com">dfaller@ball.com</a></span><br>
+<span id="author4" class="author">John Tobe</span><br>
+<span id="email4" class="email"><a href="mailto:jtobe@ball.com">jtobe@ball.com</a></span><br>
+<span id="revnumber">version 1.0.0</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_format">1.1. Format</a></li>
+<li><a href="#_definitions">1.2. Definitions</a></li>
+</ul>
+</li>
+<li><a href="#_standard">2. Standard</a>
+<ul class="sectlevel2">
+<li><a href="#seed-section">2.1. Seed Object</a>
+<ul class="sectlevel3">
+<li><a href="#job-section">2.1.1. Job Object</a>
+<ul class="sectlevel4">
+<li><a href="#maintainer-section">2.1.1.1. Maintainer Object</a></li>
+<li><a href="#resources-section">2.1.1.2. Resources Object</a></li>
+<li><a href="#interface-section">2.1.1.3. Interface Object</a>
+<ul class="sectlevel5">
+<li><a href="#inputs-section">2.1.1.3.1. Inputs Object</a></li>
+<li><a href="#outputs-section">2.1.1.3.2. Outputs Object</a></li>
+<li><a href="#mounts-section">2.1.1.3.3. Mounts Object</a></li>
+<li><a href="#settings-section">2.1.1.3.4. Settings Object</a></li>
+</ul>
+</li>
+<li><a href="#errors-section">2.1.1.4. Errors Object</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_usage">3. Usage</a>
+<ul class="sectlevel2">
+<li><a href="#_implementing">3.1. Implementing</a>
+<ul class="sectlevel3">
+<li><a href="#environment-variables">3.1.1. Environment Variables</a>
+<ul class="sectlevel4">
+<li><a href="#variable-normalization">3.1.1.1. Normalization</a></li>
+<li><a href="#variable-injection">3.1.1.2. Injection</a></li>
+</ul>
+</li>
+<li><a href="#output-data-capture">3.1.2. Output Data Capture</a></li>
+<li><a href="#extended-file-metadata">3.1.3. Extended File Metadata</a></li>
+<li><a href="#resource-defaults">3.1.4. Resource Defaults</a></li>
+</ul>
+</li>
+<li><a href="#_examples">3.2. Examples</a>
+<ul class="sectlevel3">
+<li><a href="#_random_number_generator_job">3.2.1. Random Number Generator Job</a></li>
+<li><a href="#_image_watermark_job">3.2.2. Image Watermark Job</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_discovery">4. Discovery</a>
+<ul class="sectlevel2">
+<li><a href="#_docker_hub">4.1. Docker Hub</a></li>
+<li><a href="#_docker_registry">4.2. Docker Registry</a></li>
+<li><a href="#_docker_trusted_registry">4.3. Docker Trusted Registry</a></li>
+<li><a href="#_silo">4.4. Silo</a></li>
+</ul>
+</li>
+<li><a href="#_glossary">5. Glossary</a></li>
+<li><a href="#_schema">6. Schema</a>
+<ul class="sectlevel2">
+<li><a href="#seed-manifest-schema">6.1. Seed Manifest</a></li>
+<li><a href="#seed-metadata-schema">6.2. Seed Metadata</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_introduction"><a class="link" href="#_introduction">1. Introduction</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image. While initially developed to support the <a href="http://ngageoint.github.io/scale/">Scale</a> data processing system with job
+discovery, it is designed to be readily applied to other systems as well.</p>
+</div>
+<div class="paragraph">
+<p>Seed compliant images must be named in a specific fashion due to the lack of label search capability on Docker Hub
+and Registry services. The suffix <code>-seed</code> must be used when naming images to enable discovery, prior to Hub or
+Registry push. This requirement will be deprecated as label search support is standardized across Docker registry
+services. Use of the <a href="http://github.com/ngageoint/seed-cli">CLI</a> developed by the Seed team is highly recommended to speed
+the development and packaging of jobs according to the Seed specification.</p>
+</div>
+<div class="sect2">
+<h3 id="_format"><a class="link" href="#_format">1.1. Format</a></h3>
+<div class="paragraph">
+<p>The Docker image created must adhere to a specific naming convention. The standard requires specification of both an
+job and a packaging version, tracking changes individually between the job logic and the packaging of it.
+The following image naming template maps to members defined under the <a href="#job-section">Job Objects</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>&lt;name&gt;-&lt;jobVersion&gt;-seed:&lt;packageVersion&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dockerfile snippet containing required label for Seed compliance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>FROM alpine
+
+ENTRYPOINT /app/job.sh
+
+LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{ ... }}"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>com.ngageoint.seed.manifest</code> label contents must be serialized as a string-escaped JSON object. The following is a
+complete example including required and optional keys:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "my-job",
+    "jobVersion": "1.0.0",
+    "packageVersion": "1.0.0",
+    "title": "My first job",
+    "description": "Reads an HDF5 file and outputs two png images, a CSV and manifest containing cell_count",
+    "tags": [
+      "hdf5",
+      "png",
+      "csv",
+      "image processing"
+    ],
+    "maintainer": {
+      "name": "John Doe",
+      "organization": "E-corp",
+      "email": "jdoe@example.com",
+      "url": "http://www.example.com",
+      "phone": "666-555-4321"
+    },
+    "timeout": 3600,
+    "interface": {
+      "command": "${INPUT_FILE} ${OUTPUT_DIR} ${VERSION}",
+      "inputs": {
+        "files": [
+          {
+            "name": "INPUT_FILE",
+            "required": true,
+            "mediaTypes": [
+              "image/x-hdf5-image"
+            ],
+            "partial": true
+          }
+        ],
+        "json": [
+          {
+            "name": "INPUT_JSON",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          {
+            "name": "output_file_pngs",
+            "mediaType": "image/png",
+            "multiple": true,
+            "pattern": "outfile*.png"
+          },
+          {
+            "name": "output_file_csv",
+            "mediaType": "text/csv",
+            "pattern": "outfile*.csv",
+            "required": false
+          }
+        ],
+        "json": [
+          {
+            "name": "cell_count",
+            "key": "cellCount",
+            "type": "integer"
+          },
+          {
+            "name": "dummy",
+            "type": "integer",
+            "required": false
+          }
+        ]
+      },
+      "mounts": [
+        {
+          "name": "MOUNT_PATH",
+          "path": "/the/container/path",
+          "mode": "ro"
+        },
+        {
+          "name": "WRITE_PATH",
+          "path": "/write",
+          "mode": "rw"
+        }
+      ],
+      "settings": [
+        {
+          "name": "VERSION",
+          "secret": false
+        },
+        {
+          "name": "DB_HOST",
+          "secret": false
+        },
+        {
+          "name": "DB_PASS",
+          "secret": true
+        }
+      ]
+    },
+    "resources": {
+      "scalar": [
+        {
+          "name": "cpus",
+          "value": 1
+        },
+        {
+          "name": "mem",
+          "value": 1024
+        },
+        {
+          "name": "sharedMem",
+          "value": 1024
+        },
+        {
+          "name": "disk",
+          "value": 1000,
+          "inputMultiplier": 4
+        }
+      ]
+    },
+    "errors": [
+      {
+        "code": 1,
+        "name": "error-name-one",
+        "title": "Error Name",
+        "description": "Error Description",
+        "category": "data"
+      },
+      {
+        "code": 2,
+        "name": "error-name-two",
+        "title": "Error Name",
+        "description": "Error Description",
+        "category": "job"
+      }
+    ]
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_definitions"><a class="link" href="#_definitions">1.2. Definitions</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Seed specific terms defined in the <a href="#_glossary">Glossary</a> supersede all following definitions. These terms can be found
+<em>italicized</em> throughout the specification.</p>
+</li>
+<li>
+<p>GeoJSON, and the terms Geometry and Polygon are defined in
+<a href="https://tools.ietf.org/html/rfc7946">RFC 7946 GeoJSON</a></p>
+</li>
+<li>
+<p>Internet Assigned Numbers Authority (IANA), and the terms Media Types and MIME Types are defined in
+<a href="http://www.iana.org/assignments/media-types/media-types.xhtml">IETF RFC 6838</a></p>
+</li>
+<li>
+<p>ISO 8601 and the specifics of the date format are defined in <a href="https://tools.ietf.org/html/rfc3339">IETF RFC 3339</a></p>
+</li>
+<li>
+<p>JavaScript Object Notation (JSON), and the terms object, name, value, array, integer, and number, are defined in
+<a href="http://json-schema.org/latest/json-schema-validation.html">JSON Schema</a>.</p>
+</li>
+<li>
+<p>Semantic Versioning (SemVer), and the terms major, minor, and patch version are defined at
+<a href="http://semver.org/spec/v2.0.0.html" class="bare">http://semver.org/spec/v2.0.0.html</a></p>
+</li>
+<li>
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in <a href="http://www.ietf.org/rfc/rfc2119.txt">IETF RFC 2119</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_standard"><a class="link" href="#_standard">2. Standard</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Seed standard is intended to provide a complete definition of the runtime processing, memory and storage
+requirements of a discrete unit of work, in addition to the inputs, outputs and potential errors produced.
+Completeness is fundamental but the standard accommodates both simple and complex jobs by defining a minimal subset of
+REQUIRED properties. The following sections detail every possible REQUIRED and OPTIONAL manifest property in both root
+and child objects.</p>
+</div>
+<div class="paragraph">
+<p>A complete Seed object contained within a <code>com.ngageoint.seed.manifest</code> label is always a string-escaped serialized
+object. In Seed, an object consists of a collection of name/value pairs&#8201;&#8212;&#8201;also called members. For each member, the
+name is always a string. Member values are either a string, number, object, array or one of the literals: true, false,
+and null. An array consists of elements where each element is a value as described above.</p>
+</div>
+<div class="sect2">
+<h3 id="seed-section"><a class="link" href="#seed-section">2.1. Seed Object</a></h3>
+<div class="paragraph">
+<p>The Seed object is the root JSON object that MUST be placed within a <code>com.ngageoint.seed.manifest</code> Docker image label.
+At a minimum this object MUST define the <code>seedVersion</code> and <code>job</code> names.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>seedVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string that conforms to the SemVer standard.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>job</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a <a href="#job-section">Job Objects</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="4"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+  "seedVersion": "1.0.0",
+  "job": { ... }
+}</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="job-section"><a class="link" href="#job-section">2.1.1. Job Object</a></h4>
+<div class="paragraph">
+<p>The Job object is the core member for describing a single unit of work and the resources it requires.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric or dash characters (defined by the regex† <code>^[a-zA-Z0-9-]+$</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jobVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string that conforms to the SemVer standard.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>packageVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string that conforms to the SemVer standard.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>title</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain a short descriptive title of the job.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain a full job abstract.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tags</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of strings and MAY contain any number of elements.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a integer indicating a timeout period measured in seconds. Consuming systems MUST honor this value
+as a hard limit on job execution time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>maintainer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an object as defined in <a href="#maintainer-section">Maintainer Object</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Recommended</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an object as defined in <a href="#resources-section">Resources Object</a>. It is highly advised that this member be specified,
+without it resources provided will be default for the implementing framework.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>interface</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an object as defined in <a href="#interface-section">Interface Object</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>errors</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array containing elements defined in <a href="#errors-section">Errors Objects</a></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><em>The following annotated snippet provides quick reference to the use of Job object:</em></p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "name": "my-job", <i class="conum" data-value="1"></i><b>(1)</b>
+    "jobVersion": "1.0.0", <i class="conum" data-value="2"></i><b>(2)</b>
+    "packageVersion": "1.0.0", <i class="conum" data-value="3"></i><b>(3)</b>
+    "title": "My first job", <i class="conum" data-value="4"></i><b>(4)</b>
+    "description": "Reads an HDF5 file and outputs two TIFF images, a CSV and manifest containing cell_count", <i class="conum" data-value="5"></i><b>(5)</b>
+    "timeout": 3600,<i class="conum" data-value="6"></i><b>(6)</b>
+    "maintainer": { ... }, <i class="conum" data-value="7"></i><b>(7)</b>
+    "resources": { ... }, <i class="conum" data-value="8"></i><b>(8)</b>
+    "interface": { ... }, <i class="conum" data-value="9"></i><b>(9)</b>
+    "errors": [ ... ] <i class="conum" data-value="10"></i><b>(10)</b>
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required string containing job identifier. <code>name</code> and <code>jobVersion</code> members combined should be unique system-wide.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string containing version identifier of job in SemVer format. <code>name</code> and <code>jobVersion</code> members
+combined should be unique system-wide.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Required string containing packaging version identifier in SemVer format. <code>packageVersion</code> is used to indicate
+updates to the job interface, it should NEVER be used to indicate changes to the job.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Required string containing short job title.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Required string containing job abstract. Inline markup should be avoided, but not prohibited.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Required integer containing job timeout value in seconds.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Required <a href="#maintainer-section">Maintainer Object</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Optional <a href="#resources-section">Resources Object</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Optional <a href="#interface-section">Interface Object</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Optional array of <a href="#errors-section">Errors Objects</a>.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="sect4">
+<h5 id="maintainer-section"><a class="link" href="#maintainer-section">2.1.1.1. Maintainer Object</a></h5>
+<div class="paragraph">
+<p>The Maintainer object is the member that identifies the individual and organization (optional) acting as a point of
+contact for a Seed job.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain the full name of maintaining individual.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain the best contact email for maintaining individual or organization.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phone</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain the best contact phone number for maintaining individual or organization.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>organization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain the organization responsible for maintaining or sponsoring Seed job.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and SHOULD contain a publicly accessible URL to complete job design or usage documentation.</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><em>The following annotated snippet provides quick reference to the use of Maintainer object:</em></p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "name": "John Doe", <i class="conum" data-value="1"></i><b>(1)</b>
+    "email": "jdoe@example.com", <i class="conum" data-value="2"></i><b>(2)</b>
+    "phone": "666-555-4321", <i class="conum" data-value="3"></i><b>(3)</b>
+    "organization": "E-corp", <i class="conum" data-value="4"></i><b>(4)</b>
+    "url": "http://www.example.com" <i class="conum" data-value="5"></i><b>(5)</b>
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required string containing full name of maintaining individual.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string containing best contact email for maintaining individual or organization.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Optional string containing best contact phone number for maintaining individual or organization.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Optional string containing organization responsible for maintaining or sponsoring Seed job.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Optional string containing publicly accessible URL to complete job design or usage documentation.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="resources-section"><a class="link" href="#resources-section">2.1.1.2. Resources Object</a></h5>
+<div class="paragraph">
+<p>The Resources object is the member that identifies all resource requirements for a job. This is most commonly CPU,
+memory and disk scalar resources, but MAY in the future accommodate more complex types such as ranges and sets. The
+final computed resources allocated for all <code>scalar</code> elements MUST be injected as environment variables to the job at run
+time. Reference <a href="#environment-variables">Environment Variables</a> and <a href="#resource-defaults">Resource Defaults</a> for clarification on what the implementing framework
+MUST provide.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of <code>Scalar</code> objects and MAY contain any number of elements. There is no other standard restriction
+on the array size.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<div class="title">Scalar Object</div>
+<p>The Scalar objects MAY include any arbitrary custom resource name, but there are reserved resources <code>cpus</code>, <code>disk</code>,
+<code>mem</code> and <code>sharedMem</code> that have special meaning. The reserved resource names <code>cpus</code>, <code>disk</code> and <code>mem</code> SHOULD be
+populated by all Seed compliant images, as the defaults provided at runtime will likely be inadequate to run all but the
+most minimal job. The <code>sharedMem</code> resource applies primarily to high-performance and scientific applications
+and will rarely be needed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the resource required by the job. Refer to <a href="#variable-injection">Injection</a> for details on environment variable
+available at execution time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a number indicating the quantity of the resource required by the job. When dealing with storage resources
+such as <code>mem</code> or <code>disk</code> units of Mebibytes (MiB) MUST be used.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>inputMultiplier</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a number indicating the factor by which input file size is multiplied and added to the constant value
+for resource.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Use of <code>inputMultiplier</code> for <code>mem</code> or <code>disk</code> resource types is useful when memory or output disk requirements of a job
+are a function of input file size. The following basic formula computes the resource requirement when an
+<code>inputMultiplier</code> is defined.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>resourceRequirement = inputVolume * inputMultiplier + constantValue</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example, when total input file size is 2.0MiB and an <code>inputMultiplier</code> of <code>4.0</code> and <code>value</code> of <code>0.1</code> is
+specified for <code>disk</code>, the following computes the resource requirement:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>diskRequirement = 2.0MiB * 4.0 + 0.1MiB</pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><em>The following annotated snippet provides quick reference to the use of Scalar object:</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">[
+    { "name": "cpus", "value": 1.0 }, <i class="conum" data-value="1"></i><b>(1)</b>
+    { "name": "disk", "value": 4.0, "inputMultiplier": 4.0 }, <i class="conum" data-value="2"></i><b>(2)</b>
+    { "name": "mem", "value": 64.0, "inputMultiplier": 4.0 }, <i class="conum" data-value="3"></i><b>(3)</b>
+    ... <i class="conum" data-value="4"></i><b>(4)</b>
+]</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Recommended Scalar object demonstrating single constant scalar value for specifying CPU requirement of job.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optional Scalar object demonstrating single constant scalar value in addition to a multiplier based on total input
+file size for scaling disk requirement of job. This multiplier allows for scaling the output disk space required as a
+function of input file size.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Recommended Scalar object demonstrating single constant scalar value in addition to a multiplier based on total
+input file size for scaling memory requirement of job.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Optional additional Scalar objects for any custom resources needed by job.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="interface-section"><a class="link" href="#interface-section">2.1.1.3. Interface Object</a></h5>
+<div class="paragraph">
+<p>The Interface object is the primary member that describes the command arguments, environment variables,
+mounts, settings, inputs and outputs defined for a job.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>command</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string specifying the complete string passed to the container at run time. Based on the Linux shell, shell
+escaping of special characters MAY be required. If a Docker ENTRYPOINT is defined that launches the executable, omission
+of the executable MAY be necessary in <code>command</code> string. The Seed <code>command</code> member can be treated as analogous to the
+Docker CMD statement.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>inputs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an object as defined in <a href="#inputs-section">Inputs Object</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>outputs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an object as defined in <a href="#outputs-section">Outputs Object</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mounts</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of <code>Mounts</code> objects (see <a href="#mounts-section">Mounts Object</a>) and MAY contain any number of elements. There is no
+other standard restriction on the array size.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>settings</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of <code>Settings</code> objects (see <a href="#settings-section">Settings Object</a>) and MAY contain any number of elements. There is no
+other standard restriction on the array size.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect5">
+<h6 id="inputs-section"><a class="link" href="#inputs-section">2.1.1.3.1. Inputs Object</a></h6>
+<div class="paragraph">
+<p>The Inputs object is the member responsible for indicating immutable input data available to the Seed image at
+runtime.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of objects defined in the Files Object sub-section.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of objects defined in the JSON Object sub-section.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<div class="title">Files Object</div>
+<p>Critical implementation details related to <code>multiple</code> member should be referenced in
+<a href="#environment-variables">environment variables</a>. The following table defines the <code>files</code> object members.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with
+the environment variable names based upon the input names. Refer to <a href="#variable-injection">Injection</a> for details on environment
+variables available at execution time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mediaTypes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of strings that MUST indicate the IANA Media types that the job accepts. An executor† MAY use any
+provided media types to report validation warnings to the user in the case of mismatched types.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>multiple</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether multiple physical files are processed by this <code>Files</code> element. If omitted, the
+default value MUST be treated as false. If true, the value injected into the <code>command</code> placeholder will be an absolute directory
+containing all files for this input. If false or omitted, the value injected into the <code>command</code> placeholder will be an
+absolute path to a single file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>partial</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether input file is required in whole or in part. This allows an executor† to make
+intelligent choices when providing very large files to a job. This should only be set to true if the job is expected to
+use less than half of very large input files. If omitted, the default value MUST be treated as false.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>required</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value MUST
+be treated as true.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<div class="title">JSON Object</div>
+<p>The following table defines the <code>json</code> object members.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the unique name to use for referring to this input. All inputs will be passed as environment variables, with
+the environment variable names based upon the input names. Refer to <a href="#variable-injection">Injection</a> for details on environment
+variables available at execution time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string and indicate a valid JSON schema type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>required</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+MUST be treated as true.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><em>The following annotated snippet provides quick reference to the use of Inputs object:</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "files": [ <i class="conum" data-value="1"></i><b>(1)</b>
+        {
+            "name": "INPUT_FILE", <i class="conum" data-value="2"></i><b>(2)</b>
+            "mediaTypes": [ "image/x-hdf5-image" ], <i class="conum" data-value="3"></i><b>(3)</b>
+            "multiple": false, <i class="conum" data-value="4"></i><b>(4)</b>
+            "partial": true, <i class="conum" data-value="5"></i><b>(5)</b>
+            "required": true <i class="conum" data-value="6"></i><b>(6)</b>
+        },
+        ...
+    ]
+    "json": [ <i class="conum" data-value="7"></i><b>(7)</b>
+        {
+            "name": "INPUT_STRING",<i class="conum" data-value="8"></i><b>(8)</b>
+            "type": "string", <i class="conum" data-value="9"></i><b>(9)</b>
+            "required": false <i class="conum" data-value="10"></i><b>(10)</b>
+        }
+    ]
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Optional array containing elements defined by Files Object sub-section.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string containing unique name used to refer to this input.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Optional array containing a list of accepted media types.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Optional boolean indicating whether this element represents multiple files (flat directory) vs one file (false).
+Default is <code>false</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Optional boolean indicating that a job consumes only a small portion of input file. Default is <code>false</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Optional boolean indicating whether job requires this particular file. Default is <code>true</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Optional array containing elements defined by JSON Object sub-section.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Required string containing unique name used to refer to this input.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Required string containing a valid JSON schema type for input validation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Optional boolean indicating whether job requires this particular JSON input. Default is <code>true</code>.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="outputs-section"><a class="link" href="#outputs-section">2.1.1.3.2. Outputs Object</a></h6>
+<div class="paragraph">
+<p>The Outputs object is the member responsible for indicating all output data and the means to capture that data
+following the execution of a Seed image. Data can be captured in two different forms: directly as a file or
+extracted JSON from a manifest. File type output is simply matched based on a standard glob pattern. Recursively scanning
+directories is NOT supported, but a known subdirectory structure will work (e.g. base/sub-<strong>/</strong>.ext).  JSON objects are
+expected to be gathered from a JSON manifest that by Seed standard convention MUST be written at the root of the job
+output directory as <code>seed.outputs.json</code>. The absolute path to the job output directory is REQUIRED to be passed
+into the container at job execution time in the <code>OUTPUT_DIR</code> environment variable. Special attention should be given to
+<a href="#output-data-capture">output file permissions</a> and support is provided for defining
+<a href="#extended-file-metadata">extended metadata</a>.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of objects defined in the Files Object sub-section.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an array of objects defined in the JSON Object sub-section.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<div class="title">Files Object</div>
+<p>The following table defines the <code>files</code> object members.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the unique name to use for referring to this output.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mediaType</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST indicate the IANA Media type for the file being captured by Outputs.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pattern</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST indicate a standard glob pattern for the capture of files.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>multiple</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether multiple output files may be captured by this <code>Files</code> element. If omitted, the
+default value MUST be treated as false.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>required</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+is <code>true</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<div class="title">JSON Object</div>
+<p>The following table defines the <code>json</code> object members.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the unique name to use for referring to this output. When <code>key</code> member is omitted, it must be a
+case-sensitive match of the member key in <code>seed.outputs.json</code> file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string indicating the JSON schema type of the member being captured from the <code>seed.outputs.json</code> file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>key</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string indicating the case-sensitive <code>seed.outputs.json</code> member to capture. If omitted, the member
+key is assumed to be a case-sensitive match for the above defined <code>name</code> member.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>required</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean indicating whether this input value SHOULD always be expected. If omitted, the default value
+MUST be treated as true.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><em>The following annotated snippets provides quick reference to the use of Outputs object:</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="paragraph">
+<p>Seed <code>outputs</code> object snippet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "files": [ <i class="conum" data-value="1"></i><b>(1)</b>
+        {
+            "name": "OUTPUT_TIFFS", <i class="conum" data-value="2"></i><b>(2)</b>
+            "mediaType": "image/tiff", <i class="conum" data-value="3"></i><b>(3)</b>
+            "pattern": "outfile*.tif", <i class="conum" data-value="4"></i><b>(4)</b>
+            "multiple": false, <i class="conum" data-value="5"></i><b>(5)</b>
+            "required": true <i class="conum" data-value="6"></i><b>(6)</b>
+        },
+        ...
+    ],
+    "json": [ <i class="conum" data-value="7"></i><b>(7)</b>
+        {
+            "name": "CELL_COUNT", <i class="conum" data-value="8"></i><b>(8)</b>
+            "type": "integer", <i class="conum" data-value="9"></i><b>(9)</b>
+            "key": "cellCount" <i class="conum" data-value="10"></i><b>(10)</b>
+        },
+        ...
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>seed.outputs.json:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "cellCount": 256, <i class="conum" data-value="11"></i><b>(11)</b>
+    ...
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Optional array containing elements defined by Files Object sub-section.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string containing unique output identifier.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Optional string containing IANA Media type of file.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Required string containing glob expression for file capture. Executor† is expected to
+capture output relative to OUTPUT_DIR.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Optional boolean indicating whether a single or multiple values are supported. Default value is false.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Optional boolean indicating whether executor† should assume failure if output data is missing. Default value
+is true.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Optional array containing elements defined by JSON Object sub-section.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Required string containing unique output identifier. MUST be used by executor† to match member for capture from
+<code>seed.outputs.json</code> in absence of <code>key</code> member.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Required string containing JSON schema type of member extracted from <code>seed.outputs.json</code> file.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Optional string containing key of member for extraction. This allows mapping from a <code>seed.outputs.json</code> file
+member key that differs from the value of <code>name</code> member.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>Example output manifest containing key defined in (10).</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="mounts-section"><a class="link" href="#mounts-section">2.1.1.3.3. Mounts Object</a></h6>
+<div class="paragraph">
+<p>The Mounts object is the member responsible for indicating any additional directories that must be mounted into the
+container for the Job to run. A mount directory is typically a shared file system directory that contains some set of
+reference data that the Job requires.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>) that
+correlates mount references elsewhere in the Interface to an external mount configuration that specifies how the
+mount is provided.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an absolute file system path specifying where in the container the Job expects the shared directory to be
+mounted.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string that either specifies "ro" for read-only access to the directory or "rw" for read-write access.
+Default value is "ro".</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><em>The following annotated snippet provides quick reference to the use of Mounts object:</em></p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">[
+    {
+        "name": "MOUNT1", <i class="conum" data-value="1"></i><b>(1)</b>
+        "path": "/the/container/path", <i class="conum" data-value="2"></i><b>(2)</b>
+        "mode": "ro" <i class="conum" data-value="3"></i><b>(3)</b>
+    },
+    ...
+]</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required string containing the name to be used to lookup uses in the Interface.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string indicating the absolute file system path where the directory should be mounted.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Optional string indicating whether the directory should be mounted in read-only ("ro") or read-write ("rw") mode.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="settings-section"><a class="link" href="#settings-section">2.1.1.3.4. Settings Object</a></h6>
+<div class="paragraph">
+<p>The Settings object is the member responsible for indicating all content not related to data that is needed for the
+Seed job to run. These will be exposed as environment variables at run time. Most commonly, Settings will be used for
+environment specific configuration or external credentials.</p>
+</div>
+<div class="paragraph">
+<p>While it is <em>highly</em> advised that Seed jobs SHOULD limit input / output to the provided constructs (<code>inputs</code> /
+<code>outputs</code>), there are justified use cases for violating this encapsulation. If database ingestion or downstream
+ messaging are necessary, this is a reasonable mechanism to accomplish that.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the environment variable to be injected at run time. Refer to <a href="#variable-injection">Injection</a> for details on
+environment variable available at execution time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secret</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a boolean that indicates whether the value associated with the named setting is secret and stored as a
+secure string.</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><em>The following annotated snippet provides quick reference to the use of Settings object:</em></p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">[
+   {
+       "name": "SETTING1", <i class="conum" data-value="1"></i><b>(1)</b>
+       "secret": true <i class="conum" data-value="2"></i><b>(2)</b>
+   },
+   ...
+]</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required string containing the environment variable name to be injected at run time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optional boolean indicating whether the setting value is sensitive and stored as a secret.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="errors-section"><a class="link" href="#errors-section">2.1.1.4. Errors Object</a></h5>
+<div class="paragraph">
+<p>The Errors object allows for developers† to map arbitrary exit codes to meaningful textual descriptions. This is useful
+in passing information to the executor† to differentiate between data and job errors.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Requirement</th>
+<th class="tableblock halign-left valign-top" colspan="2">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>code</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be an integer indicating the exit code of the executing job process.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string of only alphanumeric, dash or underscore characters (defined by the regex† <code>^[a-zA-Z0-9_-]+$</code>)
+indicating the unique name to use for referring to this error. An executor† MAY use member for correlation
+of error codes across job versions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>title</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string indicating the short descriptive title of the error.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string indicating the complete error description and possible causes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>category</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">MUST be a string containing one of the following values: <code>job</code> or <code>data</code>. If omitted, the default
+value is <code>job</code>.</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top" colspan="4"><p class="tableblock"><em>The following annotated snippet provides quick reference to the use of Errors object:</em></p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" colspan="3"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">[
+    {
+        "code": 1, <i class="conum" data-value="1"></i><b>(1)</b>
+        "name": "error-name", <i class="conum" data-value="2"></i><b>(2)</b>
+        "title": "Error Name", <i class="conum" data-value="3"></i><b>(3)</b>
+        "description": "Error Description", <i class="conum" data-value="4"></i><b>(4)</b>
+        "category": "job" <i class="conum" data-value="5"></i><b>(5)</b>
+    },
+    ...
+]</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required integer indicating job process exit code.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required string containing machine-friendly identifier of error.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Optional string containing human-friendly short name of error.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Optional string containing complete error code description.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Optional string containing the error type. This value MUST be either: <code>job</code> or <code>data</code>. The default
+value is <code>job</code>.</td>
+</tr>
+</table>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage"><a class="link" href="#_usage">3. Usage</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_implementing"><a class="link" href="#_implementing">3.1. Implementing</a></h3>
+<div class="paragraph">
+<p>A few requirements must be satisfied when an implementer† is building a system capable of executing Seed standardized
+images. The following sections detail behavior that is expected of the executor†, but these details are also important
+for developers† to understand what execution context they are provided.</p>
+</div>
+<div class="sect3">
+<h4 id="environment-variables"><a class="link" href="#environment-variables">3.1.1. Environment Variables</a></h4>
+<div class="paragraph">
+<p>Environment variable injection MUST be performed as it is the primary means of providing the context required by the
+defined interface of a Seed job. These environment variables MAY be consumed by a job directly or shell variable
+expansion MAY be leveraged in the <code>interface.command</code> member. Implementing frameworks MAY perform variable expansion,
+but it MUST follow Bash expansion conventions.</p>
+</div>
+<div class="sect4">
+<h5 id="variable-normalization"><a class="link" href="#variable-normalization">3.1.1.1. Normalization</a></h5>
+<div class="paragraph">
+<p>All environment variables injected MUST be normalized to remove any special characters. The majority of environment
+variable injection is dynamic and tied to <code>name</code> member values. These values MUST be sanitized based on the following
+rules:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Only upper-case alphabetic, numeric and underscore characters are permitted unaltered.</p>
+</li>
+<li>
+<p>All lower-case alphabetic characters MUST be capitalized.</p>
+</li>
+<li>
+<p>All dash characters MUST be replaced with underscores.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="variable-injection"><a class="link" href="#variable-injection">3.1.1.2. Injection</a></h5>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Collisions between the reserved variables below and <code>interface.inputs.files</code>, <code>interface.inputs.json</code> and
+<code>interface.settings</code> <code>name</code> member values MUST NOT occur.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The following variables MUST be provided:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>OUTPUT_DIR: Absolute path where all output products MUST be placed by job for Seed executor† capture.</p>
+</li>
+<li>
+<p>All <code>name</code> member values of <code>resources.scalar</code> elements MUST map to environment variables. This SHALL be done by
+<a href="#variable-normalization">normalizing</a> all <code>name</code> values and prefixing with <code>ALLOCATED_</code>. For a <code>my-demo-resourceNew</code>
+with a value of <code>5.0</code>, an environment variable <code>ALLOCATED_MY_DEMO_RESOURCENEW</code> SHALL be set to <code>5.0</code> at run time. For a
+resource with an <code>inputMultiplier</code> value the environment variable must include the final computed <em>output</em> resource
+allocation as defined in the <code>scalar</code> element under <a href="#resources-section">Resources object</a>. It SHOULD be clarified that
+the allocated value computed using an <code>inputMultiplier</code> value MUST NOT include the size of input files - only the
+additional space needed for output files during execution.</p>
+</li>
+<li>
+<p>All <code>name</code> member values of <code>interface.inputs.files</code> elements MUST map to environment variables. Variable names
+must follow <a href="#variable-normalization">normalization rules</a>. Executor&#8217;s† MUST ensure data is mounted and
+provide a container resolvable absolute path. <em>Injection behavior is dependent on the boolean value of <code>multiple</code>
+member.</em> When <code>multiple</code> is <code>true</code> the injected environment variable MUST be an absolute path to a <em>directory</em> with all
+files immediately beneath it. When <code>multiple</code> is <code>false</code> it MUST be an absolute path to the single <em>file</em> provided. This
+environment variable MUST be left unset if member <code>required</code> is false and the input is not present.</p>
+</li>
+<li>
+<p>All <code>name</code> member values of <code>interface.inputs.json</code> elements MUST map to environment variables. Variable names
+must follow <a href="#variable-normalization">normalization rules</a> and <code>array</code>, <code>object</code> and <code>string</code> JSON types MUST be
+injected string encoded. This environment variable MUST be left unset if <code>required</code> is false and the input is not
+present.</p>
+</li>
+<li>
+<p>All <code>name</code> member values of <code>interface.settings</code> elements MUST map to environment variables. Variable names
+must follow <a href="#variable-normalization">normalization rules</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Supporting complex variable expansion where jobs require parameters associated with a switch can be accomplished with
+use of Bash. Taking the example of an optional <code>inputs.files</code> element, the following <code>command</code> value will expand with
+a preceding switch only when the input is available:</p>
+</div>
+<div class="paragraph">
+<p><code>${MY_INPUT/#/-d }</code></p>
+</div>
+<div class="paragraph">
+<p>This will expand to <code>-d ${MY_INPUT}</code> only when <code>MY_INPUT</code> is set, otherwise the entire expression will be omitted. It
+is important to note this is specifically a Bash shell feature and is not present with competing Linux shells.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="output-data-capture"><a class="link" href="#output-data-capture">3.1.2. Output Data Capture</a></h4>
+<div class="paragraph">
+<p>All output data generated by a Seed compliant job MUST be placed within the location identified by OUTPUT_DIR
+environment variable. This location MUST be made available by the executor† so that the job is given full write
+access. Developers MUST ensure any files captured by <code>interface.outputs.files</code> member element <code>pattern</code> values, as well
+as the optional <code>seed.outputs.json</code> file, are marked with read permissions at minimum. This MAY be done with the
+following sample command: <code>chmod +r yourfile.txt</code></p>
+</div>
+<div class="paragraph">
+<p>Special attention should also be given to the number of files matched per <code>interface.outputs.files</code> element to ensure it
+is consistent in plurality to that defined by <code>multiple</code> member. If multiple files are matched using the <code>pattern</code>
+member value, while the <code>multiple</code> member is set to false, these jobs SHOULD be failed by the executor†. On the other
+hand, even if multiple files are not present when <code>multiple</code> is true it SHOULD NOT force a job failure by the executor†.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="extended-file-metadata"><a class="link" href="#extended-file-metadata">3.1.3. Extended File Metadata</a></h4>
+<div class="paragraph">
+<p>There is often a need by the executor† to capture additional job extracted metadata on output files. The Seed
+standard allows for this through the use of side-car files. The side-car files must be named exactly as the file they
+describe, with the addition of the <code>.metadata.json</code> extension to the original file name (extension included). The file
+must be formatted according to the <a href="#seed-metadata-schema">Seed Metadata Schema</a>. This allows for both
+spatial and any custom associated metadata to be specified. The <code>properties</code> member is of the object type which allows
+for any JSON member type that satisfies your specific use-cases.</p>
+</div>
+<div class="paragraph">
+<p>The following snippet is a notional example specifying a geometry and temporal bounded feature associated with a file:</p>
+</div>
+<div class="listingblock">
+<div class="title">Metadata JSON</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+    "type": "Feature", { <i class="conum" data-value="1"></i><b>(1)</b>
+    "geometry": { <i class="conum" data-value="2"></i><b>(2)</b>
+        "type": "Polygon",
+        "coordinates": [
+            [ [ 100.0, 0.0 ], [ 101.0, 0.0 ], [ 101.0, 1.0 ], [ 100.0, 1.0 ], [ 100.0, 0.0 ] ]
+        ]
+    },
+    "properties": { <i class="conum" data-value="3"></i><b>(3)</b>
+        "time": {
+            "start": "2016-08-06T00:00:00.000Z",
+            "end": "2016-08-06T00:00:00.000Z"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Required string indicating the GeoJSON type being defined.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Required geometry member defining spatial extent of file.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Required properties member containing example definition temporal extent of file.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="resource-defaults"><a class="link" href="#resource-defaults">3.1.4. Resource Defaults</a></h4>
+<div class="paragraph">
+<p>At a minimum, the executor† MUST provide at least the resources indicated by a Seed manifest at run time. If the
+resource requirement specified by the manifest is below the minimum amount allowed by the executor† it MAY increase the
+requirement to that value. Developers† SHOULD specify the <code>cpus</code>, <code>mem</code> and <code>disk</code> requirements of their Seed job, but
+if these are not set, the executor† is free to allocate minimal defaults.</p>
+</div>
+<div class="paragraph">
+<p>For the <code>sharedMem</code> reserved resource, the executor† SHOULD make use of the Docker run argument <code>shm-size</code> to provide
+the requested resource.</p>
+</div>
+<div class="paragraph">
+<p>When resources are indicated by a Seed manifest that are not recognized by an executor†, the job SHOULD not be run.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_examples"><a class="link" href="#_examples">3.2. Examples</a></h3>
+<div class="paragraph">
+<p>The Seed standard is intended to support both simple and complex job packaging. To that end the standard allows for
+sensible defaults to take the place of a fully specified manifest. The following examples identify both a minimal
+Seed use and a more realistic, fully exercised standard.</p>
+</div>
+<div class="sect3">
+<h4 id="_random_number_generator_job"><a class="link" href="#_random_number_generator_job">3.2.1. Random Number Generator Job</a></h4>
+<div class="paragraph">
+<p>Minimal manifest demonstrating the simplest possible Seed definition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "random-number-gen",
+    "jobVersion": "0.1.0",
+    "packageVersion": "0.1.0",
+    "title": "Random Number Generator",
+    "description": "Generates a random number and outputs on stdout",
+    "maintainer": {
+      "name": "John Doe",
+      "email": "jdoe@example.com"
+    },
+    "timeout": 10
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Serialized as a label in a Dockerfile snippet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>FROM alpine
+
+ENTRYPOINT /app/job.sh
+
+LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"random-number-gen\",\"jobVersion\":\"0.1.0\",\"packageVersion\":\"0.1.0\",\"title\":\"Random Number Generator\",\"description\":\"Generates a random number and outputs on stdout\",\"maintainer\":{\"name\":\"John Doe\",\"email\":\"jdoe@example.com\"},\"timeout\":10}}"</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_image_watermark_job"><a class="link" href="#_image_watermark_job">3.2.2. Image Watermark Job</a></h4>
+<div class="paragraph">
+<p>Image watermark job taking a single image and returning with watermark applied using Seed definition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "image-watermark",
+    "jobVersion": "0.1.0",
+    "packageVersion": "0.1.0",
+    "title": "Image Watermarker",
+    "description": "Processes an input PNG and outputs watermarked PNG.",
+    "maintainer": {
+      "name": "John Doe",
+      "email": "jdoe@example.com"
+    },
+    "timeout": 30,
+    "interface": {
+      "command": "${INPUT_IMAGE} ${OUTPUT_DIR}",
+      "inputs": {
+        "files": [
+          {
+            "name": "INPUT_IMAGE"
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          {
+            "name": "OUTPUT_IMAGE",
+            "pattern": "*_watermark.png"
+          }
+        ]
+      }
+    },
+    "resources": {
+      "scalar": [
+        {
+          "name": "cpus",
+          "value": 1
+        },
+        {
+          "name": "mem",
+          "value": 64
+        }
+      ]
+    },
+    "errors": [
+      {
+        "code": 1,
+        "name": "image-Corrupt-1",
+        "description": "Image input is not recognized as a valid PNG.",
+        "category": "data"
+      },
+      {
+        "code": 2,
+        "name": "algorithm-failure"
+      }
+    ]
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Serialized as a label in a Dockerfile snippet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>FROM alpine
+
+ENTRYPOINT /app/watermark.py
+
+LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-watermark\",\"jobVersion\":\"0.1.0\",\"packageVersion\":\"0.1.0\",\"title\":\"Image Watermarker\",\"description\":\"Processes an input PNG and outputs watermarked PNG.\",\"maintainer\":{\"name\":\"John Doe\",\"email\":\"jdoe@example.com\"},\"timeout\":30,\"interface\":{\"command\":\"\${INPUT_IMAGE} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_IMAGE\"}]},\"outputs\":{\"files\":[{\"name\":\"OUTPUT_IMAGE\",\"pattern\":\"*_watermark.png\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":1},{\"name\":\"mem\",\"value\":64}]},\"errors\":[{\"code\":1,\"name\":\"image-Corrupt-1\",\"description\":\"Image input is not recognized as a valid PNG.\",\"category\":\"data\"},{\"code\":2,\"name\":\"algorithm-failure\"}]}}"</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_discovery"><a class="link" href="#_discovery">4. Discovery</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A primary intention of this standard is for simple job discovery from public images hosted within either Docker Hub,
+Docker Trusted Registry or Docker Registry. There is significant fragmentation of APIs between the various Docker
+offerings and the following sections describe the steps that may be taken to access the labels defined by Seed.</p>
+</div>
+<div class="paragraph">
+<p>None of the Docker registry services support label search in any fashion. This incurs the requirement of applying a
+secondary means to subset image results. The standard presently requires that all job images are named with the suffix
+<code>-seed</code>. This allows for quick filtering of results to a manageable set for discovery.</p>
+</div>
+<div class="sect2">
+<h3 id="_docker_hub"><a class="link" href="#_docker_hub">4.1. Docker Hub</a></h3>
+<div class="paragraph">
+<p>Docker Hub stores Docker image manifest information in a readily accessible format only for Automated Builds. This
+enforces the need for all developers† wishing to support simple discovery from Docker Hub to support Hub builds, as
+opposed to local image builds followed by a docker push. Given this caveat, a service such as ImageLayers can be used
+to quickly identify manifest content after discovering available images.</p>
+</div>
+<div class="paragraph">
+<p>The following two steps may be taken to find and identify labels within Docker Hub:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Perform HTTP GET to find Docker images:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>URL: <a href="https://hub.docker.com/v2/search/repositories/?query=-seed" class="bare">https://hub.docker.com/v2/search/repositories/?query=-seed</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Perform HTTP POST to get label details for images found in previous request:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>BODY: {"repos":[{"name":"myorg/myjob-seed","tag":"latest"}]}</p>
+</li>
+<li>
+<p>URL: <a href="https://imagelayers.io/registry/analyze" class="bare">https://imagelayers.io/registry/analyze</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ImageLayers service is a 3rd-party service by CenturyLink Labs, but the source code is openly available at
+<a href="https://github.com/CenturyLinkLabs/imagelayers">ImageLayers</a> and can be used as a reference implementation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_docker_registry"><a class="link" href="#_docker_registry">4.2. Docker Registry</a></h3>
+<div class="paragraph">
+<p>Docker Registry does not natively support any type of search, but does provide a catalog API that allows for listing the
+entire registry contents. Using this along with tag and manifest inspection will allow label inspection.</p>
+</div>
+<div class="paragraph">
+<p>The following steps may be taken to find and identify labels of Seed compliant images within Docker Registry:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All references to <code>{registry}</code>, <code>{image-id}</code> and <code>{tag}</code> in the following URLs should be replaced with your
+environment specific values.
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Perform HTTP GET against catalog endpoint to find <code>-seed</code> suffixed images:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>URL: <a href="http://{registry}/v2/_catalog" class="bare">http://{registry}/v2/_catalog</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Perform HTTP GET against tags endpoint for each image matched:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://{registry}/v2/{image-id}/tags/list" class="bare">http://{registry}/v2/{image-id}/tags/list</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Perform HTTP GET against manifests endpoint to retrieve labels per tag (extract labels from history JSON member):</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://{registry}/v2/{image-id}/manifests/{tag}" class="bare">http://{registry}/v2/{image-id}/manifests/{tag}</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_docker_trusted_registry"><a class="link" href="#_docker_trusted_registry">4.3. Docker Trusted Registry</a></h3>
+<div class="paragraph">
+<p>There is a ticket in with Docker Trusted Registry team to natively support label search. Presently there is no API
+support to inspect hosted images for label metadata. Images must be pulled locally for inspection.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_silo"><a class="link" href="#_silo">4.4. Silo</a></h3>
+<div class="paragraph">
+<p>The Seed team has developed a tool to overcome these limitations in Docker registries called <a href="https://github.com/ngageoint/seed-silo">Silo</a>.</p>
+</div>
+<div class="paragraph">
+<p>Silo offers a REST API, implemented by the Seed team, for discovering Seed images. The API
+allows users to scan one or more repositories for Seed images and then search the resulting images and their manifests
+by keywords. An executor† can leverage these endpoints to assist users in discovering Seed images and creating
+jobs out of them.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_glossary"><a class="link" href="#_glossary">5. Glossary</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following terms are specific to Seed and are provided to clarify their meaning. They are marked with a dagger (†)
+throughout the document.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Term</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">developer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">creator and packager of Seed compliant image</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">executor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">process responsible for injecting run-time context (inputs, mounts and environment settings) and capturing all
+resulting output (files, json).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">implementer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">developer of framework for discovering or running Seed compliant images - must provide executor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">regex</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">short hand for "Regular Expression," a text string that defines a pattern to be applied to other strings. <a href="http://regexr.com/">More info</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">glob</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">a string defining a pattern to be applied to files on *nix operating systems. <a href="http://man7.org/linux/man-pages/man7/glob.7.html">More info</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_schema"><a class="link" href="#_schema">6. Schema</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="seed-manifest-schema"><a class="link" href="#seed-manifest-schema">6.1. Seed Manifest</a></h3>
+<div class="paragraph">
+<p>The following JSON Schema should be used to validate Seed manifests prior to label serialization into a Dockerfile
+for publish. It may be downloaded here: <a href="schema/seed.manifest.schema.json">Seed Manifest Schema</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "seedVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$"
+    },
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9-]+$"
+        },
+        "jobVersion": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
+        },
+        "packageVersion": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maintainer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "organization": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        },
+        "timeout": {
+          "type": "integer"
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scalar": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_-]+$"
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "inputMultiplier": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ]
+              },
+              "required": [
+                "scalar"
+              ]
+            }
+          }
+        },
+        "interface": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "command": {
+              "type": "string"
+            },
+            "inputs": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]+$"
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "default": true
+                      },
+                      "mediaTypes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "multiple": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "partial": {
+                        "type": "boolean",
+                        "default": false
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "json": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]+$"
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "default": true
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "array",
+                          "boolean",
+                          "integer",
+                          "number",
+                          "object",
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "type"
+                    ]
+                  }
+                }
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]+$"
+                      },
+                      "mediaType": {
+                        "type": "string"
+                      },
+                      "pattern": {
+                        "type": "string"
+                      },
+                      "multiple": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "default": true
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "pattern"
+                    ]
+                  }
+                },
+                "json": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]+$"
+                      },
+                      "key": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "array",
+                          "boolean",
+                          "integer",
+                          "number",
+                          "object",
+                          "string"
+                        ]
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "default": true
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "type"
+                    ]
+                  }
+                }
+              }
+            },
+            "mounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_-]+$"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "enum": [
+                      "ro",
+                      "rw"
+                    ],
+                    "default": "ro"
+                  }
+                },
+                "required": [
+                  "name",
+                  "path"
+                ]
+              }
+            },
+            "settings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_-]+$"
+                  },
+                  "secret": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]+$"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "default": "job",
+                "enum": [
+                  "job",
+                  "data"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "jobVersion",
+        "packageVersion",
+        "title",
+        "description",
+        "maintainer",
+        "timeout"
+      ]
+    }
+  },
+  "required": [
+    "seedVersion",
+    "job"
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="seed-metadata-schema"><a class="link" href="#seed-metadata-schema">6.2. Seed Metadata</a></h3>
+<div class="paragraph">
+<p>The following JSON Schema should be used to validate the side-car metadata files generated alongside Seed job output
+files. It may be downloaded here: <a href="schema/seed.metadata.schema.json">Seed Metadata Schema</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://tools.ietf.org/html/rfc7946#",
+  "title": "Geo JSON object",
+  "description": "Schema for a Geo JSON object",
+  "type": "object",
+  "required": [ "type" ],
+  "properties": {
+    "bbox": { "$ref": "http://json-schema.org/geojson/bbox.json#" }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/geometry" },
+    { "$ref": "#/definitions/geometryCollection" },
+    { "$ref": "#/definitions/feature" },
+    { "$ref": "#/definitions/featureCollection" }
+  ],
+  "definitions": {
+    "geometry": {
+      "type": "object",
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "oneOf": [
+        {
+          "title": "Point",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "Point"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/position"
+            }
+          }
+        },
+        {
+          "title": "MultiPoint",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiPoint"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/positionArray"
+            }
+          }
+        },
+        {
+          "title": "LineString",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "LineString"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/lineString"
+            }
+          }
+        },
+        {
+          "title": "MultiLineString",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiLineString"
+              ]
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/lineString"
+              }
+            }
+          }
+        },
+        {
+          "title": "Polygon",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "Polygon"
+              ]
+            },
+            "coordinates": {
+              "$ref": "#/definitions/polygon"
+            }
+          }
+        },
+        {
+          "title": "MultiPolygon",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "MultiPolygon"
+              ]
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/polygon"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "geometryCollection": {
+      "title": "GeometryCollection",
+      "description": "A collection of geometry objects",
+      "required": [ "geometries" ],
+      "properties": {
+        "type": { "enum": [ "GeometryCollection" ] },
+        "geometries": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/geometry" }
+        }
+      }
+    },
+    "feature": {
+      "title": "Feature",
+      "description": "A Geo JSON feature object",
+      "required": [ "geometry", "properties" ],
+      "properties": {
+        "type": { "enum": [ "Feature" ] },
+        "geometry": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/geometry" }
+          ]
+        },
+          "properties": { "type": [ "object", "null" ] },
+          "id": { "type": [ "string", "number" ] }
+      }
+    },
+    "featureCollection": {
+      "title": "FeatureCollection",
+      "description": "A Geo JSON feature collection",
+      "required": [ "features" ],
+      "properties": {
+        "type": { "enum": [ "FeatureCollection" ] },
+        "features": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/feature" }
+        }
+      }
+    },
+      "position": {
+        "description": "A single position",
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 3,
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "additionalItems": false
+      },
+      "positionArray": {
+        "description": "An array of positions",
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/position"
+        }
+      },
+      "lineString": {
+        "description": "An array of two or more positions",
+        "allOf": [
+          {
+            "$ref": "#/definitions/positionArray"
+          },
+          {
+            "minItems": 2
+          }
+        ]
+      },
+      "linearRing": {
+        "description": "An array of four positions where the first equals the last",
+        "allOf": [
+          {
+            "$ref": "#/definitions/positionArray"
+          },
+          {
+            "minItems": 4
+          }
+        ]
+      },
+      "polygon": {
+        "description": "An array of linear rings",
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/linearRing"
+        }
+      }
+  }
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.0.0<br>
+Last updated 2018-08-23 20:55:06 UTC
+</div>
+</div>
+</body>
+</html>
