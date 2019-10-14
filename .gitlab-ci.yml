@@ -9,7 +9,13 @@ variables:
 before_script:
   - apk add -U jq bash
 
+stages:
+  - test
+  - deploy
+
 validate:
+  stage: test
+
   image: ${NODE_IMAGE}
 
   script:
@@ -23,6 +29,8 @@ validate:
       - node_modules
 
 pages:
+  stage: deploy
+
   dependencies:
     - validate
 
