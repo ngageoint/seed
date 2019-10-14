@@ -53,6 +53,7 @@ pages:
   - spec/add-version-links.sh
   - docker run -v $(pwd)/spec:/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
   - ./spec/collect-versioned-docs.sh
+  - mv spec/output public
   artifacts:
     paths:
-    - spec/output
+    - public
