@@ -1,0 +1,192 @@
+= Seed  User Guide
+Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedis.com>
+:toc: left
+:toclevels: 5
+:stylesheet: styles/html.css
+:sectlinks:
+:sectnums:
+:sectnumlevels: 5
+:icons: font
+:docinfo:
+
+== Purpose
+
+This guide introduces data scientists and algorithm developers to the Seed and Scale technologies developed at the
+National Geospatial-Intelligence Agency (NGA) Research. These technologies exist to reduce friction in taking algorithms
+from proof of concept to operational execution within distributed processing clusters.
+
+Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
+image. Seed allows data scientists to focus their expertise on solving domain problems and rely on the toolchain we
+provide to ensure their algorithm is packaged properly for operational use. Seed can be used throughout the development
+lifecycle to build, test and package within a simulated environment that closely emulates targeted operational
+environments. This reduces risk and allows the algorithm requirements to be explicitly defined by the developers who
+best understand their processing needs.
+
+Scale frees data scientists and algorithm developers from the complexity of distributed system concepts and offers an
+integration platform for highly parallel processing of data. Scale also ensures decision makers and system
+administrators are able to visually monitor data flows and ensure reliable data processing.  It enables a true DevOps
+environment for algorithm development and cloud transition.
+
+This document will focus primarily on using the Seed Command-Line Interface (CLI) to build, test and publish your
+algorithm as a Seed compliant Docker image. The Seed toolchain consists of the CLI, Silo, Vault and any processing
+system that can consume Seed images - Scale being the primary one. Our recommendation is to familiarize yourself with
+using Seed by working through the tutorial included within this document. Detailed reference on more advanced topics is
+provided and special attention should be given to the security section.
+
+== Expectations
+
+Before using Seed, you should have a working familiarity with developing code using modern tools. Minimally we expect a
+working knowledge of Docker and Linux fundamentals. This guide is written with the assumption that you are using a Linux
+workstation. The Seed CLI is heavily reliant on Docker to build and package Seed images (Docker image with Seed
+metadata), so it is highly recommended that you have superuser access.
+
+*Add instructions for Docker and Seed CLI installation. Make sure we specify version requirements.*
+
+== Tutorial
+
+Following this step-by-step tutorial will quickly get you up and running with Seed and demonstrate the steps needed to
+arrive at a complete Seed image. By the end of this guide, you will be able to:
+
+- Build a Seed compliant algorithm
+- Leverage the Seed CLI to ensure Seed compliance and build a Seed compliant Docker image
+- Leverage the Seed CLI to test your Seed algorithm
+- Leverage the Seed CLI to publish your Seed algorithm
+- Understand next steps to automated distributed execution
+
+=== Compliance
+
+For your algorithm to be compatible with Seed, it must satisfy the following criteria:
+
+* *Run on Linux.* There is no language limitation other than it must be able to execute under Linux. You can use the
+Docker base image of your choice. Alpine and CentOS are the preferred Linux flavors.
+* *Command-line Invocation.* Seed provides input via either arguments or environment variables. If your algorithm is
+prompting for input from a user, the job will continue to wait until it times out. This includes no display popups such
+as error dialogs, file selection menus, splash screens, etc. In the event where a display device is required for
+rendering data, a pseudo device must be used.
+* *Configurable.* Your algorithm will be run in a standalone container, therefore absolute file paths must not be
+embedded in the source code for your development environment. Necessary file paths should be passable into the algorithm
+either via an environment variable or from the command line.
+* *Reporting.* While this isn’t required, it is ideal if your algorithm outputs its progress and errors to the
+console and returns an appropriate exit code. Unique exit codes should be used for failures that can be anticipated. If
+failures are not captured appropriately, Seed will only be able to identify a general algorithm error, which may make
+debugging issues more difficult.
+
+=== Sample Algorithm
+
+The foundation of a Seed image is the algorithm that it contains. Everything that follows is informed by the
+requirements of your unique algorithm: the inputs it requires, the outputs it generates and the resources that are
+required to perform the computations. For this guide we are going to use a very simple algorithm, one which takes a
+single file and dumps the first _N_ bytes as hexadecimal. We are going to output the bytes both to the console and write
+them to a file. This novel example provides an example of how to accomplish the following:
+
+* Accept a file input
+* Accept an integer type input
+* Write to the console
+* Write to an output file
+
+We are going to write our algorithm using a couple basic Linux commands. Use your favorite text editor or IDE to create
+`hex-dump.sh` file:
+
+```
+#!/usr/bin/env sh
+
+## Usage:
+## hex-dump.sh INPUT_FILE BYTE_COUNT OUTPUT_DUMP_FILE
+
+INPUT_FILE=$1
+BYTE_COUNT=$2
+OUTPUT_DUMP_FILE=$3
+
+echo "Invoked with command line: $*"
+
+head -c $BYTE_COUNT $INPUT_FILE | od -x | tee $OUTPUT_DUMP_FILE
+
+echo "Execution complete."
+```
+
+On Linux, this script can be executed immediately, but we are going to package in a Docker image. Create the following
+`Dockerfile` in a directory adjacent to the above script:
+
+```
+FROM busybox
+
+COPY hex-dump.sh /
+```
+
+With these 2 files, we can create our initial Docker containerized sample algorithm. Issue the following terminal
+commands to build and run:
+
+```
+sudo docker build -t test .
+sudo docker run --rm test sh hex-dump.sh hex-dump.sh 5 output-file.txt
+```
+
+You can see what this would look like at the command line:
+
+*Insert screen shot*
+
+Let's recap what we've done here.
+
+1. We wrote a simple script that consumes 3 positional parameters: input file path, byte count, and output file path
+1. Our script invokes a few basic linux executables to extract the number of bytes specified on the command line and
+output them to the console and write them to a file.
+1. We wrote a basic Dockerfile that identified a base image and copied our script into it.
+1. We build a Docker image of our own and called it `test`.
+1. Finally, we launch a container from our `test` image and passed it the required positional parameters directly.
+
+There are some observations we should make about what we just accomplished.
+
+1. We consumed the script we wrote as the input. The primary reason for this is so that we didn't have to concern
+ourselves with getting a data file into the running container. This would have required a Docker volume mount.
+1. We prefixed our call to the script with `sh` so that we didn't have to worry about setting the execute bit properly.
+1. We did not validate that the `output-file.txt` was written. It exists within the container, but since we used `--rm`
+flag with our docker command, the container was removed upon command completion.
+
+With the `test` Docker image created, we could share this with other people on our local machine. We could also tag it
+and push it to a remote registry (hub.docker.com, quay.io, etc.) and others would be able to run it. For our basic
+algorithm example, this is fairly simple, but what if have a more complicated algorithm with specific resource
+requirements? What if our algorithm requires large supporting reference datasets? What if we need to leverage runtime
+licenses that must be carefully protected? What if we want all of these requirements to be explicitly documented and
+transparent to the consumers of your algorithm? This is where Seed provides what you need.
+
+=== Seed Initialization
+
+Continuing on from our previously crafted sample algorithm, let's get started with the definition of the basic Seed
+manifest. A Seed manifest is the document that defines what your algorithm's purpose is, who created it, the interface
+your algorithm provides, and what resource requirements it has. When you are building a Seed image your
+`seed.manifest.json` will commonly reside next to your projects `Dockerfile`. To simplify the initial construction of
+this file you can use the `seed init` command from within your code directory:
+
+*Insert image of seed init use*
+
+The created file includes all common sections of the manifest and can be cleaned up to properly reflect your specific
+algorithm.
+
+=== Validation
+
+For this guide, we will start with a sample that demonstrates the basic use of the CLI.
+
+
+== Reference
+
+=== Installation
+
+=== Use Cases
+
+==== Reference Data
+
+==== Secret Data
+
+=== Security
+
+=== Optimization
+
+=== Best Practices
+
+* *Log everything.* Not having direct access to the file system of your algorithm means your only means for feedback on
+what is happening inside your container is through console output. Take full advantage of standard output / error to
+indicate any progress or errors you wish visibility into. Some languages (such as Python) may require you to specify
+that output should not be buffered until process exits. This will facilitate live viewing of output with longer running
+processes.
+* *Privilege step-down.* Docker images we use often are set to use the `root` user by default. This is not a good
+
