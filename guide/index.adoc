@@ -144,7 +144,7 @@ flag with our docker command, the container was removed upon command completion.
 
 With the `test` Docker image created, we could share this with other people on our local machine. We could also tag it
 and push it to a remote registry (hub.docker.com, quay.io, etc.) and others would be able to run it. For our basic
-algorithm example, this is fairly simple, but what if have a more complicated algorithm with specific resource
+algorithm example, this is fairly simple, but what if we have a more complicated algorithm with specific resource
 requirements? What if our algorithm requires large supporting reference datasets? What if we need to leverage runtime
 licenses that must be carefully protected? What if we want all of these requirements to be explicitly documented and
 transparent to the consumers of your algorithm? This is where Seed provides what you need.
@@ -159,12 +159,89 @@ this file you can use the `seed init` command from within your code directory:
 
 *Insert image of seed init use*
 
-The created file includes all common sections of the manifest and can be cleaned up to properly reflect your specific
-algorithm.
+The created file includes all common sections of the manifest and can be revised to properly reflect your specific
+algorithm. Let's start by updating the manifest (`seed.manifest.json`) for our algorithm:
 
-=== Validation
+```
+{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "file-as-hex",
+    "jobVersion": "1.0.0",
+    "packageVersion": "1.0.0",
+    "title": "File as Hex",
+    "description": "Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation",
+    "maintainer": {
+      "name": "Jonathan Meyer",
+      "organization": "Applied Information Sciences",
+      "email": "jonathan.meyer@appliedis.com"
+    },
+    "timeout": 3600,
+    "interface": {
+      "command": "sh hex-dump.sh ${INPUT_FILE} ${BYTE_COUNT} ${OUTPUT_DIR}/output.txt",
+      "inputs": {
+        "files": [
+          {
+            "name": "INPUT_FILE",
+            "required": true
+          }
+        ],
+        "json": [
+          {
+            "name": "BYTE_COUNT",
+            "type": "integer",
+            "required": true
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          {
+            "name": "OUTPUT_FILE",
+            "pattern": "*.txt"
+          }
+        ]
+      }
+    },
+    "resources": {
+      "scalar": [
+        { "name": "cpus", "value": 0.1 },
+        { "name": "mem", "value": 128.0, "inputMultiplier": 2.0 }
+      ]
+    }
+  }
+}
+```
+
+There are a number of specific settings we've made here that are worth highlighting.
+
+1. `job.interface.command`. This setting is the crux of the manifest and defines exactly what command is issued on
+container launch. As you can see, it mirrors the command we ran in the previous section. The primary difference now is
+the use of environment variables. These variable names corresponding to the `name` values within the
+`job.interface.inputs` and `job.interface.outputs` objects.
+1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path
+to the input since we have marked it as a required input.
+1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value
+to the input since we have given it an explicit type and marked it as a required input.
+1. `${OUTPUT_DIR}`. Where did this variable come from? We mentioned an `OUTPUT_FILE` under
+`job.interface.outputs.files`, but what is this? Seed provides some contextual values that ensure there are consistent
+locations for output capture. *REF ADDITIONAL VARIABLES* The `OUTPUT_DIR` environment variable is provided to all jobs
+and any file products must be placed under this location. The `pattern` expression for `OUTPUT_FILE` is rooted at and
+all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt`
+and our `pattern` is defined as `*.txt`.
+1. `job.resources.scalar`. One of the considerable advantages of using Seed CLI is that it can emulate the resource
+constraints that will be placed on your algorithm in a cluster environment. We've given a fractional CPU requirement and
+small amount of memory. The one point of interest here is use of the `inputMultiplier` setting. This informs Seed to
+allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). In other words, if our `INPUT_FILE` is 4
+MiBs the allocated memory will be: 128.0 MiBs + (2.0 * 4 MiBs) = 136 MiBs.
+
+Now that we have reviewed the basic
 
 For this guide, we will start with a sample that demonstrates the basic use of the CLI.
+
+=== Build
+
+=== Run
 
 
 == Reference
