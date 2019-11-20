@@ -216,8 +216,8 @@ algorithm. Let's start by updating the manifest (`seed.manifest.json`) for our a
 There are a number of specific settings we've made here that are worth highlighting.
 
 1. `job.interface.command`. This setting is the crux of the manifest and defines exactly what command is issued on
-container launch. As you can see, it mirrors the command we ran in the previous section. The primary difference now is
-the use of environment variables. These variable names corresponding to the `name` values within the
+container launch. As you can see, it mirrors the Docker command we ran in the previous section. The primary difference
+now is the use of environment variables. These variable names correspond to the `name` values within the
 `job.interface.inputs` and `job.interface.outputs` objects.
 1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path
 to the input since we have marked it as a required input.
@@ -226,7 +226,7 @@ to the input since we have given it an explicit type and marked it as a required
 1. `${OUTPUT_DIR}`. Where did this variable come from? We mentioned an `OUTPUT_FILE` under
 `job.interface.outputs.files`, but what is this? Seed provides some contextual values that ensure there are consistent
 locations for output capture. *REF ADDITIONAL VARIABLES* The `OUTPUT_DIR` environment variable is provided to all jobs
-and any file products must be placed under this location. The `pattern` expression for `OUTPUT_FILE` is rooted at and
+and any file products must be placed under this location. The `pattern` expression for `OUTPUT_FILE` is rooted at it and
 all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt`
 and our `pattern` is defined as `*.txt`.
 1. `job.resources.scalar`. One of the considerable advantages of using Seed CLI is that it can emulate the resource
@@ -235,13 +235,174 @@ small amount of memory. The one point of interest here is use of the `inputMulti
 allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). In other words, if our `INPUT_FILE` is 4
 MiBs the allocated memory will be: 128.0 MiBs + (2.0 * 4 MiBs) = 136 MiBs.
 
-Now that we have reviewed the basic
+In the next section, we will cover how we can use the CLI to bundle our Seed manifest with our Docker image to provide
+a self-describing, reusable, distributable package.
 
-For this guide, we will start with a sample that demonstrates the basic use of the CLI.
+=== Validate & Build
 
-=== Build
+Providing validation and injection of the Seed manifest when building the final product is critical to ensuring
+adherence to the specification. The CLI allows you to validate a standalone manifest file, as well as apply validation
+as part of the build process. Let's perform a build of our job at this point to see this in action:
+
+```
+seed build
+```
+
+The first step of the build is to apply validation. We can see the file that is being validated against the schema. We
+are also informed that our resources section does not contain all the recommended resource objects. Our build did
+successfully complete and we can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest as
+the final step of the Docker build process. Let's address the warning regarding disk resource by updating our manifest
+as follows:
+
+```
+{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "file-as-hex",
+    "jobVersion": "1.0.0",
+    "packageVersion": "1.0.0",
+    "title": "File as Hex",
+    "description": "Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation",
+    "maintainer": {
+      "name": "Jonathan Meyer",
+      "organization": "Applied Information Sciences",
+      "email": "jonathan.meyer@appliedis.com"
+    },
+    "timeout": 3600,
+    "interface": {
+      "command": "sh hex-dump.sh ${INPUT_FILE} ${BYTE_COUNT} ${OUTPUT_DIR}/output.txt",
+      "inputs": {
+        "files": [
+          {
+            "name": "INPUT_FILE",
+            "required": true
+          }
+        ],
+        "json": [
+          {
+            "name": "BYTE_COUNT",
+            "type": "integer",
+            "required": true
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          {
+            "name": "OUTPUT_FILE",
+            "pattern": "*.txt"
+          }
+        ]
+      }
+    },
+    "resources": {
+      "scalar": [
+        { "name": "cpus", "value": 0.1 },
+        { "name": "mem", "value": 128.0, "inputMultiplier": 2.0 },
+        { "name": "disk", "value": 10.0 }
+      ]
+    }
+  }
+}
+```
+
+We've added a very minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
+temporary storage needed as part of the job execution beyond the storage required to write the input files to disk -
+that storage will already be accounted for by Seed. Since our job is merely performing an analysis over the file stream
+we will not have any appreciable need for temporary storage.
+
+Now that our manifest is updated, lets explicitly perform a validation to ensure our warnings are resolved:
+
+```
+seed validate
+```
+
+With the warnings corrected, let's create a new build:
+
+```
+seed build
+```
+
+With a complete Seed image now created, we can continue on to run our job using the resulting Seed image. We can see
+that the CLI is preparing us to run a common subsequent command with an example invocation:
+`seed run -i INPUT_FILE=sample_file -j BYTE_COUNT=8`
 
 === Run
+
+The `seed run` command provides the bulk of the functionality within the CLI and is where we can ensure our job is ready
+to run in an operational environment. By leveraging `seed run` we can be confident that the job we publish behaves
+consistently with our mental model we've used to define our interface and requirements in the `seed.manifest.json`.
+Let's try a simple example to demonstrate the information the command can provide to guide in proper invocation:
+
+```
+$ seed run
+INFO: Image name not specified. Attempting to use local manifest: .
+INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+normalName: INPUT_FILE
+ERROR: Error occurred processing inputs arguments.
+ERROR: Incorrect input data files key/values provided. -i arguments should be in the form:
+  seed run -i KEY1=path/to/file1 -i KEY2=path/to/file2 ...
+The following input file keys are expected, but were not provided:
+  INPUT_FILE
+```
+
+*TODO: Update above snippet when the CLI is update to properly note all missing inputs*
+
+We can see that the `seed run` command inferred the needed image from our current directory since there was a local
+manifest, which was then used to find the Seed image built from it. The CLI is also able to identify the inputs that are
+required, but we failed to provide. Let's properly specify these inputs and see if our image behaves as we'd expect:
+
+```
+$ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
+INFO: Image name not specified. Attempting to use manifest: .
+INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+normalName: INPUT_FILE
+INFO: /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 not found; creating directory...
+INFO: Running Docker command:
+docker run -v /Users/jmeyer/code/seed/guide/example/seed.manifest.json:/Users/jmeyer/code/seed/guide/example/seed.manifest.json -e INPUT_FILE=/Users/jmeyer/code/seed/guide/example/seed.manifest.json -v /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00:/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e OUTPUT_DIR=/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e BYTE_COUNT=128 -e ALLOCATED_CPUS=0.100000 -m 1025m -e ALLOCATED_MEM=1025 -e ALLOCATED_DISK=10.000000 file-as-hex-1.0.0-seed:1.0.0 sh hex-dump.sh /Users/jmeyer/code/seed/guide/example/seed.manifest.json 128 /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+Invoked with command line: /Users/jmeyer/code/seed/guide/example/seed.manifest.json 128 /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+0000000 0a7b 2020 7322 6565 5664 7265 6973 6e6f
+0000020 3a22 2220 2e31 2e30 2230 0a2c 2020 6a22
+0000040 626f 3a22 7b20 200a 2020 2220 616e 656d
+0000060 3a22 2220 6966 656c 612d 2d73 6568 2278
+0000100 0a2c 2020 2020 6a22 626f 6556 7372 6f69
+0000120 226e 203a 3122 302e 302e 2c22 200a 2020
+0000140 2220 6170 6b63 6761 5665 7265 6973 6e6f
+0000160 3a22 2220 2e31 2e30 2230 0a2c 2020 2020
+0000200
+Execution complete.
+INFO: file-as-hex-1.0.0-seed:1.0.0 run took 1.343549206s
+INFO: Validating output files found under /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00...
+SUCCESS: 1 files found for output OUTPUT_FILE:
+	/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+```
+
+*TODO: Update command line if we update -j flag to -i*
+
+A complete run of our job!  There is a lot to unpack that the CLI has accomplished for us here, so let's review:
+
+- Directory for output data was created prior to launch. The CLI creates a date stamped directory to avoid any name
+collision during subsequent executions. This is mounted into the container from the host when Docker container is
+launched.
+- `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted at
+runtime to provide output capture.
+- The input file `seed.manifest.json` we've specified is explicitly mounted into the container at run-time.
+- `INPUT_FILE` environment variable is set on container launch to inject the absolute file path relative to the
+container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value
+of the `seed.manifest.json`.
+- `BYTE_COUNT` environment variable is set on container launch to inject the value we specify for our JSON input type.
+- Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch your
+Seed image. You can see the resource requirements identified as environment variables as well. Commonly this will not
+be needed, but it is worth noting their presence especially for JVM applications that may benefit from explict
+understanding of their memory constraints. *Move into "note" sidebar*
+- Following the output of our job, we can see the CLI validate that an output file was written in a location that
+matches the pattern we defined under `job.interface.outputs.files`.
+
+Once we've gotten to this point in testing our job, we can leverage more advanced features of the `seed run` command to
+further validate performance or exercise it against test data-sets.
+
 
 
 == Reference
@@ -249,6 +410,8 @@ For this guide, we will start with a sample that demonstrates the basic use of t
 === Installation
 
 === Use Cases
+
+==== Multi-file bundles
 
 ==== Reference Data
 
