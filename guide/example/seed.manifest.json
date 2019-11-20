@@ -1,0 +1,49 @@
+{
+  "seedVersion": "1.0.0",
+  "job": {
+    "name": "file-as-hex",
+    "jobVersion": "1.0.0",
+    "packageVersion": "1.0.0",
+    "title": "File as Hex",
+    "description": "Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation",
+    "maintainer": {
+      "name": "Jonathan Meyer",
+      "organization": "Applied Information Sciences",
+      "email": "jonathan.meyer@appliedis.com"
+    },
+    "timeout": 3600,
+    "interface": {
+      "command": "sh hex-dump.sh ${INPUT_FILE} ${BYTE_COUNT} ${OUTPUT_DIR}/output.txt",
+      "inputs": {
+        "files": [
+          {
+            "name": "INPUT_FILE",
+            "required": true
+          }
+        ],
+        "json": [
+          {
+            "name": "BYTE_COUNT",
+            "type": "integer",
+            "required": true
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          {
+            "name": "OUTPUT_FILE",
+            "pattern": "*.txt"
+          }
+        ]
+      }
+    },
+    "resources": {
+      "scalar": [
+        { "name": "cpus", "value": 0.1 },
+        { "name": "mem", "value": 1024.0, "inputMultiplier": 4.0 },
+        { "name": "disk", "value": 10.0 }
+      ]
+    }
+  }
+}
