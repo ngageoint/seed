@@ -403,7 +403,47 @@ matches the pattern we defined under `job.interface.outputs.files`.
 Once we've gotten to this point in testing our job, we can leverage more advanced features of the `seed run` command to
 further validate performance or exercise it against test data-sets.
 
+=== Publish
 
+After we've tested our job, we will commonly want to share it so that it can consumed by others. Seed supports various
+registry backends commonly used in the Docker ecosystem. Docker Hub is a managed registry that makes it easy to publish
+your Seed image without configuring any additional services of your own. Before you can publish, you'll need to register
+for an account at https://hub.docker.com, once you've done that, we can continue.
+
+The following command will publish our Seed built and tested image to Docker Hub:
+*TODO: Simplify this command example once sane defaults are applied.*
+
+```
+$ seed publish -r index.docker.io -O gisjedi -u gisjedi -p "not-really-my-password"
+INFO: Image name not specified. Attempting to use manifest: .
+INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+Docker login warning: WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+
+Login Succeeded
+INFO: Tagging image file-as-hex-1.0.0-seed:1.0.0 as index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+INFO: Running Docker command:
+docker tag file-as-hex-1.0.0-seed:1.0.0 index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+INFO: Performing docker push index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+INFO: Running Docker command:
+docker push index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+The push refers to repository [docker.io/library/file-as-hex-1.0.0-seed]
+28d9b1eb0588: Pushed
+adab5d09ba79: Pushed
+1.0.0: digest: sha256:5af9528db02c8cff65100805374fa36d86f7626584e3d21a28acb2f49342b25f size: 734
+INFO: Removing local image index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
+INFO: Running Docker command:
+docker rmi index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
+Untagged: index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
+Untagged: index.docker.io/gisjedi/file-as-hex-1.0.0-seed@sha256:5af9528db02c8cff65100805374fa36d86f7626584e3d21a28acb2f49342b25f
+```
+
+As can be seen from the console, we are internally performing a number of operations to publish the image. We attach
+an appropriate tag to the physical Docker image to comply with the specification that reflect the remote registry
+`index.docker.io` and organization `gisjedi`. This is followed by a push of the image and cleanup of the remote tags.
+This leaves our local environment with only the image names we've built for our use.
+
+We can confirm this 
 
 == Reference
 
