@@ -1,5 +1,5 @@
 = Seed  User Guide
-Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedis.com>
+Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedis.com>; Matt Anderson <matt.anderson@appliedis.com>
 :toc: left
 :toclevels: 5
 :stylesheet: styles/html.css
@@ -42,6 +42,76 @@ metadata), so it is highly recommended that you have superuser access.
 
 *Add instructions for Docker and Seed CLI installation. Make sure we specify version requirements.*
 
+== Docker Installation
+
+Refer to the Docker documentation for instructions on how to install Docker for your platform: https://docs.docker.com/install/
+
+Depending on your IT environment, you may need to request an administrator install Docker for you.
+
+The current version of Seed (1.2.1) requires Docker version 18.09 or newer.
+
+To verify that installation was successful and confirm the Docker version, run the command `docker --version` from the terminal. 
+Depending on your environment, you may need to superuser privileges to execute the `docker` command; e.g. `sudo docker`. 
+Output should be similar to the following:
+```
+docker version 19.03.8, build afacb8b
+```
+
+== Seed CLI Installation
+
+The Seed CLI can be installed by downloading a binary from the releases page on GitHub: https://github.com/ngageoint/seed-cli/releases
+
+Rename the downloaded binary file `seed` to match the usage in the rest of this guide.
+
+Move the binary to your desired location on your filesystem:
+```
+mkdir /path/to/seed-dir  # e.g. mkdir /opt/seed
+mv ./seed-darwin-amd64 /path/to/seed-dir/seed  # e.g. mv ./seed-darwin-amd64 /opt/seed/seed
+```
+
+If `~/.bash_profile` does not exist, create it: `touch ~/.bash_profile`. Open it in your desired text editor, and add the following line:
+```
+export PATH=$PATH:/path/to/seed-dir  # e.g. export PATH=$PATH:/opt/seed
+```
+Run `source ~/.bash_profile` to reload the profile.
+
+To verify that installation was successful, run the command `seed` from the terminal. The Seed logo, usage instructions, and a list of commands should be displayed:
+
+```
+       .',,;;;;,,''''.
+     .::::::::::;,,'.
+    ,c:;;;;;::. ....
+., .c;,;;::::. .,,,,,'.
+'c;,;,;:::::. .,'''''',.      ';;;;;.   .;;;;;;;.   ;;;;;;;,   ,;;;;;,.
+;:::,;::::;.  ,'''''''''     ::.   .    'c,        .::         ;c.   ;c'
+,:;;,,'..    .,''''''','     ;:,.       'c'        .:;         ;:.   .:,
+ ,:::,.     .,'''''''',.      .,;::,    ':;,,,     .::;,;.     ;:.   .c,
+   ....''..','''''''',.           '::   'c'        .:;         ;:.   .:,
+         .,'''''''','.      .;.   .c;   'c,        .c:.        ;c.  .;c.
+         ,,,,,,,,,'.         ';;;;;'    .;;;;;;;.   ;;;;;;;,   ';;;;;,.
+         ..'''...
+
+Usage:	seed COMMAND
+
+A tool for assisting in creating seed spec compliant algorithms
+
+Commands:
+  build 	Builds Seed compliant Docker image
+  batch 	Executes Seed compliant docker image over multiple iterations
+  init  	Initialize new project with example seed.manifest.json file
+  list  	Lists all Seed compliant images residing on the local system
+  publish	Publishes Seed compliant images to remote Docker registry
+  pull		Pulls images from remote Docker registry
+  run   	Executes Seed compliant Docker image
+  search	Allows for discovery of Seed compliant images hosted within a Docker registry (default is docker.io)
+  spec		Displays the specification for the current Seed version
+  unpublish	Removes images from remote Docker registry
+  validate	Validates a Seed spec
+  version	Prints the version of Seed spec
+
+Run 'seed COMMAND --help' for more information on a command.
+```
+
 == Tutorial
 
 Following this step-by-step tutorial will quickly get you up and running with Seed and demonstrate the steps needed to
@@ -77,14 +147,14 @@ The foundation of a Seed image is the algorithm that it contains. Everything tha
 requirements of your unique algorithm: the inputs it requires, the outputs it generates and the resources that are
 required to perform the computations. For this guide we are going to use a very simple algorithm, one which takes a
 single file and dumps the first _N_ bytes as hexadecimal. We are going to output the bytes both to the console and write
-them to a file. This novel example provides an example of how to accomplish the following:
+them to a file. This example provides an example of how to accomplish the following:
 
 * Accept a file input
 * Accept an integer type input
 * Write to the console
 * Write to an output file
 
-We are going to write our algorithm using a couple basic Linux commands. Use your favorite text editor or IDE to create
+We are going to write our algorithm using basic Linux commands. Use your favorite text editor or IDE to create
 `hex-dump.sh` file:
 
 ```
