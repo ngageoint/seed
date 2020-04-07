@@ -319,10 +319,45 @@ seed build
 ```
 
 The first step of the build is to apply validation. We can see the file that is being validated against the schema. We
-are also informed that our resources section does not contain all the recommended resource objects. Our build did
-successfully complete and we can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest as
-the final step of the Docker build process. Let's address the warning regarding disk resource by updating our manifest
-as follows:
+are also informed that our resources section does not contain all the recommended resource objects:
+
+```
+INFO: Validating seed manifest file /Users/user/code/seed/seed-algorithm-test/seed.manifest.json against schema...
+INFO: Checking for variable name collisions...
+WARNING: /Users/user/code/seed/seed-algorithm-test/seed.manifest.json does not specify some recommended resources
+Specifying cpu, memory and disk requirements are highly recommended
+The following resources are not defined: [disk]
+SUCCESS: No errors found. /Users/user/code/seed/seed-algorithm-test/seed.manifest.json is valid.
+```
+
+Our build did successfully complete and we can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest in 
+Step 3/3 of the Docker build process, as well as the `seed run` command in the final line of the output:
+
+```
+INFO: Building file-as-hex-1.0.0-seed:1.0.0
+dockerfile: .
+INFO: Running Docker command:
+docker build -t file-as-hex-1.0.0-seed:1.0.0 /Users/matt/code/seed/seed-algorithm-test --label com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"file-as-hex\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"File as Hex\",\"description\":\"Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation\",\"maintainer\":{\"name\":\"Jonathan Meyer\",\"organization\":\"Applied Information Sciences\",\"email\":\"jonathan.meyer@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh hex-dump.sh \${INPUT_FILE} \${BYTE_COUNT} \${OUTPUT_DIR}\/output.txt\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true}],\"json\":[{\"name\":\"BYTE_COUNT\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"OUTPUT_FILE\",\"pattern\":\"*.txt\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":128.0,\"inputMultiplier\":2.0}]}}}"
+Sending build context to Docker daemon   5.12kB
+Step 1/3 : FROM busybox
+ ---> 83aa35aa1c79
+Step 2/3 : COPY hex-dump.sh /
+ ---> Using cache
+ ---> c0c57cb2208b
+Step 3/3 : LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"file-as-hex\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"File as Hex\",\"description\":\"Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation\",\"maintainer\":{\"name\":\"Jonathan Meyer\",\"organization\":\"Applied Information Sciences\",\"email\":\"jonathan.meyer@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh hex-dump.sh \${INPUT_FILE} \${BYTE_COUNT} \${OUTPUT_DIR}\/output.txt\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true}],\"json\":[{\"name\":\"BYTE_COUNT\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"OUTPUT_FILE\",\"pattern\":\"*.txt\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":128.0,\"inputMultiplier\":2.0}]}}}"
+ ---> Running in f914ba865bc7
+Removing intermediate container f914ba865bc7
+ ---> 40f431bf9d7a
+Successfully built 40f431bf9d7a
+Successfully tagged file-as-hex-1.0.0-seed:1.0.0
+INFO: Successfully built image. This image can be published with the following command:
+seed publish -in file-as-hex-1.0.0-seed:1.0.0 -r my.registry.address
+This image can be run with the following command:
+seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file> -e BYTE_COUNT=<setting> -o <outdir>
+seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>
+```
+
+Let's address the warning regarding disk resource by updating our manifest as follows:
 
 ```
 {
@@ -376,15 +411,21 @@ as follows:
 }
 ```
 
-We've added a very minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
+We added a very minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
 temporary storage needed as part of the job execution beyond the storage required to write the input files to disk -
 that storage will already be accounted for by Seed. Since our job is merely performing an analysis over the file stream
 we will not have any appreciable need for temporary storage.
 
-Now that our manifest is updated, lets explicitly perform a validation to ensure our warnings are resolved:
+Now that our manifest is updated, explicitly perform a validation to ensure our warnings are resolved:
 
 ```
 seed validate
+```
+
+```
+INFO: Validating seed manifest file /Users/user/code/seed/seed-algorithm-test/seed.manifest.json against schema...
+INFO: Checking for variable name collisions...
+SUCCESS: No errors found. /Users/user/code/seed/seed-algorithm-test/seed.manifest.json is valid.
 ```
 
 With the warnings corrected, let's create a new build:
@@ -395,7 +436,7 @@ seed build
 
 With a complete Seed image now created, we can continue on to run our job using the resulting Seed image. We can see
 that the CLI is preparing us to run a common subsequent command with an example invocation:
-`seed run -i INPUT_FILE=sample_file -j BYTE_COUNT=8`
+`seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>`
 
 === Run
 
