@@ -442,13 +442,13 @@ that the CLI is preparing us to run a common subsequent command with an example 
 
 The `seed run` command provides the bulk of the functionality within the CLI and is where we can ensure our job is ready
 to run in an operational environment. By leveraging `seed run` we can be confident that the job we publish behaves
-consistently with our mental model we've used to define our interface and requirements in the `seed.manifest.json`.
+consistently with how we defined our interface and requirements in the `seed.manifest.json`.
 Let's try a simple example to demonstrate the information the command can provide to guide in proper invocation:
 
 ```
 $ seed run
 INFO: Image name not specified. Attempting to use local manifest: .
-INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
 INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
 normalName: INPUT_FILE
 ERROR: Error occurred processing inputs arguments.
@@ -460,20 +460,20 @@ The following input file keys are expected, but were not provided:
 
 *TODO: Update above snippet when the CLI is update to properly note all missing inputs*
 
-We can see that the `seed run` command inferred the needed image from our current directory since there was a local
+We can see that the `seed run` command inferred the image from our current directory since it contained a Seed
 manifest, which was then used to find the Seed image built from it. The CLI is also able to identify the inputs that are
 required, but we failed to provide. Let's properly specify these inputs and see if our image behaves as we'd expect:
 
 ```
 $ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
 INFO: Image name not specified. Attempting to use manifest: .
-INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
 INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
 normalName: INPUT_FILE
-INFO: /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 not found; creating directory...
+INFO: /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 not found; creating directory...
 INFO: Running Docker command:
-docker run -v /Users/jmeyer/code/seed/guide/example/seed.manifest.json:/Users/jmeyer/code/seed/guide/example/seed.manifest.json -e INPUT_FILE=/Users/jmeyer/code/seed/guide/example/seed.manifest.json -v /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00:/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e OUTPUT_DIR=/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e BYTE_COUNT=128 -e ALLOCATED_CPUS=0.100000 -m 1025m -e ALLOCATED_MEM=1025 -e ALLOCATED_DISK=10.000000 file-as-hex-1.0.0-seed:1.0.0 sh hex-dump.sh /Users/jmeyer/code/seed/guide/example/seed.manifest.json 128 /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
-Invoked with command line: /Users/jmeyer/code/seed/guide/example/seed.manifest.json 128 /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+docker run -v /Users/user/code/seed/guide/example/seed.manifest.json:/Users/user/code/seed/guide/example/seed.manifest.json -e INPUT_FILE=/Users/user/code/seed/guide/example/seed.manifest.json -v /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00:/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e OUTPUT_DIR=/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e BYTE_COUNT=128 -e ALLOCATED_CPUS=0.100000 -m 1025m -e ALLOCATED_MEM=1025 -e ALLOCATED_DISK=10.000000 file-as-hex-1.0.0-seed:1.0.0 sh hex-dump.sh /Users/user/code/seed/guide/example/seed.manifest.json 128 /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+Invoked with command line: /Users/user/code/seed/guide/example/seed.manifest.json 128 /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
 0000000 0a7b 2020 7322 6565 5664 7265 6973 6e6f
 0000020 3a22 2220 2e31 2e30 2230 0a2c 2020 6a22
 0000040 626f 3a22 7b20 200a 2020 2220 616e 656d
@@ -485,21 +485,19 @@ Invoked with command line: /Users/jmeyer/code/seed/guide/example/seed.manifest.j
 0000200
 Execution complete.
 INFO: file-as-hex-1.0.0-seed:1.0.0 run took 1.343549206s
-INFO: Validating output files found under /Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00...
+INFO: Validating output files found under /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00...
 SUCCESS: 1 files found for output OUTPUT_FILE:
-	/Users/jmeyer/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+	/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
 ```
-
-*TODO: Update command line if we update -j flag to -i*
 
 A complete run of our job!  There is a lot to unpack that the CLI has accomplished for us here, so let's review:
 
-- Directory for output data was created prior to launch. The CLI creates a date stamped directory to avoid any name
-collision during subsequent executions. This is mounted into the container from the host when Docker container is
+- A directory for output data was created prior to launch. The CLI creates a timestamped directory to avoid any name
+collision during subsequent executions. This is mounted into the container from the host when the Docker container is
 launched.
 - `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted at
-runtime to provide output capture.
-- The input file `seed.manifest.json` we've specified is explicitly mounted into the container at run-time.
+runtime to capture output.
+- The input file `seed.manifest.json` we specified is explicitly mounted into the container at run-time.
 - `INPUT_FILE` environment variable is set on container launch to inject the absolute file path relative to the
 container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value
 of the `seed.manifest.json`.
@@ -511,8 +509,8 @@ understanding of their memory constraints. *Move into "note" sidebar*
 - Following the output of our job, we can see the CLI validate that an output file was written in a location that
 matches the pattern we defined under `job.interface.outputs.files`.
 
-Once we've gotten to this point in testing our job, we can leverage more advanced features of the `seed run` command to
-further validate performance or exercise it against test data-sets.
+Now that we understand the basics of running and testing our job, we can leverage more advanced features of the 
+`seed run` command to further validate performance or exercise it against different test input datasets.
 
 === Publish
 
@@ -527,7 +525,7 @@ The following command will publish our Seed built and tested image to Docker Hub
 ```
 $ seed publish -r index.docker.io -O gisjedi -u gisjedi -p "not-really-my-password"
 INFO: Image name not specified. Attempting to use manifest: .
-INFO: Found manifest: /Users/jmeyer/code/seed/guide/example/seed.manifest.json
+INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
 WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Docker login warning: WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 
