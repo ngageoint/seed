@@ -40,8 +40,6 @@ working knowledge of Docker and Linux fundamentals. This guide is written with t
 workstation. The Seed CLI is heavily reliant on Docker to build and package Seed images (Docker image with Seed
 metadata), so it is highly recommended that you have superuser access.
 
-*Add instructions for Docker and Seed CLI installation. Make sure we specify version requirements.*
-
 == Docker Installation
 
 Refer to the Docker documentation for instructions on how to install Docker for your platform: https://docs.docker.com/install/
@@ -123,7 +121,7 @@ arrive at a complete Seed image. By the end of this guide, you will be able to:
 - Leverage the Seed CLI to publish your Seed algorithm
 - Understand next steps to automated distributed execution
 
-=== Compliance
+=== Seed Compliance
 
 For your algorithm to be compatible with Seed, it must satisfy the following criteria:
 
@@ -322,12 +320,12 @@ The first step of the build is to apply validation. We can see the file that is 
 are also informed that our resources section does not contain all the recommended resource objects:
 
 ```
-INFO: Validating seed manifest file /Users/user/code/seed/seed-algorithm-test/seed.manifest.json against schema...
+INFO: Validating seed manifest file /Users/user/code/seed/guide/example/seed.manifest.json against schema...
 INFO: Checking for variable name collisions...
-WARNING: /Users/user/code/seed/seed-algorithm-test/seed.manifest.json does not specify some recommended resources
+WARNING: /Users/user/code/seed/guide/example/seed.manifest.json does not specify some recommended resources
 Specifying cpu, memory and disk requirements are highly recommended
 The following resources are not defined: [disk]
-SUCCESS: No errors found. /Users/user/code/seed/seed-algorithm-test/seed.manifest.json is valid.
+SUCCESS: No errors found. /Users/user/code/seed/guide/example/seed.manifest.json is valid.
 ```
 
 Our build did successfully complete and we can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest in 
@@ -423,9 +421,9 @@ seed validate
 ```
 
 ```
-INFO: Validating seed manifest file /Users/user/code/seed/seed-algorithm-test/seed.manifest.json against schema...
+INFO: Validating seed manifest file /Users/user/code/seed/guide/example/seed.manifest.json against schema...
 INFO: Checking for variable name collisions...
-SUCCESS: No errors found. /Users/user/code/seed/seed-algorithm-test/seed.manifest.json is valid.
+SUCCESS: No errors found. /Users/user/code/seed/guide/example/seed.manifest.json is valid.
 ```
 
 With the warnings corrected, let's create a new build:
@@ -503,60 +501,71 @@ container context. This is why we indicate inputs via environment variable synta
 of the `seed.manifest.json`.
 - `BYTE_COUNT` environment variable is set on container launch to inject the value we specify for our JSON input type.
 - Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch your
-Seed image. You can see the resource requirements identified as environment variables as well. Commonly this will not
-be needed, but it is worth noting their presence especially for JVM applications that may benefit from explict
-understanding of their memory constraints. *Move into "note" sidebar*
+Seed image. You can see the resource requirements identified as environment variables as well. 
+
+[NOTE]
+====
+Typically resource requirements are not needed, but it is worth noting their presence especially for JVM applications 
+that may benefit from explict understanding of their memory constraints. 
+====
+
 - Following the output of our job, we can see the CLI validate that an output file was written in a location that
 matches the pattern we defined under `job.interface.outputs.files`.
+
+
 
 Now that we understand the basics of running and testing our job, we can leverage more advanced features of the 
 `seed run` command to further validate performance or exercise it against different test input datasets.
 
 === Publish
 
-After we've tested our job, we will commonly want to share it so that it can consumed by others. Seed supports various
+After testing our job, we will typically want to share it so that it can used by others. Seed supports various
 registry backends commonly used in the Docker ecosystem. Docker Hub is a managed registry that makes it easy to publish
-your Seed image without configuring any additional services of your own. Before you can publish, you'll need to register
-for an account at https://hub.docker.com, once you've done that, we can continue.
+your Seed image without configuring any additional services of your own. Before you can publish, you will need to register
+for an account at https://hub.docker.com, Once you've done that, we can continue.
 
 The following command will publish our Seed built and tested image to Docker Hub:
 *TODO: Simplify this command example once sane defaults are applied.*
 
 ```
-$ seed publish -r index.docker.io -O gisjedi -u gisjedi -p "not-really-my-password"
+$ seed publish -r index.docker.io -O dockerhub-username -u dockerhub-username -p "dockerhub-password"
 INFO: Image name not specified. Attempting to use manifest: .
 INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
 WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Docker login warning: WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 
 Login Succeeded
-INFO: Tagging image file-as-hex-1.0.0-seed:1.0.0 as index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+INFO: Tagging image file-as-hex-1.0.0-seed:1.0.0 as index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker tag file-as-hex-1.0.0-seed:1.0.0 index.docker.io/file-as-hex-1.0.0-seed:1.0.0
-INFO: Performing docker push index.docker.io/file-as-hex-1.0.0-seed:1.0.0
+docker tag file-as-hex-1.0.0-seed:1.0.0 index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+INFO: Performing docker push index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker push index.docker.io/file-as-hex-1.0.0-seed:1.0.0
-The push refers to repository [docker.io/library/file-as-hex-1.0.0-seed]
-28d9b1eb0588: Pushed
-adab5d09ba79: Pushed
-1.0.0: digest: sha256:5af9528db02c8cff65100805374fa36d86f7626584e3d21a28acb2f49342b25f size: 734
-INFO: Removing local image index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
+docker push index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+The push refers to repository [docker.io/dockerhub-username/file-as-hex-1.0.0-seed]
+156f2dc847e9: Pushed
+a6d503001157: Mounted from library/busybox
+1.0.0: digest: sha256:fc29e2201b87bc32a94c58afcebba45115bf930788c8d1b95f871a4de9356396 size: 734
+INFO: Removing local image index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker rmi index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
-Untagged: index.docker.io/gisjedi/file-as-hex-1.0.0-seed:1.0.0
-Untagged: index.docker.io/gisjedi/file-as-hex-1.0.0-seed@sha256:5af9528db02c8cff65100805374fa36d86f7626584e3d21a28acb2f49342b25f
+docker rmi index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+Untagged: dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+Untagged: dockerhub-username/file-as-hex-1.0.0-seed@sha256:fc29e2201b87bc32a94c58afcebba45115bf930788c8d1b95f871a4de9356396
 ```
 
 As can be seen from the console, we are internally performing a number of operations to publish the image. We attach
 an appropriate tag to the physical Docker image to comply with the specification that reflect the remote registry
-`index.docker.io` and organization `gisjedi`. This is followed by a push of the image and cleanup of the remote tags.
-This leaves our local environment with only the image names we've built for our use.
+`index.docker.io` and organization `dockerhub-username`. This is followed by a push of the image to the repository and cleanup 
+of the remote tags. This leaves our local environment with only the image names we built for our use, which can be verified by 
+running the `docker images` command.
 
-We can confirm this 
+[NOTE]
+====
+In the example above, we are pushing to our personal Docker hub account, where the organization is the same as the username. 
+For other use cases, the organization may differ from the username; for example, where organization is `my-company` and 
+username is `my-company-username`.
+====
 
 == Reference
-
-=== Installation
 
 === Use Cases
 
