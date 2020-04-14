@@ -8,21 +8,25 @@ Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedi
 :sectnumlevels: 5
 :icons: font
 :docinfo:
+:seed-spec-url: https://ngageoint.github.io/seed/seed.html
 
 == Purpose
 
 This guide introduces data scientists and algorithm developers to the Seed and Scale technologies developed at the
-National Geospatial-Intelligence Agency (NGA) Research. These technologies exist to reduce friction in taking algorithms
+National Geospatial-Intelligence Agency (NGA) Research. These technologies optimize algorithm development
 from proof of concept to operational execution within distributed processing clusters.
 
-Seed is a general standard to aid in the discovery and consumption of a discrete unit of work contained within a Docker
-image. Seed allows data scientists to focus their expertise on solving domain problems and rely on the toolchain we
-provide to ensure their algorithm is packaged properly for operational use. Seed can be used throughout the development
-lifecycle to build, test and package within a simulated environment that closely emulates targeted operational
-environments. This reduces risk and allows the algorithm requirements to be explicitly defined by the developers who
-best understand their processing needs.
+*TODO: Docker -> Seed -> Scale diagram*
 
-Scale frees data scientists and algorithm developers from the complexity of distributed system concepts and offers an
+Seed is a general {seed-spec-url}[standard] to aid in the discovery and consumption of 
+a discrete unit of work contained within a Docker image. Seed allows data scientists to focus their expertise on solving 
+domain problems and provides tools to ensure their algorithm is packaged properly for operational use. Seed can be used 
+throughout the development lifecycle to build, test and package within a simulated environment that closely emulates 
+targeted operational environments. This reduces risk and allows the algorithm requirements to be explicitly defined by 
+the developers who best understand their processing needs.
+
+Scale is a distributed processing framework for near real-time processing of large data sets. It frees data scientists 
+and algorithm developers from the complexity of distributed system concepts and offers an
 integration platform for highly parallel processing of data. Scale also ensures decision makers and system
 administrators are able to visually monitor data flows and ensure reliable data processing.  It enables a true DevOps
 environment for algorithm development and cloud transition.
@@ -35,10 +39,10 @@ provided and special attention should be given to the security section.
 
 == Expectations
 
-Before using Seed, you should have a working familiarity with developing code using modern tools. Minimally we expect a
-working knowledge of Docker and Linux fundamentals. This guide is written with the assumption that you are using a Linux
+Before using Seed, you should have a working familiarity with developing code using modern tools, at minimum knowledge of 
+Docker and Linux fundamentals. This guide is written with the assumption that you are using a Linux
 workstation. The Seed CLI is heavily reliant on Docker to build and package Seed images (Docker image with Seed
-metadata), so it is highly recommended that you have superuser access.
+metadata), so it is highly recommended that you have superuser (i.e. `sudo`) access.
 
 == Docker Installation
 
@@ -281,7 +285,7 @@ algorithm. Let's start by updating the manifest (`seed.manifest.json`) for our a
 }
 ```
 
-There are a number of specific settings we've made here that are worth highlighting.
+There are a number of specific settings we've made here that are worth highlighting`.
 
 1. `job.interface.command`. This setting is the crux of the manifest and defines exactly what command is issued on
 container launch. As you can see, it mirrors the Docker command we ran in the previous section. The primary difference
@@ -291,25 +295,21 @@ now is the use of environment variables. These variable names correspond to the 
 to the input since we have marked it as a required input.
 1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value
 to the input since we have given it an explicit type and marked it as a required input.
-1. `${OUTPUT_DIR}`. Where did this variable come from? We mentioned an `OUTPUT_FILE` under
-`job.interface.outputs.files`, but what is this? Seed provides some contextual values that ensure there are consistent
-locations for output capture. *REF ADDITIONAL VARIABLES* The `OUTPUT_DIR` environment variable is provided to all jobs
-and any file products must be placed under this location. The `pattern` expression for `OUTPUT_FILE` is rooted at it and
-all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt`
-and our `pattern` is defined as `*.txt`.
-1. `job.resources.scalar`. One of the considerable advantages of using Seed CLI is that it can emulate the resource
+1. `${OUTPUT_DIR}`. Seed provides some contextual values that ensure there are consistent locations for output capture. 
+The `OUTPUT_DIR` environment variable is provided to all jobs and any file products must be placed under this location. 
+The `pattern` expression for `OUTPUT_FILE` is rooted at `OUTPUT_DIR` and all patterns defined are relative to that 
+location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt` and our `pattern` is defined as `*.txt`. 
+1. `job.resources.scalar`. A considerable advantage of using Seed CLI is that it can emulate the resource
 constraints that will be placed on your algorithm in a cluster environment. We've given a fractional CPU requirement and
 small amount of memory. The one point of interest here is use of the `inputMultiplier` setting. This informs Seed to
 allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). In other words, if our `INPUT_FILE` is 4
 MiBs the allocated memory will be: 128.0 MiBs + (2.0 * 4 MiBs) = 136 MiBs.
-
-In the next section, we will cover how we can use the CLI to bundle our Seed manifest with our Docker image to provide
-a self-describing, reusable, distributable package.
+*REF ADDITIONAL VARIABLES*
 
 === Validate & Build
 
 Providing validation and injection of the Seed manifest when building the final product is critical to ensuring
-adherence to the specification. The CLI allows you to validate a standalone manifest file, as well as apply validation
+adherence to the {seed-spec-url}[specification]. The CLI allows you to validate a standalone manifest file, as well as apply validation
 as part of the build process. Let's perform a build of our job at this point to see this in action:
 
 ```
@@ -355,61 +355,26 @@ seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file> -e BYTE_COUNT
 seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>
 ```
 
-Let's address the warning regarding disk resource by updating our manifest as follows:
+Let's address the warning regarding disk resource by updating our manifest with a third object in the
+`job.resources.scalar` array:
 
 ```
 {
   "seedVersion": "1.0.0",
   "job": {
-    "name": "file-as-hex",
-    "jobVersion": "1.0.0",
-    "packageVersion": "1.0.0",
-    "title": "File as Hex",
-    "description": "Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation",
-    "maintainer": {
-      "name": "Jonathan Meyer",
-      "organization": "Applied Information Sciences",
-      "email": "jonathan.meyer@appliedis.com"
-    },
-    "timeout": 3600,
-    "interface": {
-      "command": "sh hex-dump.sh ${INPUT_FILE} ${BYTE_COUNT} ${OUTPUT_DIR}/output.txt",
-      "inputs": {
-        "files": [
-          {
-            "name": "INPUT_FILE",
-            "required": true
-          }
-        ],
-        "json": [
-          {
-            "name": "BYTE_COUNT",
-            "type": "integer",
-            "required": true
-          }
-        ]
-      },
-      "outputs": {
-        "files": [
-          {
-            "name": "OUTPUT_FILE",
-            "pattern": "*.txt"
-          }
-        ]
-      }
-    },
+    ...<omitted for clarity>...
     "resources": {
       "scalar": [
         { "name": "cpus", "value": 0.1 },
         { "name": "mem", "value": 128.0, "inputMultiplier": 2.0 },
-        { "name": "disk", "value": 10.0 }
+        { "name": "disk", "value": 10.0 } <-- new disk resource object
       ]
     }
   }
 }
 ```
 
-We added a very minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
+We added a minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
 temporary storage needed as part of the job execution beyond the storage required to write the input files to disk -
 that storage will already be accounted for by Seed. Since our job is merely performing an analysis over the file stream
 we will not have any appreciable need for temporary storage.
@@ -458,9 +423,11 @@ The following input file keys are expected, but were not provided:
 
 *TODO: Update above snippet when the CLI is update to properly note all missing inputs*
 
-We can see that the `seed run` command inferred the image from our current directory since it contained a Seed
-manifest, which was then used to find the Seed image built from it. The CLI is also able to identify the inputs that are
-required, but we failed to provide. Let's properly specify these inputs and see if our image behaves as we'd expect:
+The first three lines show how the `seed run` command inferred the image from our current directory because it contained 
+a Seed manifest, which was then used to find the Seed image built from it. 
+
+The next two lines beginning with `ERROR` show how the CLI is also able to identify the inputs that are required, but we 
+failed to provide (in this case, `INPUT_FILE`). Let's specify these inputs and try again:
 
 ```
 $ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
@@ -488,7 +455,7 @@ SUCCESS: 1 files found for output OUTPUT_FILE:
 	/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
 ```
 
-A complete run of our job!  There is a lot to unpack that the CLI has accomplished for us here, so let's review:
+A complete run of our job!  Let's review what the CLI has accomplished for us:
 
 - A directory for output data was created prior to launch. The CLI creates a timestamped directory to avoid any name
 collision during subsequent executions. This is mounted into the container from the host when the Docker container is
@@ -501,21 +468,14 @@ container context. This is why we indicate inputs via environment variable synta
 of the `seed.manifest.json`.
 - `BYTE_COUNT` environment variable is set on container launch to inject the value we specify for our JSON input type.
 - Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch your
-Seed image. You can see the resource requirements identified as environment variables as well. 
-
-[NOTE]
-====
-Typically resource requirements are not needed, but it is worth noting their presence especially for JVM applications 
-that may benefit from explict understanding of their memory constraints. 
-====
-
+Seed image. You can see the resource requirements identified as environment variables as well. Typically resource 
+requirements are not needed, but JVM applications may benefit from explict understanding of their memory constraints. 
 - Following the output of our job, we can see the CLI validate that an output file was written in a location that
 matches the pattern we defined under `job.interface.outputs.files`.
 
-
-
-Now that we understand the basics of running and testing our job, we can leverage more advanced features of the 
-`seed run` command to further validate performance or exercise it against different test input datasets.
+Now that we understand the basics of running and testing our job, we can use more advanced features of the 
+`seed run` command to further validate performance or exercise it against different test input datasets. See the 
+<<Use Cases>> section for more examples.
 
 === Publish
 
@@ -562,7 +522,7 @@ running the `docker images` command.
 ====
 In the example above, we are pushing to our personal Docker hub account, where the organization is the same as the username. 
 For other use cases, the organization may differ from the username; for example, where organization is `my-company` and 
-username is `my-company-username`.
+username is `my-username`.
 ====
 
 == Reference
