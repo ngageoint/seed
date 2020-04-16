@@ -39,10 +39,21 @@ provided and special attention should be given to the security section.
 
 == Expectations
 
+=== Docker and Linux Fundamentals
+
 Before using Seed, you should have a working familiarity with developing code using modern tools, at minimum knowledge of 
 Docker and Linux fundamentals. This guide is written with the assumption that you are using a Linux
 workstation. The Seed CLI is heavily reliant on Docker to build and package Seed images (Docker image with Seed
-metadata), so it is highly recommended that you have superuser (i.e. `sudo`) access.
+metadata), so it is highly recommended that you have superuser (i.e. `sudo`) access. 
+
+=== Algorithm Requirements
+
+It is beneficial to identify and understand the following characteristics of each algorithm you intend to package with Seed:
+
+* Software requirements (e.g. libraries, frameworks, and/or software dependencies needed)
+* Hardware requirements (e.g. CPU and memory requirements, GPUs, etc.)
+* Reference material or other support data 
+* Licenses required
 
 == Docker Installation
 
@@ -53,11 +64,20 @@ Depending on your IT environment, you may need to request an administrator insta
 The current version of Seed (1.2.1) requires Docker version 18.09 or newer.
 
 To verify that installation was successful and confirm the Docker version, run the command `docker --version` from the terminal. 
+
+[NOTE]
+====
 Depending on your environment, you may need to superuser privileges to execute the `docker` command; e.g. `sudo docker`. 
+====
+
 Output should be similar to the following:
 ```
 docker version 19.03.8, build afacb8b
 ```
+
+If this command fails, verify the Docker daemon is running using the `docker info` command. You can also use operating system 
+utilities, such as `sudo systemctl is-active docker` or `sudo status docker` or `sudo service docker status`, or checking the 
+service status using Windows utilities.
 
 == Seed CLI Installation
 
@@ -195,7 +215,12 @@ sudo docker run --rm test sh hex-dump.sh hex-dump.sh 5 output-file.txt
 
 You can see what this would look like at the command line:
 
-*Insert screen shot*
+```
+Invoked with command line: hex-dump.sh 5 output-file.txt
+0000000 2123 752f 0073
+0000005
+Execution complete.
+```
 
 Let's recap what we've done here.
 
@@ -229,10 +254,12 @@ your algorithm provides, and what resource requirements it has. When you are bui
 `seed.manifest.json` will commonly reside next to your projects `Dockerfile`. To simplify the initial construction of
 this file you can use the `seed init` command from within your code directory:
 
-*Insert image of seed init use*
+```
+Created Seed file: /Users/user/code/seed/guide/example/seed.manifest.json
+```
 
-The created file includes all common sections of the manifest and can be revised to properly reflect your specific
-algorithm. Let's start by updating the manifest (`seed.manifest.json`) for our algorithm:
+The newly-created `seed.manifest.json` file includes all common sections of the manifest and can be revised to properly 
+reflect your specific algorithm. Let's start by updating the manifest for our sample algorithm to match the following:
 
 ```
 {
@@ -285,12 +312,13 @@ algorithm. Let's start by updating the manifest (`seed.manifest.json`) for our a
 }
 ```
 
-There are a number of specific settings we've made here that are worth highlighting`.
+There are a number of specific settings we made here that are worth highlighting:
 
 1. `job.interface.command`. This setting is the crux of the manifest and defines exactly what command is issued on
 container launch. As you can see, it mirrors the Docker command we ran in the previous section. The primary difference
 now is the use of environment variables. These variable names correspond to the `name` values within the
-`job.interface.inputs` and `job.interface.outputs` objects.
+`job.interface.inputs` and `job.interface.outputs` objects. If an `ENTRYPOINT` is specified in the Dockerfile, the 
+contents of this setting will be passed to it.
 1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path
 to the input since we have marked it as a required input.
 1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value
@@ -306,15 +334,28 @@ allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). I
 MiBs the allocated memory will be: 128.0 MiBs + (2.0 * 4 MiBs) = 136 MiBs.
 *REF ADDITIONAL VARIABLES*
 
+[TIP]
+====
+In this example, we have named our output file `output.txt`. For an actual algorithm, we recommend using a more unique name 
+or having the algorithm generate the name of the output file to help distinguish it from other outputs.
+====  
+
 === Validate & Build
 
 Providing validation and injection of the Seed manifest when building the final product is critical to ensuring
-adherence to the {seed-spec-url}[specification]. The CLI allows you to validate a standalone manifest file, as well as apply validation
-as part of the build process. Let's perform a build of our job at this point to see this in action:
+adherence to the {seed-spec-url}[specification]. The CLI allows you to validate a standalone manifest file, as well as apply 
+validation as part of the build process. Let's perform a build of our job at this point to see this in action:
 
 ```
 seed build
 ```
+
+[NOTE]
+====
+The `seed build` command will automatically detect and use a Dockerfile and Seed manifest file in the current directory. 
+Alternatively, the `-D` or `-dockerfile` and `-M` or `-manifest` options can be used to specify a path to a Dockerfile 
+and/or manifest file, respectively.
+====
 
 The first step of the build is to apply validation. We can see the file that is being validated against the schema. We
 are also informed that our resources section does not contain all the recommended resource objects:
@@ -406,7 +447,7 @@ that the CLI is preparing us to run a common subsequent command with an example 
 The `seed run` command provides the bulk of the functionality within the CLI and is where we can ensure our job is ready
 to run in an operational environment. By leveraging `seed run` we can be confident that the job we publish behaves
 consistently with how we defined our interface and requirements in the `seed.manifest.json`.
-Let's try a simple example to demonstrate the information the command can provide to guide in proper invocation:
+Let's try a simple example to demonstrate the information the command can provide to guide proper invocation:
 
 ```
 $ seed run
