@@ -589,3 +589,78 @@ that output should not be buffered until process exits. This will facilitate liv
 processes.
 * *Privilege step-down.* Docker images we use often are set to use the `root` user by default. This is not a good
 
+=== Frequently Asked Questions (FAQs)
+
+[float]
+==== How do I use Docker?
+Plenty of resources for learning about Docker can be found at https://www.docker.com. The primary goal of this guide 
+is to explain how to integrate an algorithm with Seed and not focus on how to build a Docker container.
+
+[float]
+==== What is this Seed image?
+https://ngageoint.github.io/seed/[Seed] is a general {seed-spec-url}[standard] that was developed to aid in the discovery 
+and running of self-contained algorithms. It is a JSON-defined manifest that is embedded into the Docker image as a label. 
+It defines:
+
+	* Algorithm - name, version, description
+	* Developer - name, company, contact info
+	* Inputs/Outputs - how many, what type
+	* Hardware Requirements - CPUs, memory, disk
+	* Error handling - data vs. algorithm errors
+	* Environment variables
+	* Mounts
+
+[float]
+==== Why not just add all the files in my directory to the Docker image?
+The image should be as small as necessary. It is pulled across the network each time it runs on a node.  
+Smaller images result in less network traffic.
+
+[float]
+==== Why not just increase the hardware resources as much as possible?  I want it to run fast.
+It is critical to strike a balance between the minimum resources required to run the algorithm and acceptable runtimes. 
+Scale depends on accurate requirements in order to efficiently schedule jobs on the cluster. If a job requests more resources 
+than it uses, these resources are wasted as they cannot not be allocated to other jobs. In a cloud environment, wasted 
+resources equate to wasted money. If a job's requirements depend on the input, the Seed manifest allows the user to specify 
+a multiplicative value for the hardware request.
+
+[float]
+==== My algorithm requires some reference data, should I just embed it into the Docker image?
+It depends. If the total size of the file(s) is sufficiently small; e.g. less than 100 MB, then add it into the Docker image. 
+If it has larger requirements, such as a lookup directory, please work with the Scale team to create a mountable directory.
+
+[float]
+==== How to secure sensitive information like passwords inside my Docker image?
+The Seed manifest allows the developer to define "Settings", which will be defined as environment variables at runtime. 
+These "Settings" can be marked as "secret" and will be stored in https://www.vaultproject.io/[HashiCorp Vault]. The values 
+for these environment variables are hidden from the API and are only injected at runtime.
+
+[float]
+==== Why should I define error codes?
+The developer should properly capture and define errors in their code using exit codes.  The Seed manifest allows the developer 
+to define specific error codes with name, description, and type (job vs. data). A data error indicates that the input data was 
+invalid and the job **will never** be able to run it. All other errors are job errors and could potentially be resolved on future 
+executions (re-queues/re-process). A third type, "System" errors, are reserved for the Scale framework.
+
+[float]
+==== How do I use exit codes in Python/Matlab/Java/etc.?
+Code should use proper try/catch or if/else statements to identify the type of error. The code can exit with any value between 
+0-255. **The zero value indicates successful run.** The exit code can be checked after a program finishes with "echo $?".
+
+Common examples exiting with code 42:
+
+Python: `sys.exit(42)`
+
+Matlab: `exit(42)`
+
+Java: `System.exit(42)`
+
+C/C++: `exit(42)`
+
+Shell: `exit 42`
+
+[float]
+==== My algorithm involves running Python code, followed by Matlab code, and finally C code. Should I put it all in one Docker image?
+It depends. Does each step involve heavy processing or create time-consuming intermediate products? If so, they would be better as 
+their own standalone jobs with its output products being passed to a subsequent step in a recipe. If the individual steps are relatively 
+small (in runtime and resources), it can all run within a single container using something like a shell script to execute each step.
+
