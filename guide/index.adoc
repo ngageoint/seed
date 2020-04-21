@@ -9,6 +9,7 @@ Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedi
 :icons: font
 :docinfo:
 :seed-spec-url: https://ngageoint.github.io/seed/seed.html
+:vault-url: https://www.vaultproject.io/
 
 == Purpose
 
@@ -403,7 +404,7 @@ Let's address the warning regarding disk resource by updating our manifest with 
 {
   "seedVersion": "1.0.0",
   "job": {
-    ...<omitted for clarity>...
+    ...<omitted for brevity>...
     "resources": {
       "scalar": [
         { "name": "cpus", "value": 0.1 },
@@ -576,6 +577,66 @@ username is `my-username`.
 
 ==== Secret Data
 
+While Seed jobs should prefer the Inputs object for passing in data, the Settings object can be used to specify sensitive 
+information for the job, such as a database password.
+
+[WARNING]
+Sensitive information, such as passwords, private keys, or other credentials should never been included as files or code 
+in the Seed job. Always use the Settings object to inject these values.
+
+Update the `job.interface` object in our manifest from the <<Tutorial>> with a `settings` object:
+
+```
+{
+  "seedVersion": "1.0.0",
+  "job": {
+    ...<omitted for brevity>...
+    "interface": {
+      ...<omitted for brevity>...
+      "settings": [
+        {
+          "name": "MY_SECRET_SETTING", 
+          "secret": true 
+        }
+      ]
+    }
+  }
+}
+```
+
+`MY_SECRET_SETTING` will be injected into the job as an environment variable at runtime. It can be specified as a environment 
+variable when executing the job using `seed run`:
+
+```
+seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128 -e MY_SECRET_SETTING=<secret-value>
+```
+
+If the environment variable is ommitted from the `seed run` command, the Seed CLI will output an error: 
+
+```
+$ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
+INFO: Image name not specified. Attempting to use manifest: .
+INFO: Found manifest: /Users/user/code/seed/guide/example2/seed.manifest.json
+INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+normalName: INPUT_FILE
+INFO: /Users/user/code/seed/guide/example2/output-file-as-hex-1.0.0-seed_1.0.0-2020-04-21T14_37_21-04_00 not found; creating directory...
+ERROR: Error occurred processing settings arguments.
+ERROR: Incorrect setting key/values provided. -e arguments should be in the form:
+  seed run -e SETTING=somevalue ...
+The following settings are expected:
+  MY_SECRET_SETTING
+
+ERROR: Incorrect setting key/values provided. -e arguments should be in the form:
+  seed run -e SETTING=somevalue ...
+The following settings are expected:
+  MY_SECRET_SETTING
+  ```
+
+When running the Seed job on a Scale cluster, secret names and values are input as part of the JobType definition in Scale. 
+Scale then stores the secrets in a {vault-url}[HashiCorp Vault] secret store where they are only accessible by running jobs. 
+The system will automatically retrieve any secrets defined in the Seed job and inject them at runtime. You can also contact 
+the Scale team for assistance with adding JobTypes that contain secrets.
+
 === Security
 
 === Optimization
@@ -593,8 +654,8 @@ processes.
 
 [float]
 ==== How do I use Docker?
-Plenty of resources for learning about Docker can be found at https://www.docker.com. The primary goal of this guide 
-is to explain how to integrate an algorithm with Seed and not focus on how to build a Docker container.
+Plenty of resources for learning about Docker can be found on the https://www.docker.com[Docker website]. The primary 
+goal of this guide is to explain how to integrate an algorithm with Seed and not focus on how to build a Docker container.
 
 [float]
 ==== What is this Seed image?
@@ -631,8 +692,8 @@ If it has larger requirements, such as a lookup directory, please work with the 
 [float]
 ==== How to secure sensitive information like passwords inside my Docker image?
 The Seed manifest allows the developer to define "Settings", which will be defined as environment variables at runtime. 
-These "Settings" can be marked as "secret" and will be stored in https://www.vaultproject.io/[HashiCorp Vault]. The values 
-for these environment variables are hidden from the API and are only injected at runtime.
+These "Settings" can be marked as "secret" and will be stored in {vault-url}[HashiCorp Vault]. The values 
+for these environment variables are hidden from the API and are only injected at runtime. See <<Secret Data>> for more details.
 
 [float]
 ==== Why should I define error codes?
