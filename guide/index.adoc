@@ -630,7 +630,7 @@ ERROR: Incorrect setting key/values provided. -e arguments should be in the form
   seed run -e SETTING=somevalue ...
 The following settings are expected:
   MY_SECRET_SETTING
-  ```
+```
 
 When running the Seed job on a Scale cluster, secret names and values are input as part of the JobType definition in Scale. 
 Scale then stores the secrets in a {vault-url}[HashiCorp Vault] secret store where they are only accessible by running jobs. 
@@ -641,14 +641,65 @@ the Scale team for assistance with adding JobTypes that contain secrets.
 
 === Optimization
 
+[float]
+==== Image Optimization
+Use of Anaconda and other rather large libraries associated with data science and machine learning 
+jobs is common. This makes sense for development on Windows or other environments that make compilation of complex scientific 
+and math libraries challenging, but this paradigm should not be carried over to the Seed job. As a rule of thumb, in order 
+to avoid excessive strain on Docker registry and image cache resources, Docker images in Seed jobs should be kept under 
+500 MB. Docker images should be based on minimal operating systems (Alpine / Busybox) and layer optimization techniques 
+(manual and automated) should be applied.
+
+[float]
+==== Image Clean-up
+Another strategy for optimizing the size of the Docker image associated with the Seed job is to add 
+commands to clean up after any package installations. Consult the documentation for any package management system used by the 
+operating system (e.g `apk` or `yum`) and/or language (e.g. `pip` or `mpm`), as the exact clean-up commands will vary 
+depending on the environment and tools being used.
+
 === Best Practices
 
-* *Log everything.* Not having direct access to the file system of your algorithm means your only means for feedback on
-what is happening inside your container is through console output. Take full advantage of standard output / error to
-indicate any progress or errors you wish visibility into. Some languages (such as Python) may require you to specify
-that output should not be buffered until process exits. This will facilitate live viewing of output with longer running
+[float]
+==== Workflow Decomposition
+Breaking down larger processing chains into separate jobs will yield benefits throughout the 
+algorithm development lifecycle. Problems will be discovered sooner and component algorithms can be built and tested 
+independently. This will help to minimize any single person or team being a bottleneck. The greatest benefits can be realized 
+when extracting general purpose, reusable jobs that can be applied to multiple data types, such as an job for generating a 
+tile pyramid within a GeoTIFF. This will ensure that commonly used job are both optimized and thoroughly proven by reuse.
+
+[float]
+==== Log Everything
+Not having direct access to the file system of your job means the only method for feedback on
+what is happening inside the container is through console output. Take full advantage of standard output / error to
+indicate any progress or errors you wish to have visibility into. Some languages (such as Python) may require specifying
+that output should not be buffered until the process exits. This will facilitate live viewing of output with longer running
 processes.
-* *Privilege step-down.* Docker images we use often are set to use the `root` user by default. This is not a good
+
+[float]
+==== Meaningful Errors
+Specific error conditions represented by unique process exit codes should be used to give clear feedback when 
+a known error has occurred. These can be used to distinguish between data errors where the data arrived but contained an 
+error condition that could not be automatically addressed within the job and errors that occurred within the job 
+execution itself.
+
+[float]
+==== Runtime Configuration
+Most jobs have configuration values that are desirable to change at runtime. These could be 
+anything from confidence values for feature detection to a band number within a multi-band image. Ensure that your job can 
+consume its configuration as either environment variables or command-line arguments. This ensures that your job is a 
+configurable Docker image and does not require the creation of new Docker images for common changes.
+
+[float]
+==== Privilege Minimization
+Docker images often are set to use the `root` user by default. This should be avoided 
+unless absolutely necessary. To avoid using the `root` user, add a non-privileged user to the Docker image and set the user 
+for the image to this non-privileged user.
+
+[float]
+==== Dockerfiles
+Docker provides guidance on some additional best practices for writing 
+https://docs.docker.com/develop/develop-images/dockerfile_best-practices/[Dockerfiles].
+
 
 === Frequently Asked Questions (FAQs)
 
