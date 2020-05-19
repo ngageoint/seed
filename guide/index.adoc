@@ -8,13 +8,18 @@ Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedi
 :sectnumlevels: 5
 :icons: font
 :docinfo:
+// Refs
 :alpine-docker-url: https://hub.docker.com/_/alpine
 :busybox-docker-url: https://hub.docker.com/_/busybox
 :docker-best-practices-url: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+:pillow-docs-url: https://pillow.readthedocs.io/en/stable/
+:python-beginners-guide-url: https://wiki.python.org/moin/BeginnersGuide/Download
 :scale-url: https://ngageoint.github.io/scale/
 :seed-spec-url: https://ngageoint.github.io/seed/seed.html
 :silo-url: https://github.com/ngageoint/seed-silo
 :vault-url: https://www.vaultproject.io/
+:url-pipenv: https://pipenv.pypa.io/en/latest/
+:url-venv: https://docs.python.org/3/library/venv.html
 
 == Purpose
 
@@ -45,7 +50,7 @@ creating jobs out of them.
 
 The Seed command-line interface (CLI) is a standalone tool for working with Seed jobs locally. This document will focus 
 primarily on using the Seed CLI to build, test and publish your algorithm as a Seed-compliant Docker image. The Seed 
-toolchain consists of the CLI, Silo, Vault (if using <<Secret Data>>) and a processing system that can consume Seed 
+toolchain consists of the CLI, SILO, {vault-url}[Vault] (if using <<Secret Data>>) and a processing system that can consume Seed 
 images, such as Scale. Our recommendation is to familiarize yourself with using Seed by working through this tutorial. 
 Detailed reference on more advanced topics is provided and special attention should be given to the <<Security>> section.
 
@@ -53,7 +58,7 @@ Detailed reference on more advanced topics is provided and special attention sho
 ====
 Commands that can be run from the terminal are indicated in colored monospace font or as callouts; e.g. 
 `mkdir test-dir && cd test-dir` or 
-```
+```sh
 mkdir test-dir && cd test-dir
 ``` 
 ====
@@ -107,13 +112,13 @@ The Seed CLI can be installed by downloading a binary from the releases page on 
 Rename the downloaded binary file `seed` to match the usage in the rest of this guide.
 
 Move the binary to your desired location on your filesystem:
-```
+```sh
 mkdir /path/to/seed-dir  # e.g. mkdir /opt/seed
 mv ./seed-darwin-amd64 /path/to/seed-dir/seed  # e.g. mv ./seed-darwin-amd64 /opt/seed/seed
 ```
 
 If `~/.bash_profile` does not exist, create it: `touch ~/.bash_profile`. Open it in your desired text editor, and add the following line:
-```
+```sh
 export PATH=$PATH:/path/to/seed-dir  # e.g. export PATH=$PATH:/opt/seed
 ```
 Run `source ~/.bash_profile` to reload the profile.
@@ -189,101 +194,217 @@ debugging issues more difficult.
 The foundation of a Seed image is the algorithm that it contains. Everything that follows is informed by the
 requirements of your unique algorithm: the inputs it requires, the outputs it generates and the resources that are
 required to perform the computations. For this guide we are going to use a very simple algorithm, one which takes a
-single file and dumps the first _N_ bytes as hexadecimal. We are going to output the bytes both to the console and write
-them to a file. This example illustrates how to accomplish the following:
+single image file as input and outputs the image rotated a specified number of degrees. We are going to output the bytes 
+both to the console and write them to a file. This example illustrates how to accomplish the following:
 
 * Accept a file input
 * Accept an integer type input
 * Write to the console
 * Write to an output file
 
-We are going to write our algorithm using basic Linux commands. Use your favorite text editor or IDE to create
-`hex-dump.sh` file:
+==== Running in Python 
+
+This example assumes Python 3 is installed and uses the {pillow-docs-url}[Pillow] library for image processing. For help 
+installing Python, see the {python-beginners-guide-url}[Python Beginners Guide]. For help installing Pillow, see its 
+{pillow-docs-url}/installation.html[installation instructions].
+
+[TIP]
+====
+Using tools such as {url-pipenv}[pipenv] or {url-venv}venv will help simplify environment and dependency management for Python programs.
+====  
+
+We are going to write our algorithm using basic Linux commands. Use your favorite text editor or IDE to create an 
+`image_rotate.py` file:
+
+```python
+import json
+import os
+import shutil
+import sys
+from PIL import Image
+
+def rotate_image(source_image_path, rotate_degrees, output_dir):
+    """Rotates an image a specified number of degrees"""
+    product_image_name =  f'ROTATED_{rotate_degrees}_{os.path.basename(source_image_path)}'
+
+    # Open source image
+    original_image = Image.open(source_image_path)
+
+    # Rotate it 90 degrees
+    rotated_image = original_image.rotate(int(rotate_degrees), 0, 1)
+    rotated_image.save(product_image_name)
+
+    # Move saved image to output directory
+    product_image_path = os.path.join(output_dir, product_image_name)
+    shutil.move(product_image_name, product_image_path)
+
+    return product_image_name
+
+def write_results_manifest(output_dir, product_image):
+
+    with open(os.path.join(output_dir, 'results_manifest.json'), 'w+') as fout:
+        json_string = json.dumps({'output_data': [{'name': 'ROTATED_IMAGE','path': product_image}]})
+        fout.write(json_string)
+        print(json_string)
+
+if __name__ == "__main__":
+
+    source_image_path = sys.argv[1]
+    rotate_degrees = sys.argv[2]
+    output_dir = sys.argv[3]
+
+    product_image_path = rotate_image(source_image_path, rotate_degrees, output_dir)
+    write_results_manifest(output_dir, product_image_path)
+```
+
+Run the algorithm using the following command:
+```sh
+python image_roll.py seed.png 180 output
+```
+A new image file named `ROTATED_180_seed.png` will be created in the `output` directory.
+The following output will be displayed in the console and also saved as `results_manifest.json` in the `output` directory:
+```
+{"output_data": [{"name": "ROTATED_IMAGE", "path": "ROTATED_180_seed.png"}]}
+```
+
+===== Python Troubleshooting
+
+If the following `ModuleNotFound` error occurs, it likely means the Pillow library is not installed correctly. 
+Please refer to the Pillow {pillow-docs-url}/installation.html[installation instructions].
+```
+Traceback (most recent call last):
+  File "image_roll.py", line 5, in <module>
+    from PIL import Image
+ModuleNotFoundError: No module named 'PIL'
+```
+
+If the following `SyntaxError` occurs, it likely means you are using Python 2 instead of Python 3. 
+Please refer to these {python-beginners-guide-url}/[instructions] for installing Python.
 
 ```
-#!/usr/bin/env sh
-
-## Usage:
-## hex-dump.sh INPUT_FILE BYTE_COUNT OUTPUT_DUMP_FILE
-
-INPUT_FILE=$1
-BYTE_COUNT=$2
-OUTPUT_DUMP_FILE=$3
-
-echo "Invoked with command line: $*"
-
-head -c $BYTE_COUNT $INPUT_FILE | od -x | tee $OUTPUT_DUMP_FILE
-
-echo "Execution complete."
+  File "image_rotate.py", line 9
+    product_image_name =  f'ROTATED_{rotate_degrees}_{os.path.basename(source_image_path)}'
+                                                                                          ^
+SyntaxError: invalid syntax
 ```
 
-On Linux, this script can be executed immediately, but we are going to package in a Docker image. Create the following
-`Dockerfile` in a directory adjacent to the above script:
 
+==== Running in Docker
+
+First, create a script called `image_rotate.sh` in the same directory as the Python file created above:
+
+```sh
+#!/bin/bash
+
+INPUT=$1
+DEGREES=$2
+OUTPUT_DIR=$3
+
+echo ''
+echo '-----------------------------------------------------------------'
+echo 'Rotating image with arguments '${INPUT} ${DEGREES} ${OUTPUT_DIR}
+
+python /image_rotate.py $INPUT $DEGREES $OUTPUT_DIR
+rc=$?
+
+echo 'Done rotating image'
+echo '-----------------------------------------------------------------'
+echo ''
+exit ${rc}
 ```
-FROM busybox
 
-COPY hex-dump.sh /
+We will use this script as an "entry point" to invoke our image rotation algorithm.
+
+Create a file named `Dockerfile` in the same directory:
+
+```sh
+FROM python:3.8-alpine
+
+RUN apk add build-base python-dev py-pip jpeg-dev zlib-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
+
+RUN pip install --upgrade pip && \
+    pip install --upgrade Pillow >= 7
+
+ADD ./image_rotate.py /
+ADD ./image_rotate.sh /
+
+RUN chmod +x /image_rotate.sh
+
+ENTRYPOINT [ "/bin/sh", "./image_rotate.sh"]
 ```
 
-With these 2 files, we can create our initial Docker containerized sample algorithm. Issue the following terminal
-commands to build and run:
+With these files, we can create our initial Docker containerized sample algorithm. 
+Issue the following terminal commands to build the Docker image:
 
-```
-sudo docker build -t test .
-sudo docker run --rm test sh hex-dump.sh hex-dump.sh 5 output-file.txt
-```
-
-You can see what this would look like at the command line:
-
-```
-Invoked with command line: hex-dump.sh 5 output-file.txt
-0000000 2123 752f 0073
-0000005
-Execution complete.
+```sh
+sudo docker build -t img-test .
 ```
 
-Let's recap what we've done here.
+The image may take a minute or two to build.
+Once it completes successfully, you should output similar to the following:
+```
+Successfully built 84dd346586d1
+Successfully tagged img-test:latest
+```
 
-1. We wrote a simple script that consumes 3 positional parameters: input file path, byte count, and output file path
-1. Our script invokes a few basic linux executables to extract the number of bytes specified on the command line and
-output them to the console and write them to a file.
-1. We wrote a basic Dockerfile that identified a base image and copied our script into it.
-1. We build a Docker image of our own and called it `test`.
-1. Finally, we launch a container from our `test` image and passed it the required positional parameters directly.
+Now run the Docker container using the following command:
+```sh
+sudo docker run --rm -v ${PWD}:/algo img-test seed.png 45 output
+```
+
+Output should be similar to the following:
+```
+-----------------------------------------------------------------
+Rotating image with arguments seed.png 45 output
+{"output_data": [{"name": "ROTATED_IMAGE", "path": "ROTATED_45_seed.png"}]}
+Done rotating image
+-----------------------------------------------------------------
+```
+
+Let's recap what we've done:
+
+1. We wrote a simple Python algorithms that consumes three positional parameters: input file path, degrees of rotation, and output file directory.
+1. Our algorithm uses the {pillow-docs-url}[Pillow] library to rotate the image a specified number of degrees.
+1. The algorithm outputs some information about the output to the command line and to a file.
+1. The algorithm saves the rotated image as a new file in the specified output directory.
+1. We wrote a simple shell script to launch our algorithm.
+1. We wrote a basic Dockerfile that identified a base image, installed dependencies, and copied our algorithm and launch script into it.
+1. We built a Docker image of our own and called it `img-test`.
+1. Finally, we ran a Docker container from our `img-test` image, mounted a volume, and passed it the required positional parameters.
 
 There are some observations we should make about what we just accomplished.
 
-1. We consumed the script we wrote as the input. The primary reason for this is so that we didn't have to concern
-ourselves with getting a data file into the running container. This would have required a Docker volume mount. Further 
-discussion of volume mounts and getting data into a container can be found in the <<Reference Data>> section.
-1. We prefixed our call to the script with `sh` so that we didn't have to worry about setting the execute bit properly; 
-e.g. by running `chmod +x ./hex-dump.sh`.
-1. We did not validate that the `output-file.txt` was written. It exists within the container, but since we used `--rm`
-flag with our docker command, the container was removed upon command completion. In a more complete usage scenario, we 
-would provide a way to access the output file.
+1. We made our data accessible to the container in our `docker run` command by mounting a volume with `-v ${PWD}:/algo`. This maps our current working directory to the path `/algo` inside the container. 
+1. We used the `WORKDIR` command in our Dockerfile to set the working directory to `/algo`.
+1. We set the execute bit for our `image_rotate.sh` launch script in the Dockerfile: `RUN chmod +x ./image_rotate.sh`.
+1. We used our `rotate_image.sh` script as the "entry point" to our algorithm. This is indicated by the `ENTRYPOINT` command at the end of the Dockerfile and is a common pattern when writing Dockerfiles.
+1. Because we mounted our current directory as a volume, our specified output directory `output` is created in our current directory, and the output of the algorithm is placed in this directory.
 
-With the `test` Docker image created, we could share this with other people on our local machine. We could also tag it
-and push it to a remote registry (hub.docker.com, quay.io, etc.) and others would be able to run it. For our basic
-algorithm example, this is fairly simple, but what if we have a more complicated algorithm with specific resource
-requirements? What if our algorithm requires large supporting reference datasets? What if we need to leverage runtime
-licenses that must be carefully protected? What if we want all of these requirements to be explicitly documented and
-transparent to the consumers of your algorithm? This is where Seed provides what you need.
+[TIP]
+====
+Further discussion of volume mounts and getting data into a container can be found in the <<Reference Data>> section.
+====
 
-=== Seed Initialization
+With the `img-test` Docker image created, we could share this with other people on our local machine. 
+We could also tag it and push it to a remote registry (hub.docker.com, quay.io, etc.) and others would be able to run it. 
+For a basic algorithm example, this is fairly simple, but what if we have a more complicated algorithm with specific resource requirements? What if our algorithm requires large supporting reference datasets? 
+What if we need to leverage runtime licenses that must be carefully protected? 
+What if we want all of these requirements to be explicitly documented and transparent to the consumers of your algorithm? 
+Seed helps solve these problems.
 
-Continuing on from our previously crafted sample algorithm, let's get started with the definition of the basic Seed
-manifest. A Seed manifest is the document that defines what your algorithm's purpose is, who created it, the interface
-your algorithm provides, and what resource requirements it has. When you are building a Seed image your
-`seed.manifest.json` will commonly reside next to your projects `Dockerfile`. To simplify the initial construction of
-this file you can use the `seed init` command from within your code directory:
+=== Initialization
+
+Building on our example algorithm, let's define the Seed manifest. 
+A Seed manifest is a JSON document that defines an algorithm's purpose, who created it, the interface the algorithm provides, and its resource requirements. 
+When you are building a Seed image, the `seed.manifest.json` will commonly reside next to the project's `Dockerfile`. 
+To simplify the initial construction of this file you can use the `seed init` command from the same directory as the algorithm code:
 
 ```
 Created Seed file: /Users/user/code/seed/guide/example/seed.manifest.json
 ```
 
-The newly-created `seed.manifest.json` file includes all common sections of the manifest and can be revised to properly 
-reflect your specific algorithm. 
+The newly-created `seed.manifest.json` file includes all common sections of the manifest and can be revised to reflect your specific algorithm. 
 
 [TIP]
 ====
@@ -292,33 +413,41 @@ The full Seed specification can be found at {seed-spec-url}.
 
 Let's start by updating the manifest for our sample algorithm to match the following:
 
-```
+```sh
 {
   "seedVersion": "1.0.0",
   "job": {
-    "name": "file-as-hex",
+    "name": "image-rotate",
     "jobVersion": "1.0.0",
     "packageVersion": "1.0.0",
-    "title": "File as Hex",
-    "description": "Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation",
+    "title": "Image Rotate",
+    "description": "Rotates an image a specified number of degrees",
+    "tags": [
+      "jpg",
+      "png",
+      "image processing"
+    ],
     "maintainer": {
-      "name": "Jonathan Meyer",
-      "organization": "Applied Information Sciences",
-      "email": "jonathan.meyer@appliedis.com"
+      "name": "Matt Anderson",
+      "organization": "AIS",
+      "email": "matt.anderson@appliedis.com"
     },
     "timeout": 3600,
     "interface": {
-      "command": "sh hex-dump.sh ${INPUT_FILE} ${BYTE_COUNT} ${OUTPUT_DIR}/output.txt",
+      "command": "${INPUT_FILE} ${DEGREES} ${OUTPUT_DIR}",
       "inputs": {
         "files": [
           {
             "name": "INPUT_FILE",
-            "required": true
+            "required": true,
+            "mediaTypes": [
+              "image/jpeg", "image/jpg", "image/png"
+            ]
           }
         ],
         "json": [
           {
-            "name": "BYTE_COUNT",
+            "name": "DEGREES",
             "type": "integer",
             "required": true
           }
@@ -327,42 +456,28 @@ Let's start by updating the manifest for our sample algorithm to match the follo
       "outputs": {
         "files": [
           {
-            "name": "OUTPUT_FILE",
-            "pattern": "*.txt"
+            "name": "ROTATED_IMAGE",
+            "multiple": false,
+            "pattern": "ROTATED_*"
           }
         ]
       }
     },
     "resources": {
       "scalar": [
-        { "name": "cpus", "value": 0.1 },
-        { "name": "mem", "value": 128.0, "inputMultiplier": 2.0 }
+        {
+          "name": "cpus",
+          "value": 0.5
+        },
+        {
+          "name": "mem",
+          "value": 512
+        }
       ]
     }
   }
 }
 ```
-
-There are a number of specific settings we made here that are worth highlighting:
-
-1. `job.interface.command`. This setting is the crux of the manifest and defines exactly what command is issued on
-container launch. As you can see, it mirrors the Docker command we ran in the previous section. The primary difference
-now is the use of environment variables. These variable names correspond to the `name` values within the
-`job.interface.inputs` and `job.interface.outputs` objects. If an `ENTRYPOINT` is specified in the Dockerfile, the 
-contents of this setting will be passed to it.
-1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path
-to the input since we have marked it as a required input.
-1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value
-to the input since we have given it an explicit type and marked it as a required input.
-1. `${OUTPUT_DIR}`. Seed provides some contextual values that ensure there are consistent locations for output capture. 
-The `OUTPUT_DIR` environment variable is provided to all jobs and any file products must be placed under this location. 
-The `pattern` expression for `OUTPUT_FILE` is rooted at `OUTPUT_DIR` and all patterns defined are relative to that 
-location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt` and our `pattern` is defined as `*.txt`. 
-1. `job.resources.scalar`. A considerable advantage of using Seed CLI is that it can emulate the resource
-constraints that will be placed on your algorithm in a cluster environment. We've given a fractional CPU requirement and
-small amount of memory. The one point of interest here is use of the `inputMultiplier` setting. This informs Seed to
-allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). In other words, if our `INPUT_FILE` is 4
-MiBs the allocated memory will be: 128.0 MiBs + (2.0 * 4 MiBs) = 136 MiBs.
 
 [TIP]
 ====
@@ -370,13 +485,28 @@ In this example, we have named our output file `output.txt`. For an actual algor
 or having the algorithm generate the name of the output file to help distinguish it from other outputs.
 ====  
 
+There are a number of specific settings we made here that are worth highlighting:
+
+1. `job.interface.command`. This setting defines exactly what command is issued on container launch. It mirrors the Docker command we ran in the previous section. The primary difference here is the use of environment variables. 
+1. `job.interface.command` environment variables. These variable names correspond to the `name` values within the `job.interface.inputs` and `job.interface.outputs` objects. If an `ENTRYPOINT` is specified in the Dockerfile, the contents of this setting will be passed to it.
+1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path to the input since we have marked it as a required input.
+1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value to the input since we have given it the explicit type "integer" and marked it as a required input.
+1. `${OUTPUT_DIR}`. Seed provides some contextual values that ensure there are consistent locations for output capture. The `OUTPUT_DIR` environment variable is provided to all jobs and any file products must be placed under this location. 
+1.  `OUTPUT_FILE` pattern expression. The expression is rooted at `OUTPUT_DIR` and all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt` and our `pattern` is defined as `*.txt`. 
+1. `job.resources.scalar`.  We provided a fractional CPU requirement and an amount of memory. We can use the `inputMultiplier` setting to inform Seed to allocate memory (MiBs) in proportion to the total size of inputs files (MiBs). In other words, if our `INPUT_FILE` is 25 MiBs the allocated memory will be: 256 MiBs + (4.0 * 25 MiBs) = 356 MiBs.
+
+[TIP]
+====
+A significant advantage of using Seed CLI is that it can emulate the resource constraints that will be placed on your algorithm in a production cluster environment.
+====  
+
 === Validate & Build
 
-Providing validation and injection of the Seed manifest when building the final product is critical to ensuring
-adherence to the {seed-spec-url}[specification]. The CLI allows you to validate a standalone manifest file, as well as apply 
-validation as part of the build process. Let's perform a build of our job at this point to see this in action:
+Providing validation and injection of the Seed manifest when building the final package is critical to ensuring adherence to the {seed-spec-url}[specification]. 
+The CLI allows you to validate a standalone manifest file, as well as apply validation as part of the build process. 
+Let's build of our job to see this in action:
 
-```
+```sh
 seed build
 ```
 
@@ -384,11 +514,11 @@ seed build
 ====
 The `seed build` command will automatically detect and use a Dockerfile and Seed manifest file in the current directory. 
 Alternatively, the `-D` or `-dockerfile` and `-M` or `-manifest` options can be used to specify a path to a Dockerfile 
-and/or manifest file, respectively.
+and/or manifest file.
 ====
 
-The first step of the build is to apply validation. We can see the file that is being validated against the schema. We
-are also informed that our resources section does not contain all the recommended resource objects:
+The first step of the build is to apply validation. We can see the file that is being validated against the schema. 
+We are also informed that our resources section does not contain all the recommended resource objects:
 
 ```
 INFO: Validating seed manifest file /Users/user/code/seed/guide/example/seed.manifest.json against schema...
@@ -399,58 +529,85 @@ The following resources are not defined: [disk]
 SUCCESS: No errors found. /Users/user/code/seed/guide/example/seed.manifest.json is valid.
 ```
 
-Our build did successfully complete and we can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest in 
-Step 3/3 of the Docker build process, as well as the `seed run` command in the final line of the output:
+Our build did successfully complete. 
+We can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized manifest in Step 3/3 of the Docker build process, as well as the `seed run` command in the final line of the output:
 
 ```
-INFO: Building file-as-hex-1.0.0-seed:1.0.0
+INFO: Building image-rotate-1.0.0-seed:1.0.0
 dockerfile: .
 INFO: Running Docker command:
-docker build -t file-as-hex-1.0.0-seed:1.0.0 /Users/matt/code/seed/seed-algorithm-test --label com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"file-as-hex\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"File as Hex\",\"description\":\"Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation\",\"maintainer\":{\"name\":\"Jonathan Meyer\",\"organization\":\"Applied Information Sciences\",\"email\":\"jonathan.meyer@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh hex-dump.sh \${INPUT_FILE} \${BYTE_COUNT} \${OUTPUT_DIR}\/output.txt\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true}],\"json\":[{\"name\":\"BYTE_COUNT\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"OUTPUT_FILE\",\"pattern\":\"*.txt\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":128.0,\"inputMultiplier\":2.0}]}}}"
-Sending build context to Docker daemon   5.12kB
-Step 1/3 : FROM busybox
- ---> 83aa35aa1c79
-Step 2/3 : COPY hex-dump.sh /
+docker build -t image-rotate-1.0.0-seed:1.0.0 /Users/user/code/seed/guide/example --label com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"\${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0}]}}}"
+Sending build context to Docker daemon  18.23MB
+Step 1/10 : FROM python:3.8-alpine
+ ---> db0e2316082c
+Step 2/10 : RUN apk add build-base python-dev py-pip jpeg-dev zlib-dev
  ---> Using cache
- ---> c0c57cb2208b
-Step 3/3 : LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"file-as-hex\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"File as Hex\",\"description\":\"Reads any arbitrary file and writes and prints N bytes as their hexadecimal representation\",\"maintainer\":{\"name\":\"Jonathan Meyer\",\"organization\":\"Applied Information Sciences\",\"email\":\"jonathan.meyer@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh hex-dump.sh \${INPUT_FILE} \${BYTE_COUNT} \${OUTPUT_DIR}\/output.txt\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true}],\"json\":[{\"name\":\"BYTE_COUNT\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"OUTPUT_FILE\",\"pattern\":\"*.txt\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":128.0,\"inputMultiplier\":2.0}]}}}"
- ---> Running in f914ba865bc7
-Removing intermediate container f914ba865bc7
- ---> 40f431bf9d7a
-Successfully built 40f431bf9d7a
-Successfully tagged file-as-hex-1.0.0-seed:1.0.0
+ ---> 427251dce74d
+Step 3/10 : ENV LIBRARY_PATH=/lib:/usr/lib
+ ---> Using cache
+ ---> 61111d74877b
+Step 4/10 : RUN pip install --upgrade pip &&     pip install --upgrade Pillow >= 7
+ ---> Using cache
+ ---> af2fcca4e098
+Step 5/10 : WORKDIR /algo
+ ---> Using cache
+ ---> 40fd0aa70d58
+Step 6/10 : ADD ./image_rotate.py .
+ ---> Using cache
+ ---> fbdbd31a55e0
+Step 7/10 : ADD ./image_rotate.sh .
+ ---> Using cache
+ ---> 5bbd749f6360
+Step 8/10 : RUN chmod +x ./image_rotate.sh
+ ---> Using cache
+ ---> 9914998e8c4d
+Step 9/10 : ENTRYPOINT [ "/bin/sh", "./image_rotate.sh"]
+ ---> Using cache
+ ---> 63a864b87c20
+Step 10/10 : LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"\${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0}]}}}"
+ ---> Running in 816a99d29640
+Removing intermediate container 816a99d29640
+ ---> 55ebd6fe1133
+Successfully built 55ebd6fe1133
+Successfully tagged image-rotate-1.0.0-seed:1.0.0
 INFO: Successfully built image. This image can be published with the following command:
-seed publish -in file-as-hex-1.0.0-seed:1.0.0 -r my.registry.address
+seed publish -in image-rotate-1.0.0-seed:1.0.0 -r my.registry.address
 This image can be run with the following command:
-seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file> -e BYTE_COUNT=<setting> -o <outdir>
-seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>
+seed run -rm -in image-rotate-1.0.0-seed:1.0.0 -i INPUT_FILE=<file> -e DEGREES=<setting> -o <outdir>
+seed run -rm -in image-rotate-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e DEGREES=<setting>  -o <outdir>
 ```
 
-Let's address the warning regarding disk resource by updating our manifest with a third object in the
-`job.resources.scalar` array:
+Let's address the warning regarding disk resource by updating our manifest with a third object in the `job.resources.scalar` array:
 
-```
+```sh
 {
   "seedVersion": "1.0.0",
   "job": {
     ...<omitted for brevity>...
     "resources": {
       "scalar": [
-        { "name": "cpus", "value": 0.1 },
-        { "name": "mem", "value": 128.0, "inputMultiplier": 2.0 },
-        { "name": "disk", "value": 10.0 } <-- new disk resource object
+        {
+          "name": "cpus",
+          "value": 0.1
+        },
+        {
+          "name": "mem",
+          "value": 256,
+          "inputMultiplier": 4.0
+        },
+        {
+          "name": "disk",
+          "value": 512
+        }
       ]
     }
   }
 }
 ```
 
-We added a minimal disk requirement of 10 MiBs to resolve the warning. This space is only to accommodate any
-temporary storage needed as part of the job execution beyond the storage required to write the input files to disk -
-that storage will already be accounted for by Seed. Since our job is merely performing an analysis over the file stream
-we will not have any appreciable need for temporary storage.
-
-Now that our manifest is updated, explicitly perform a validation to ensure our warnings are resolved:
+We added a disk requirement of 512 MiBs to resolve the warning. 
+This space is only to accommodate any temporary storage needed as part of the job execution beyond the storage required to write the input files to disk - that storage will already be accounted for by Seed. 
+Now that our manifest is updated, explicitly perform a validation to ensure the warning is resolved:
 
 ```
 seed validate
@@ -468,81 +625,78 @@ With the warnings corrected, let's create a new build:
 seed build
 ```
 
-With a complete Seed image now created, we can continue on to run our job using the resulting Seed image. We can see
-that the CLI is preparing us to run a common subsequent command with an example invocation:
-`seed run -rm -in file-as-hex-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>`
+With a complete Seed image now created, we can continue on to run our job using the resulting Seed image. 
+We can see that the CLI is preparing us to run a common subsequent command with an example invocation:
+
+```
+seed run -rm -in image-rotate-1.0.0-seed:1.0.0 -i INPUT_FILE=<file>  -e BYTE_COUNT=<setting>  -o <outdir>
+```
 
 === Run
 
-The `seed run` command provides the bulk of the functionality within the CLI and is where we can ensure our job is ready
-to run in an operational environment. By leveraging `seed run` we can be confident that the job we publish behaves
-consistently with how we defined our interface and requirements in the `seed.manifest.json`.
-Let's try a simple example to demonstrate the information the command can provide to guide proper invocation:
+The `seed run` command provides the bulk of the functionality within the CLI. 
+This is how we ensure our job is ready to run in an operational environment. 
+By leveraging `seed run` we can be confident that the job we publish behaves consistently with how we defined our interface and requirements in the `seed.manifest.json`.
+Let's run our example to demonstrate the information the command can provide:
 
 ```
 $ seed run
-INFO: Image name not specified. Attempting to use local manifest: .
-INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
-INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+INFO: Image name not specified. Attempting to use manifest: .
+INFO: Found manifest: /Users/users/code/seed/guide/example/seed.manifest.json
+INFO: Retrieving seed manifest from image-rotate-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
 normalName: INPUT_FILE
 ERROR: Error occurred processing inputs arguments.
 ERROR: Incorrect input data files key/values provided. -i arguments should be in the form:
   seed run -i KEY1=path/to/file1 -i KEY2=path/to/file2 ...
-The following input file keys are expected, but were not provided:
+The following input file keys are expected:
+  INPUT_FILE
+
+ERROR: Incorrect input data files key/values provided. -i arguments should be in the form:
+  seed run -i KEY1=path/to/file1 -i KEY2=path/to/file2 ...
+The following input file keys are expected:
   INPUT_FILE
 ```
 
 *TODO: Update above snippet when the CLI is update to properly note all missing inputs*
 
-The first three lines show how the `seed run` command inferred the image from our current directory because it contained 
-a Seed manifest, which was then used to find the Seed image built from it. 
+The first three lines show how the `seed run` command inferred the image from our current directory because it contained a Seed manifest, which was then used to find the Seed image built from it. 
 
-The next two lines beginning with `ERROR` show how the CLI is also able to identify the inputs that are required, but we 
-failed to provide (in this case, `INPUT_FILE`). Let's specify these inputs and try again:
+The next two lines beginning with `ERROR` show how the CLI is also able to identify the inputs that are required, but we failed to provide (in this case, `INPUT_FILE`). 
+Let's specify these inputs and try again:
 
 ```
-$ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
+$ seed run -i INPUT_FILE=seed.png -j DEGREES=180
 INFO: Image name not specified. Attempting to use manifest: .
 INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
-INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+INFO: Retrieving seed manifest from image-rotate-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
 normalName: INPUT_FILE
-INFO: /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 not found; creating directory...
+INFO: /Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00 not found; creating directory...
 INFO: Running Docker command:
-docker run -v /Users/user/code/seed/guide/example/seed.manifest.json:/Users/user/code/seed/guide/example/seed.manifest.json -e INPUT_FILE=/Users/user/code/seed/guide/example/seed.manifest.json -v /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00:/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e OUTPUT_DIR=/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00 -e BYTE_COUNT=128 -e ALLOCATED_CPUS=0.100000 -m 1025m -e ALLOCATED_MEM=1025 -e ALLOCATED_DISK=10.000000 file-as-hex-1.0.0-seed:1.0.0 sh hex-dump.sh /Users/user/code/seed/guide/example/seed.manifest.json 128 /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
-Invoked with command line: /Users/user/code/seed/guide/example/seed.manifest.json 128 /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
-0000000 0a7b 2020 7322 6565 5664 7265 6973 6e6f
-0000020 3a22 2220 2e31 2e30 2230 0a2c 2020 6a22
-0000040 626f 3a22 7b20 200a 2020 2220 616e 656d
-0000060 3a22 2220 6966 656c 612d 2d73 6568 2278
-0000100 0a2c 2020 2020 6a22 626f 6556 7372 6f69
-0000120 226e 203a 3122 302e 302e 2c22 200a 2020
-0000140 2220 6170 6b63 6761 5665 7265 6973 6e6f
-0000160 3a22 2220 2e31 2e30 2230 0a2c 2020 2020
-0000200
-Execution complete.
-INFO: file-as-hex-1.0.0-seed:1.0.0 run took 1.343549206s
-INFO: Validating output files found under /Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00...
-SUCCESS: 1 files found for output OUTPUT_FILE:
-	/Users/user/code/seed/guide/example/output-file-as-hex-1.0.0-seed_1.0.0-2019-11-20T08_08_17-05_00/output.txt
+docker run -v /Users/user/code/seed/guide/example/seed.png:/Users/user/code/seed/guide/example/seed.png -e INPUT_FILE=/Users/user/code/seed/guide/example/seed.png -v /Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00:/Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00 -e OUTPUT_DIR=/Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00 -e DEGREES=180 -e ALLOCATED_CPUS=0.100000 -m 257m -e ALLOCATED_MEM=257 -e ALLOCATED_DISK=128.000000 image-rotate-1.0.0-seed:1.0.0 /Users/user/code/seed/guide/example/seed.png 180 /Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00
+
+-----------------------------------------------------------------
+Rotating image with arguments /Users/user/code/seed/guide/example/seed.png 180 /Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00
+{"output_data": [{"name": "ROTATED_IMAGE", "path": "ROTATED_180_seed.png"}]}
+Done rotating image
+-----------------------------------------------------------------
+
+INFO: image-rotate-1.0.0-seed:1.0.0 run took 531.131393ms
+INFO: Validating output files found under /Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00...
+SUCCESS: 1 files found for output ROTATED_IMAGE:
+	/Users/user/code/seed/guide/example/output-image-rotate-1.0.0-seed_1.0.0-2020-05-19T15_10_22-04_00/ROTATED_180_seed.png
+
 ```
 
 A complete run of our job!  Let's review what the CLI has accomplished for us:
 
-- A directory for output data was created prior to launch. The CLI creates a timestamped directory to avoid any name
-collision during subsequent executions. This is mounted into the container from the host when the Docker container is
-launched.
-- `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted at
-runtime to capture output.
-- The input file `seed.manifest.json` we specified is explicitly mounted into the container at run-time.
+- A directory for output data was created prior to launch. The CLI creates a timestamped directory to avoid any name collision during subsequent executions. This is mounted into the container from the host when the Docker container is launched.
+- `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted atruntime to capture output.
+- The input file `seed.png` we specified is explicitly mounted into the container at run-time.
 - `INPUT_FILE` environment variable is set on container launch to inject the absolute file path relative to the
-container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value
-of the `seed.manifest.json`.
-- `BYTE_COUNT` environment variable is set on container launch to inject the value we specify for our JSON input type.
-- Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch your
-Seed image. You can see the resource requirements identified as environment variables as well. Typically resource 
-requirements are not needed, but JVM applications may benefit from explict understanding of their memory constraints. 
-- Following the output of our job, we can see the CLI validate that an output file was written in a location that
-matches the pattern we defined under `job.interface.outputs.files`.
+container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value of the `seed.manifest.json`.
+- `DEGREES` environment variable is set on container launch to inject the value we specify for our JSON input type.
+- Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch THE Seed image. You can see the resource requirements identified as environment variables as well. Typically resource requirements are not needed, but JVM applications may benefit from explict understanding of their memory constraints. 
+- Following the output of our job, we can see the CLI validate that an output file was written in a location that matches the pattern we defined under `job.interface.outputs.files`.
 
 Now that we understand the basics of running and testing our job, we can use more advanced features of the 
 `seed run` command to further validate performance or exercise it against different test input datasets. See the 
@@ -550,10 +704,10 @@ Now that we understand the basics of running and testing our job, we can use mor
 
 === Publish
 
-After testing our job, we will typically want to share it so that it can used by others. Seed supports various
-registry backends commonly used in the Docker ecosystem. Docker Hub is a managed registry that makes it easy to publish
-your Seed image without configuring any additional services of your own. Before you can publish, you will need to register
-for an account at https://hub.docker.com, Once you've done that, we can continue.
+After testing our job, we will typically want to share it so that it can used by others. 
+Seed supports various registry backends commonly used in the Docker ecosystem. 
+Docker Hub is a managed registry that makes it easy to publish your Seed image without configuring any additional services of your own.
+Before you can publish, you will need to register for an account at https://hub.docker.com.
 
 The following command will publish our Seed built and tested image to Docker Hub:
 *TODO: Simplify this command example once sane defaults are applied.*
@@ -566,28 +720,27 @@ WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Docker login warning: WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 
 Login Succeeded
-INFO: Tagging image file-as-hex-1.0.0-seed:1.0.0 as index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+INFO: Tagging image image-rotate-1.0.0-seed:1.0.0 as index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker tag file-as-hex-1.0.0-seed:1.0.0 index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
-INFO: Performing docker push index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+docker tag image-rotate-1.0.0-seed:1.0.0 index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
+INFO: Performing docker push index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker push index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
-The push refers to repository [docker.io/dockerhub-username/file-as-hex-1.0.0-seed]
+docker push index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
+The push refers to repository [docker.io/dockerhub-username/image-rotate-1.0.0-seed]
 156f2dc847e9: Pushed
 a6d503001157: Mounted from library/busybox
 1.0.0: digest: sha256:fc29e2201b87bc32a94c58afcebba45115bf930788c8d1b95f871a4de9356396 size: 734
-INFO: Removing local image index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
+INFO: Removing local image index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
 INFO: Running Docker command:
-docker rmi index.docker.io/dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
-Untagged: dockerhub-username/file-as-hex-1.0.0-seed:1.0.0
-Untagged: dockerhub-username/file-as-hex-1.0.0-seed@sha256:fc29e2201b87bc32a94c58afcebba45115bf930788c8d1b95f871a4de9356396
+docker rmi index.docker.io/dockerhub-username/image-rotate-1.0.0-seed:1.0.0
+Untagged: dockerhub-username/image-rotate-1.0.0-seed:1.0.0
+Untagged: dockerhub-username/image-rotate-1.0.0-seed@sha256:fc29e2201b87bc32a94c58afcebba45115bf930788c8d1b95f871a4de9356396
 ```
 
-As can be seen from the console, we are internally performing a number of operations to publish the image. We attach
-an appropriate tag to the physical Docker image to comply with the specification that reflect the remote registry
-`index.docker.io` and organization `dockerhub-username`. This is followed by a push of the image to the repository and cleanup 
-of the remote tags. This leaves our local environment with only the image names we built for our use, which can be verified by 
-running the `docker images` command.
+As can be seen from the output, we are internally performing a series of operations to publish the image. 
+We attach an appropriate tag to the physical Docker image to comply with the specification that reflect the remote registry `index.docker.io` and organization `dockerhub-username`. 
+This is followed by a push of the image to the repository and cleanup of the remote tags. 
+This leaves our local environment with only the image names we built for our use, which can be verified by running the `docker images` command.
 
 [NOTE]
 ====
@@ -650,9 +803,9 @@ If the environment variable is ommitted from the `seed run` command, the Seed CL
 $ seed run -i INPUT_FILE=seed.manifest.json -j BYTE_COUNT=128
 INFO: Image name not specified. Attempting to use manifest: .
 INFO: Found manifest: /Users/user/code/seed/guide/example2/seed.manifest.json
-INFO: Retrieving seed manifest from file-as-hex-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
+INFO: Retrieving seed manifest from image-rotate-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
 normalName: INPUT_FILE
-INFO: /Users/user/code/seed/guide/example2/output-file-as-hex-1.0.0-seed_1.0.0-2020-04-21T14_37_21-04_00 not found; creating directory...
+INFO: /Users/user/code/seed/guide/example2/output-image-rotate-1.0.0-seed_1.0.0-2020-04-21T14_37_21-04_00 not found; creating directory...
 ERROR: Error occurred processing settings arguments.
 ERROR: Incorrect setting key/values provided. -e arguments should be in the form:
   seed run -e SETTING=somevalue ...

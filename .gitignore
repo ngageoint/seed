@@ -3,7 +3,8 @@
 *.iml
 
 # scratch files during development
-output/
+env*
+output*
 html.css*
 *.man.adoc
 *.bak
