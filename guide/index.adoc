@@ -256,7 +256,7 @@ if __name__ == "__main__":
 Run the algorithm using the following command:
 
 ```sh
-python image_roll.py seed.png 180 output
+python image_rotate.py seed.png 180 output
 ```
 
 A new image file named `ROTATED_180_seed.png` will be created in the `output` directory.
@@ -272,7 +272,7 @@ If the following `ModuleNotFound` error occurs, it likely means the Pillow libra
 Please refer to the Pillow {pillow-docs-url}/installation.html[installation instructions].
 ```
 Traceback (most recent call last):
-  File "image_roll.py", line 5, in <module>
+  File "image_rotate.py", line 5, in <module>
     from PIL import Image
 ModuleNotFoundError: No module named 'PIL'
 ```
