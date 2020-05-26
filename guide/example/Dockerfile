@@ -10,7 +10,3 @@ WORKDIR /algo
 
 ADD ./image_rotate.py .
 ADD ./image_rotate.sh .
-
-RUN chmod +x ./image_rotate.sh
-
-ENTRYPOINT [ "/bin/sh", "./image_rotate.sh"]

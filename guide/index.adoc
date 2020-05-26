@@ -311,7 +311,7 @@ echo ''
 exit ${rc}
 ```
 
-We will use this script as an "entry point" to invoke our image rotation algorithm.
+We will use this script to invoke our image rotation algorithm.
 
 Create a file named `Dockerfile` in the same directory:
 
@@ -326,10 +326,6 @@ RUN pip install --upgrade pip && \
 
 ADD ./image_rotate.py /
 ADD ./image_rotate.sh /
-
-RUN chmod +x /image_rotate.sh
-
-ENTRYPOINT [ "/bin/sh", "./image_rotate.sh"]
 ```
 
 With these files, we can create our initial Docker containerized sample algorithm. 
@@ -350,7 +346,7 @@ Successfully tagged img-test:latest
 
 Now run the Docker container using the following command:
 ```sh
-sudo docker run --rm -v ${PWD}:/algo img-test seed.png 45 output
+sudo docker run --rm -v ${PWD}:/algo img-test  seed.png 45 output
 ```
 
 Output should be similar to the following:
@@ -364,21 +360,21 @@ Done rotating image
 
 Let's recap what we've done:
 
-1. We wrote a simple Python algorithms that consumes three positional parameters: input file path, degrees of rotation, and output file directory.
+1. We wrote a simple Python algorithm that consumes three positional parameters: input file path, degrees of rotation, and output file directory.
 1. Our algorithm uses the {pillow-docs-url}[Pillow] library to rotate the image a specified number of degrees.
 1. The algorithm outputs some information about the output to the command line and to a file.
 1. The algorithm saves the rotated image as a new file in the specified output directory.
 1. We wrote a simple shell script to launch our algorithm.
 1. We wrote a basic Dockerfile that identified a base image, installed dependencies, and copied our algorithm and launch script into it.
 1. We built a Docker image of our own and called it `img-test`.
-1. Finally, we ran a Docker container from our `img-test` image, mounted a volume, and passed it the required positional parameters.
+1. Finally, we ran a Docker container from our `img-test` image, mounted a volume, and passed it the command to run our algorithm with the required positional parameters.
 
 There are some observations we should make about what we just accomplished.
 
 1. We made our data accessible to the container in our `docker run` command by mounting a volume with `-v ${PWD}:/algo`. This maps our current working directory to the path `/algo` inside the container. 
 1. We used the `WORKDIR` command in our Dockerfile to set the working directory to `/algo`.
-1. We set the execute bit for our `image_rotate.sh` launch script in the Dockerfile: `RUN chmod +x ./image_rotate.sh`.
-1. We used our `rotate_image.sh` script as the "entry point" to our algorithm. This is indicated by the `ENTRYPOINT` command at the end of the Dockerfile and is a common pattern when writing Dockerfiles.
+1. We prefixed our call to the script with `sh` so that we did not have to set the execute bit. Alternatively, we could set the execute bit in the Dockerfile with `RUN chmod +x ./image_rotate.sh`.
+1. We used our `rotate_image.sh` script to call our Python code and is a common pattern when writing Dockerfiles.
 1. Because we mounted our current directory as a volume, our specified output directory `output` is created in our current directory, and the output of the algorithm is placed in this directory.
 
 [TIP]
@@ -434,7 +430,7 @@ Let's start by updating the manifest for our sample algorithm to match the follo
     },
     "timeout": 3600,
     "interface": {
-      "command": "${INPUT_FILE} ${DEGREES} ${OUTPUT_DIR}",
+      "command": "sh image_rotate.sh ${INPUT_FILE} ${DEGREES} ${OUTPUT_DIR}",
       "inputs": {
         "files": [
           {
@@ -536,39 +532,33 @@ We can see the `com.ngageoint.seed.manifest` LABEL that contains our serialized 
 INFO: Building image-rotate-1.0.0-seed:1.0.0
 dockerfile: .
 INFO: Running Docker command:
-docker build -t image-rotate-1.0.0-seed:1.0.0 /Users/user/code/seed/guide/example --label com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"\${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0}]}}}"
+docker build -t image-rotate-1.0.0-seed:1.0.0 /Users/matt/code/seed/guide/example --label com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh image_rotate.sh \${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0},{\"name\":\"disk\",\"value\":128}]}}}"
 Sending build context to Docker daemon  18.23MB
-Step 1/10 : FROM python:3.8-alpine
+Step 1/8 : FROM python:3.8-alpine
  ---> db0e2316082c
-Step 2/10 : RUN apk add build-base python-dev py-pip jpeg-dev zlib-dev
+Step 2/8 : RUN apk add build-base python-dev py-pip jpeg-dev zlib-dev
  ---> Using cache
  ---> 427251dce74d
-Step 3/10 : ENV LIBRARY_PATH=/lib:/usr/lib
+Step 3/8 : ENV LIBRARY_PATH=/lib:/usr/lib
  ---> Using cache
  ---> 61111d74877b
-Step 4/10 : RUN pip install --upgrade pip &&     pip install --upgrade Pillow >= 7
+Step 4/8 : RUN pip install --upgrade pip &&     pip install --upgrade Pillow >= 7
  ---> Using cache
  ---> af2fcca4e098
-Step 5/10 : WORKDIR /algo
+Step 5/8 : WORKDIR /algo
  ---> Using cache
  ---> 40fd0aa70d58
-Step 6/10 : ADD ./image_rotate.py .
+Step 6/8 : ADD ./image_rotate.py .
  ---> Using cache
  ---> fbdbd31a55e0
-Step 7/10 : ADD ./image_rotate.sh .
+Step 7/8 : ADD ./image_rotate.sh .
  ---> Using cache
  ---> 5bbd749f6360
-Step 8/10 : RUN chmod +x ./image_rotate.sh
- ---> Using cache
- ---> 9914998e8c4d
-Step 9/10 : ENTRYPOINT [ "/bin/sh", "./image_rotate.sh"]
- ---> Using cache
- ---> 63a864b87c20
-Step 10/10 : LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"\${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0}]}}}"
- ---> Running in 816a99d29640
-Removing intermediate container 816a99d29640
- ---> 55ebd6fe1133
-Successfully built 55ebd6fe1133
+Step 8/8 : LABEL com.ngageoint.seed.manifest="{\"seedVersion\":\"1.0.0\",\"job\":{\"name\":\"image-rotate\",\"jobVersion\":\"1.0.0\",\"packageVersion\":\"1.0.0\",\"title\":\"Image Rotate\",\"description\":\"Rotates an image a specified number of degrees\",\"tags\":[\"jpg\",\"png\",\"image processing\"],\"maintainer\":{\"name\":\"Matt Anderson\",\"organization\":\"AIS\",\"email\":\"matt.anderson@appliedis.com\"},\"timeout\":3600,\"interface\":{\"command\":\"sh image_rotate.sh \${INPUT_FILE} \${DEGREES} \${OUTPUT_DIR}\",\"inputs\":{\"files\":[{\"name\":\"INPUT_FILE\",\"required\":true,\"mediaTypes\":[\"image\/jpeg\",\"image\/jpg\",\"image\/png\"]}],\"json\":[{\"name\":\"DEGREES\",\"type\":\"integer\",\"required\":true}]},\"outputs\":{\"files\":[{\"name\":\"ROTATED_IMAGE\",\"multiple\":false,\"pattern\":\"ROTATED_*\"}]}},\"resources\":{\"scalar\":[{\"name\":\"cpus\",\"value\":0.1},{\"name\":\"mem\",\"value\":256,\"inputMultiplier\":4.0},{\"name\":\"disk\",\"value\":128}]}}}"
+ ---> Running in 6aa9a7b29fa1
+Removing intermediate container 6aa9a7b29fa1
+ ---> 7c20874e1ba9
+Successfully built 7c20874e1ba9
 Successfully tagged image-rotate-1.0.0-seed:1.0.0
 INFO: Successfully built image. This image can be published with the following command:
 seed publish -in image-rotate-1.0.0-seed:1.0.0 -r my.registry.address
@@ -666,7 +656,7 @@ The next two lines beginning with `ERROR` show how the CLI is also able to ident
 Let's specify these inputs and try again:
 
 ```
-$ seed run -i INPUT_FILE=seed.png -j DEGREES=180
+$ seed run -i INPUT_FILE=seed.png -j DEGREES=180 -o output
 INFO: Image name not specified. Attempting to use manifest: .
 INFO: Found manifest: /Users/user/code/seed/guide/example/seed.manifest.json
 INFO: Retrieving seed manifest from image-rotate-1.0.0-seed:1.0.0 LABEL=com.ngageoint.seed.manifest
@@ -690,11 +680,10 @@ SUCCESS: 1 files found for output ROTATED_IMAGE:
 
 A complete run of our job!  Let's review what the CLI has accomplished for us:
 
-- A directory for output data was created prior to launch. The CLI creates a timestamped directory to avoid any name collision during subsequent executions. This is mounted into the container from the host when the Docker container is launched.
-- `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted atruntime to capture output.
-- The input file `seed.png` we specified is explicitly mounted into the container at run-time.
-- `INPUT_FILE` environment variable is set on container launch to inject the absolute file path relative to the
-container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value of the `seed.manifest.json`.
+- A directory for output data was created prior to launch. If no output directory is provided, the CLI creates a timestamped directory to avoid any name collision during subsequent executions. This is mounted into the container from the host when the Docker container is launched.
+- `OUTPUT_DIR` environment variable is set on container launch to match the output volume that is being mounted at runtime to capture output.
+- The input file `seed.png` we specified is explicitly mounted into the container at runtime. Unlike when we ran our algorithm using `docker run`, we do not have to explicitly mount the input file as a volume--Seed handles that for us.
+- `INPUT_FILE` environment variable is set on container launch to inject the absolute file path relative to the container context. This is why we indicate inputs via environment variable syntax in our `job.interface.command` value of the `seed.manifest.json`.
 - `DEGREES` environment variable is set on container launch to inject the value we specify for our JSON input type.
 - Complete `docker run` statement is output to help identify the exact invocation command Seed CLI uses to launch THE Seed image. You can see the resource requirements identified as environment variables as well. Typically resource requirements are not needed, but JVM applications may benefit from explict understanding of their memory constraints. 
 - Following the output of our job, we can see the CLI validated that an output file was written in a location that matches the pattern we defined under `job.interface.outputs.files`.
