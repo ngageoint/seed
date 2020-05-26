@@ -1,0 +1,54 @@
+
+table {
+  border-collapse: collapse;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+td, th {
+  box-sizing: border-box;
+  border-bottom: 1px solid color(grey, 300);
+  font-size: size(base);
+  vertical-align: top;
+  @include col-pad($pad / 2, $pad / 2);
+  @include type-space(5px, 4px, 0, 0, size(baseline));
+  & > *:first-child,
+  .paragraph:first-child p {
+    margin-top: 0;
+    padding-top: 0;
+  }
+  & > *:last-child,
+  .paragraph:last-child p {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .paragraph ~ .listingblock:last-child {
+    margin-bottom: 9px;
+  }
+  pre,
+  .listingblock pre {
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+  .listingblock:first-child pre {
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+  table {
+    margin-bottom: 19px;
+  }
+  td {
+    border-bottom-color: transparent;
+  }
+  tr:first-child td {
+    padding-top: 0;
+  }
+  tr:last-child td {
+    padding-bottom: 0;
+  }
+}
+
+th {
+  font-weight: 700;
+  text-align: left;
+}

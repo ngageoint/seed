@@ -1,0 +1,58 @@
+@import 'vars';
+
+// Functions
+
+@function list-val($list, $key) {
+  @if map-has-key($list, $key) {
+    @return map-get($list, $key);
+  }
+
+  @warn "Unknown `#{$key}` in `#{$list}`";
+  @return null;
+}
+
+@function map-deep-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+  @return $map;
+}
+
+@function color($color, $value: 500) {
+  @return map-deep-get($colors, $color, $value);
+}
+
+@function size($key) {
+  @return list-val($sizes, $key);
+}
+
+@function font($key) {
+  @return list-val($fonts, $key);
+}
+
+@function baseline($num: 1) {
+  @return size(baseline) * $num;
+}
+
+
+// Mixins
+
+@mixin col-pad($pad-left: $pad, $pad-right: $pad) {
+  padding-left: $pad-left;
+  padding-right: $pad-right;
+}
+
+@mixin type-space($pad-top: 0px, $pad-bottom: 0px, $margin-top: 0px, $margin-bottom: 0px, $line-height: 2rem) {
+  margin-top: $margin-top;
+  margin-bottom: $margin-bottom;
+  padding-top: $pad-top;
+  padding-bottom: $pad-bottom;
+  line-height: $line-height;
+}
+
+@mixin pseudo-el($width: auto, $height: auto) {
+  content: '';
+  display: block;
+  width: $width;
+  height: $height;
+}
