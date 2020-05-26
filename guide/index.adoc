@@ -1,4 +1,4 @@
-= Seed  User Guide
+= Seed User Guide
 Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedis.com>; Matt Anderson <matt.anderson@appliedis.com>
 :toc: left
 :toclevels: 5
@@ -21,6 +21,7 @@ Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedi
 :scale-url: https://ngageoint.github.io/scale/
 :seed-url: https://ngageoint.github.io/seed
 :seed-releases-url: https://github.com/ngageoint/seed-cli/releases
+:seed-version: 1.2.1
 :silo-url: https://github.com/ngageoint/seed-silo
 :vault-url: https://www.vaultproject.io/
 :pipenv-url: https://pipenv.pypa.io/en/latest/
@@ -30,8 +31,6 @@ Emily Smith <emily.smith@appliedis.com>; Jonathan Meyer <jonathan.meyer@appliedi
 
 Scale and Seed optimize algorithm development from proof of concept to operational execution within distributed processing clusters.
 This guide introduces data scientists and algorithm developers to the these technologies developed at the National Geospatial-Intelligence Agency (NGA) Research. 
-
-*TODO: Docker -> Seed -> Scale diagram*
 
 {scale-url}[Scale] is a distributed processing framework for near real-time processing of large data sets. 
 It frees data scientists and algorithm developers from the complexity of distributed system concepts and offers an integration platform for highly parallel processing of data. 
@@ -57,7 +56,7 @@ Detailed reference on more advanced topics is provided and special attention sho
 
 [TIP]
 ====
-Commands that can be run from the terminal are indicated in colored monospace font or as callouts; e.g. 
+Commands that can be run from the terminal are indicated in monospace font or as callouts; e.g. 
 `mkdir test-dir && cd test-dir` or 
 ```sh
 mkdir test-dir && cd test-dir
@@ -99,12 +98,12 @@ docker version 19.03.8, build afacb8b
 ```
 
 If this command fails, verify the Docker daemon is running using the `docker info` command. You can also use operating system 
-utilities, such as `sudo systemctl is-active docker` or `sudo status docker` or `sudo service docker status`, or checking the 
+utilities, such as `sudo systemctl is-active docker`, `sudo status docker` or `sudo service docker status`, or checking the 
 service status using Windows utilities.
 
 == Seed CLI Installation
 
-The Seed CLI can be installed by downloading a binary from the {seed-releases-url}[releases] page on GitHub.
+The Seed CLI can be installed by downloading a binary from the {seed-releases-url}/tag/{seed-version}[releases] page on GitHub.
 Under each release, there is an "Assets" section with downloadable binaries for various operating systems.
 Download the appropriate version for your system and rename the downloaded binary file `seed` to match the usage in the rest of this guide.
 Move the binary to your desired location on your filesystem:
@@ -207,7 +206,7 @@ For help installing Pillow, see its {pillow-docs-url}/installation.html[installa
 
 [TIP]
 ====
-Using tools such as {pipenv-url}[pipenv] or {venv-url}venv will help simplify environment and dependency management for Python programs.
+Using tools such as {pipenv-url}[pipenv] or {venv-url}[venv] will help simplify environment and dependency management for Python programs.
 ====  
 
 We are going to write our algorithm using basic Linux commands. Use your favorite text editor or IDE to create an `image_rotate.py` file:
@@ -361,21 +360,21 @@ Done rotating image
 Let's recap what we've done:
 
 1. We wrote a simple Python algorithm that consumes three positional parameters: input file path, degrees of rotation, and output file directory.
-1. Our algorithm uses the {pillow-docs-url}[Pillow] library to rotate the image a specified number of degrees.
-1. The algorithm outputs some information about the output to the command line and to a file.
-1. The algorithm saves the rotated image as a new file in the specified output directory.
-1. We wrote a simple shell script to launch our algorithm.
-1. We wrote a basic Dockerfile that identified a base image, installed dependencies, and copied our algorithm and launch script into it.
-1. We built a Docker image of our own and called it `img-test`.
-1. Finally, we ran a Docker container from our `img-test` image, mounted a volume, and passed it the command to run our algorithm with the required positional parameters.
+2. Our algorithm uses the {pillow-docs-url}[Pillow] library to rotate the image a specified number of degrees.
+3. The algorithm outputs some information about the output to the command line and to a file.
+4. The algorithm saves the rotated image as a new file in the specified output directory.
+5. We wrote a simple shell script to launch our algorithm.
+6. We wrote a basic Dockerfile that identified a base image, installed dependencies, and copied our algorithm and launch script into it.
+7. We built a Docker image of our own and called it `img-test`.
+8. Finally, we ran a Docker container from our `img-test` image, mounted a volume, and passed it the command to run our algorithm with the required positional parameters.
 
 There are some observations we should make about what we just accomplished.
 
 1. We made our data accessible to the container in our `docker run` command by mounting a volume with `-v ${PWD}:/algo`. This maps our current working directory to the path `/algo` inside the container. 
-1. We used the `WORKDIR` command in our Dockerfile to set the working directory to `/algo`.
-1. We prefixed our call to the script with `sh` so that we did not have to set the execute bit. Alternatively, we could set the execute bit in the Dockerfile with `RUN chmod +x ./image_rotate.sh`.
-1. We used our `rotate_image.sh` script to call our Python code and is a common pattern when writing Dockerfiles.
-1. Because we mounted our current directory as a volume, our specified output directory `output` is created in our current directory, and the output of the algorithm is placed in this directory.
+2. We used the `WORKDIR` command in our Dockerfile to set the working directory to `/algo`.
+3. We prefixed our call to the script with `sh` so that we did not have to set the execute bit. Alternatively, we could set the execute bit in the Dockerfile with `RUN chmod +x ./image_rotate.sh`.
+4. We used our `rotate_image.sh` script to call our Python code and is a common pattern when writing Dockerfiles.
+5. Because we mounted our current directory as a volume, our specified output directory `output` is created in our current directory, and the output of the algorithm is placed in this directory.
 
 [TIP]
 ====
@@ -484,12 +483,12 @@ or having the algorithm generate the name of the output file to help distinguish
 There are a number of specific settings we made here that are worth highlighting:
 
 1. `job.interface.command`. This setting defines exactly what command is issued on container launch. It mirrors the Docker command we ran in the previous section. The primary difference here is the use of environment variables. 
-1. `job.interface.command` environment variables. These variable names correspond to the `name` values within the `job.interface.inputs` and `job.interface.outputs` objects. If an `ENTRYPOINT` is specified in the Dockerfile, the contents of this setting will be passed to it.
-1. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path to the input since we have marked it as a required input.
-1. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value to the input since we have given it the explicit type "integer" and marked it as a required input.
-1. `${OUTPUT_DIR}`. Seed provides some contextual values that ensure there are consistent locations for output capture. The `OUTPUT_DIR` environment variable is provided to all jobs and any file products must be placed under this location. 
-1.  `OUTPUT_FILE` pattern expression. The expression is rooted at `OUTPUT_DIR` and all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt` and our `pattern` is defined as `*.txt`. 
-1. `job.resources.scalar`.  We provided a fractional CPU requirement and an amount of memory. We can use the `inputMultiplier` setting to inform Seed to allocate memory (MiB) in proportion to the total size of input files (MiB). In other words, if our `INPUT_FILE` is 25 MiB the allocated memory will be: 256 MiB + (4.0 * 25 MiB) = 356 MiB.
+2. `job.interface.command` environment variables. These variable names correspond to the `name` values within the `job.interface.inputs` and `job.interface.outputs` objects. If an `ENTRYPOINT` is specified in the Dockerfile, the contents of this setting will be passed to it.
+3. `${INPUT_FILE}`. The Seed specification contract ensures that this variable will be populated with an absolute path to the input since we have marked it as a required input.
+4. `${BYTE_COUNT}`. The Seed specification contract ensures that this variable will be populated with an integer value to the input since we have given it the explicit type "integer" and marked it as a required input.
+5. `${OUTPUT_DIR}`. Seed provides some contextual values that ensure there are consistent locations for output capture. The `OUTPUT_DIR` environment variable is provided to all jobs and any file products must be placed under this location. 
+6.  `OUTPUT_FILE` pattern expression. The expression is rooted at `OUTPUT_DIR` and all patterns defined are relative to that location. This is why we tell our job to write to `${OUTPUT_DIR}/output.txt` and our `pattern` is defined as `*.txt`. 
+7. `job.resources.scalar`.  We provided a fractional CPU requirement and an amount of memory. We can use the `inputMultiplier` setting to inform Seed to allocate memory (MiB) in proportion to the total size of input files (MiB). In other words, if our `INPUT_FILE` is 25 MiB the allocated memory will be: 256 MiB + (4.0 * 25 MiB) = 356 MiB.
 
 [TIP]
 ====
@@ -648,8 +647,6 @@ The following input file keys are expected:
   INPUT_FILE
 ```
 
-*TODO: Update above snippet when the CLI is update to properly note all missing inputs*
-
 The first three lines show how the `seed run` command inferred the image from our current directory because it contained a Seed manifest, which was then used to find the Seed image built from it. 
 
 The next two lines beginning with `ERROR` show how the CLI is also able to identify the inputs that are required, but we failed to provide (in this case, `INPUT_FILE`). 
@@ -700,7 +697,6 @@ Docker Hub is a managed registry that makes it easy to publish your Seed image w
 Before you can publish, you will need to register for an account at https://hub.docker.com.
 
 The following command will publish our Seed image that we built and tested to Docker Hub:
-*TODO: Simplify this command example once sane defaults are applied.*
 
 ```
 $ seed publish -r index.docker.io -O dockerhub-username -u dockerhub-username -p "dockerhub-password"
