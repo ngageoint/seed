@@ -14,6 +14,9 @@
 
 pushd $(dirname $0) > /dev/null
 
+echo Compiling css from sass...
+docker run --rm -v $(pwd):/var/www ${SASS_IMAGE} sh styles/compile-sass.sh
+
 echo Generating HTML...
 docker run -v $(pwd):/documents --rm ${ASCIIDOCTOR_IMAGE} asciidoctor -D /documents/output index.adoc
 
