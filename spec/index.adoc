@@ -1,5 +1,5 @@
 = Seed
-Jonathan Meyer <jonathan.meyer@appliedis.com>; Mike Holt <mike.holt@appliedis.com>; John Tobe <jtobe@ball.com>; Emily Smith <emily.smith@appliedis.com>
+scale@nga.mil
 :toc: left
 :toclevels: 5
 :stylesheet: styles/html.css
